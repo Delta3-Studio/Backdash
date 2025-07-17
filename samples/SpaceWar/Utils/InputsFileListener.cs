@@ -1,4 +1,6 @@
+using System.IO.Compression;
 using Backdash;
+using Backdash.Network;
 using Backdash.Synchronizing.Input.Confirmed;
 using SpaceWar.Logic;
 
@@ -7,9 +9,9 @@ namespace SpaceWar;
 /// <summary>
 /// Sample of an implementation for saving inputs.
 /// </summary>
-sealed class InputsFileListener(string filename) : IInputListener<PlayerInputs>
+sealed class InputsFileListener(string fileName) : IInputListener<PlayerInputs>
 {
-    readonly FileStream fileStream = File.Create(filename);
+    readonly FileStream fileStream = File.Create(NetUtils.GetTempFile());
 
     byte[] inputBuffer = [];
     InputContext<PlayerInputs> inputContext = null!;
@@ -23,7 +25,11 @@ sealed class InputsFileListener(string filename) : IInputListener<PlayerInputs>
         fileStream.Seek(0, SeekOrigin.Begin);
     }
 
-    public void OnSessionClose() => fileStream.Flush();
+    public void OnSessionClose()
+    {
+        fileStream.Flush();
+        CompressFile();
+    }
 
     public void OnConfirmed(in Frame frame, in ConfirmedInputs<PlayerInputs> inputs)
     {
@@ -33,24 +39,31 @@ sealed class InputsFileListener(string filename) : IInputListener<PlayerInputs>
         var paddingCount = inputContext.ConfirmedInputSize - written;
         for (var i = 0; i < paddingCount; i++)
             fileStream.WriteByte(0);
-
     }
 
     public void Dispose() => fileStream.Dispose();
+
+    void CompressFile()
+    {
+        using var compressed = File.Create(fileName);
+        using DeflateStream compressor = new(compressed, CompressionMode.Compress);
+        fileStream.Seek(0, SeekOrigin.Begin);
+        fileStream.CopyTo(compressor);
+    }
 }
 
-sealed class InputsFileProvider(string file) : IInputProvider<PlayerInputs>
+sealed class InputsFileProvider(string fileName) : IInputProvider<PlayerInputs>
 {
     public IReadOnlyList<ConfirmedInputs<PlayerInputs>> GetInputs(InputContext<PlayerInputs> context)
     {
-        if (!File.Exists(file))
+        if (!File.Exists(fileName))
             throw new InvalidOperationException("Invalid replay file");
 
         var buffer = new byte[context.ConfirmedInputSize];
         List<ConfirmedInputs<PlayerInputs>> result = [];
         ConfirmedInputs<PlayerInputs> confirmedInput = new();
 
-        using var replayStream = File.OpenRead(file);
+        using var replayStream = DecompressFile(fileName);
         while (replayStream.Read(buffer) > 0)
         {
             context.Read(buffer, ref confirmedInput);
@@ -58,5 +71,15 @@ sealed class InputsFileProvider(string file) : IInputProvider<PlayerInputs>
         }
 
         return result.AsReadOnly();
+    }
+
+    static FileStream DecompressFile(string fileName)
+    {
+        using var compressedFileStream = File.OpenRead(fileName);
+        var outputFileStream = File.Create(NetUtils.GetTempFile());
+        using DeflateStream decompressor = new(compressedFileStream, CompressionMode.Decompress);
+        decompressor.CopyTo(outputFileStream);
+        outputFileStream.Seek(0, SeekOrigin.Begin);
+        return outputFileStream;
     }
 }

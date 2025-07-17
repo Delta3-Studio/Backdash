@@ -25,4 +25,9 @@ public static class NetUtils
             tcpListener?.Stop();
         }
     }
+
+    /// <summary>
+    /// Returns a temporary file name
+    /// </summary>
+    public static string GetTempFile() => Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 }
