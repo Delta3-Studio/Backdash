@@ -1,3 +1,4 @@
+using Backdash.Options;
 using Backdash.Serialization;
 
 namespace Backdash.Synchronizing.Input.Confirmed;
@@ -10,7 +11,7 @@ public interface IInputListener<TInput> : IDisposable where TInput : unmanaged
     /// <summary>
     ///     Session Started
     /// </summary>
-    void OnSessionStart(in IBinarySerializer<TInput> serializer);
+    void OnSessionStart(in IBinarySerializer<TInput> serializer, NetcodeOptions options);
 
     /// <summary>
     ///     New confirmed input event handler

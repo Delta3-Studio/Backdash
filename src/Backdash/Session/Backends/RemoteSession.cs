@@ -221,7 +221,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         started = true;
 
         plugins.OnStart(this);
-        inputListener?.OnSessionStart(in inputSerializer);
+        inputListener?.OnSessionStart(in inputSerializer, options);
         backgroundJobTask = jobManager.Start(options.UseBackgroundThread, stoppingToken);
     }
 

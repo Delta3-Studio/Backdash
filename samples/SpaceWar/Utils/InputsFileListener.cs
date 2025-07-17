@@ -1,4 +1,5 @@
 using Backdash;
+using Backdash.Options;
 using Backdash.Serialization;
 using Backdash.Synchronizing.Input.Confirmed;
 using SpaceWar.Logic;
@@ -14,7 +15,7 @@ sealed class InputsFileListener(string filename) : IInputListener<PlayerInputs>
     readonly FileStream fileStream = File.Create(filename);
     readonly byte[] inputBuffer = new byte[InputSize];
 
-    public void OnSessionStart(in IBinarySerializer<PlayerInputs> serializer)
+    public void OnSessionStart(in IBinarySerializer<PlayerInputs> serializer, NetcodeOptions options)
     {
         fileStream.SetLength(0);
         fileStream.Seek(0, SeekOrigin.Begin);
