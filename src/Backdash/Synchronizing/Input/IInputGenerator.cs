@@ -8,7 +8,7 @@ using Random = System.Random;
 ///     Input value provider
 /// </summary>
 /// <typeparam name="TInput"></typeparam>
-public interface IInputProvider<out TInput> where TInput : unmanaged
+public interface IInputGenerator<out TInput> where TInput : unmanaged
 {
     /// <summary>
     ///     Returns the next input
@@ -21,10 +21,10 @@ public interface IInputProvider<out TInput> where TInput : unmanaged
 /// </summary>
 /// <typeparam name="TInput"></typeparam>
 /// <remarks>
-///     Initializes new <see cref="RandomInputProvider{TInput}" />
+///     Initializes new <see cref="RandomInputGenerator{TInput}" />
 /// </remarks>
-public sealed class RandomInputProvider<TInput>(Random? random = null)
-    : IInputProvider<TInput> where TInput : unmanaged
+public sealed class RandomInputGenerator<TInput>(Random? random = null)
+    : IInputGenerator<TInput> where TInput : unmanaged
 {
     Random Random { get; } = random ?? Random.Shared;
 

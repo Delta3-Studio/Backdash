@@ -4,6 +4,7 @@ using Backdash.Data;
 using Backdash.Network;
 using Backdash.Options;
 using Backdash.Synchronizing;
+using Backdash.Synchronizing.Input.Confirmed;
 using Backdash.Synchronizing.Random;
 using Backdash.Synchronizing.State;
 
@@ -319,4 +320,10 @@ public interface INetcodeSession<TInput> : INetcodeSession where TInput : unmana
     ///     This must be called after <see cref="SynchronizeInputs" />
     /// </summary>
     void GetInputs(Span<TInput> buffer) => CurrentInputs.CopyTo(buffer);
+
+    /// <summary>
+    ///     Return all confirmed inputs of a <see cref="SessionMode.Remote"/> session.
+    ///     Requires <see cref="NetcodeOptions.SaveConfirmedInputHistory"/> to be <c>true</c>.
+    /// </summary>
+    IReadOnlyList<ConfirmedInputs<TInput>> GetConfirmedInputs() => [];
 }

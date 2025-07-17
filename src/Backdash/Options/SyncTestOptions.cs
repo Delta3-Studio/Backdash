@@ -40,7 +40,7 @@ public sealed record SyncTestOptions<TInput> where TInput : unmanaged
     /// <summary>
     ///     Input generator service for session.
     /// </summary>
-    public IInputProvider<TInput>? InputProvider { get; set; }
+    public IInputGenerator<TInput>? InputProvider { get; set; }
 
     /// <inheritdoc cref="CheckDistanceFrames" />
     public SyncTestOptions<TInput> CheckDistance(int frames)
@@ -64,12 +64,12 @@ public sealed record SyncTestOptions<TInput> where TInput : unmanaged
     }
 
     /// <summary>
-    ///     Use <see cref="RandomInputProvider{TInput}" /> as input provider.
+    ///     Use <see cref="RandomInputGenerator{TInput}" /> as input provider.
     /// </summary>
     /// <seealso cref="InputProvider" />
     public SyncTestOptions<TInput> UseRandomInputProvider()
     {
-        InputProvider = new RandomInputProvider<TInput>();
+        InputProvider = new RandomInputGenerator<TInput>();
         return this;
     }
 
@@ -97,7 +97,7 @@ public sealed record SyncTestOptions<TInput> where TInput : unmanaged
     }
 
     /// <inheritdoc cref="InputProvider" />
-    public SyncTestOptions<TInput> UseInputProvider<T>() where T : IInputProvider<TInput>, new()
+    public SyncTestOptions<TInput> UseInputProvider<T>() where T : IInputGenerator<TInput>, new()
     {
         InputProvider = new T();
         return this;

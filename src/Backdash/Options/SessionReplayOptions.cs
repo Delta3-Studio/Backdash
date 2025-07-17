@@ -16,5 +16,24 @@ public sealed record SessionReplayOptions<TInput> where TInput : unmanaged
     /// <summary>
     ///     Inputs to be replayed
     /// </summary>
-    public IReadOnlyList<ConfirmedInputs<TInput>> InputList { get; set; } = [];
+    public IInputProvider<TInput>? InputProvider { get; set; }
+
+
+    /// <inheritdoc cref="IInputProvider{TInput}" />
+    public SessionReplayOptions<TInput> UseInputProvider<T>() where T : IInputProvider<TInput>, new()
+    {
+        InputProvider = new T();
+        return this;
+    }
+
+    /// <inheritdoc cref="IInputProvider{TInput}" />
+    public SessionReplayOptions<TInput> WithInputProvider(IInputProvider<TInput> provider)
+    {
+        InputProvider = provider;
+        return this;
+    }
+
+    /// <inheritdoc cref="IInputProvider{TInput}" />
+    public SessionReplayOptions<TInput> WithInputs(IEnumerable<ConfirmedInputs<TInput>> inputs) =>
+        WithInputProvider(new EnumerableInputProvider<TInput>(inputs));
 }

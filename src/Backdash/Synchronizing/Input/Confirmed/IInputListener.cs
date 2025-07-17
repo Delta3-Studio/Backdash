@@ -1,22 +1,19 @@
-using Backdash.Options;
-using Backdash.Serialization;
-
 namespace Backdash.Synchronizing.Input.Confirmed;
 
 /// <summary>
-///     Listen for confirmed input
+///     Listener for confirmed inputs
 /// </summary>
 public interface IInputListener<TInput> : IDisposable where TInput : unmanaged
 {
     /// <summary>
     ///     Session Started
     /// </summary>
-    void OnSessionStart(in IBinarySerializer<TInput> serializer, NetcodeOptions options);
+    void OnSessionStart(InputContext<TInput> context);
 
     /// <summary>
     ///     New confirmed input event handler
     /// </summary>
-    void OnConfirmed(in Frame frame, ReadOnlySpan<TInput> inputs);
+    void OnConfirmed(in Frame frame, in ConfirmedInputs<TInput> inputs);
 
     /// <summary>
     ///     Session End

@@ -263,6 +263,13 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         return this;
     }
 
+    /// <inheritdoc cref="NetcodeOptions.SaveConfirmedInputHistory" />
+    public NetcodeSessionBuilder<TInput> WithConfirmedInputHistory(bool enabled = true)
+    {
+        options.SaveConfirmedInputHistory = enabled;
+        return this;
+    }
+
     /// <summary>
     ///     Select the input serialization <see cref="Endianness" />
     /// </summary>

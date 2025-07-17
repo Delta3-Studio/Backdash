@@ -45,7 +45,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     readonly bool throwError;
     readonly IStateDesyncHandler? mismatchHandler;
     readonly IStateStringParser stateParser;
-    readonly IInputProvider<TInput>? inputGenerator;
+    readonly IInputGenerator<TInput>? inputGenerator;
     readonly IDeterministicRandom<TInput> random;
     readonly Endianness endianness;
     readonly bool logStateOnDesync;

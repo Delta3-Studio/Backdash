@@ -40,8 +40,9 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     readonly IBinarySerializer<TInput> inputSerializer;
     readonly IBinarySerializer<ConfirmedInputs<TInput>> inputGroupSerializer;
     readonly EqualityComparer<TInput> inputComparer;
-    readonly EqualityComparer<ConfirmedInputs<TInput>> inputGroupComparer;
+    readonly EqualityComparer<ConfirmedInputs<TInput>> confirmedInputComparer;
     readonly IInputListener<TInput>? inputListener;
+    readonly InputContext<TInput> inputContext;
     readonly ProtocolNetworkEventQueue networkEventQueue;
     readonly PluginManager plugins;
 
@@ -72,25 +73,31 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         this.options = options;
         FixedFrameRate = this.options.FrameRate;
-        inputSerializer = services.InputSerializer;
         jobManager = services.JobManager;
         logger = services.Logger;
         inputListener = services.InputListener;
         random = services.DeterministicRandom;
-        inputComparer = services.InputComparer;
         plugins = services.PluginManager;
+
+        inputComparer = services.InputComparer;
+        confirmedInputComparer = ConfirmedInputComparer<TInput>.Create(services.InputComparer);
+
+        inputSerializer = services.InputSerializer;
+        inputGroupSerializer = new ConfirmedInputsSerializer<TInput>(inputSerializer);
+        inputContext = new(this.options, inputSerializer, inputGroupSerializer);
 
         peerInputEventQueue = new();
         networkEventQueue = new();
-        inputGroupComparer = ConfirmedInputComparer<TInput>.Create(services.InputComparer);
         syncNumber = services.Random.SyncNumber();
         peerCombinedInputsEventPublisher = new(peerInputEventQueue);
-        inputGroupSerializer = new ConfirmedInputsSerializer<TInput>(inputSerializer);
         localConnections = new(Max.NumberOfPlayers);
         endpoints = new(Max.NumberOfPlayers);
         spectators = [];
         peerObservers = new();
         callbacks = services.SessionHandler;
+
+        if (this.options.SaveConfirmedInputHistory)
+            inputListener = new MemoryInputListener<TInput>(inputListener);
 
         synchronizer = new(
             this.options,
@@ -221,7 +228,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         started = true;
 
         plugins.OnStart(this);
-        inputListener?.OnSessionStart(in inputSerializer, options);
+        inputListener?.OnSessionStart(inputContext);
         backgroundJobTask = jobManager.Start(options.UseBackgroundThread, stoppingToken);
     }
 
@@ -338,7 +345,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             new(player, player.EndPoint, localConnections, syncNumber),
             inputGroupSerializer,
             peerCombinedInputsEventPublisher,
-            inputGroupComparer
+            confirmedInputComparer
         );
 
         peerObservers.Add(protocol.GetUdpObserver());
@@ -607,38 +614,8 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         if (minConfirmedFrame >= Frame.Zero)
         {
-            if (NumberOfSpectators > 0)
-            {
-                GameInput<ConfirmedInputs<TInput>> confirmed = new(nextSpectatorFrame);
-                while (nextSpectatorFrame <= minConfirmedFrame)
-                {
-                    if (!synchronizer.GetConfirmedInputGroup(in nextSpectatorFrame, ref confirmed))
-                        break;
-
-                    logger.Write(LogLevel.Trace, $"pushing frame {nextSpectatorFrame} to spectators");
-                    for (var s = 0; s < specs.Length; s++)
-                        if (specs[s].IsRunning)
-                            specs[s].SendInput(in confirmed);
-
-                    nextSpectatorFrame++;
-                }
-            }
-
-            if (inputListener is not null)
-            {
-                GameInput<ConfirmedInputs<TInput>> confirmed = new(nextListenerFrame);
-                while (nextListenerFrame <= minConfirmedFrame)
-                {
-                    if (!synchronizer.GetConfirmedInputGroup(in nextListenerFrame, ref confirmed))
-                        break;
-
-                    logger.Write(LogLevel.Trace, $"pushing frame {nextListenerFrame} to listener");
-                    var inputs = confirmed.Data.Inputs[..confirmed.Data.Count];
-                    inputListener.OnConfirmed(in confirmed.Frame, inputs);
-
-                    nextListenerFrame++;
-                }
-            }
+            SyncSpectators(in minConfirmedFrame, specs);
+            SyncListeners(minConfirmedFrame);
 
             logger.Write(LogLevel.Trace, $"setting confirmed frame in sync to {minConfirmedFrame}");
             synchronizer.SetLastConfirmedFrame(minConfirmedFrame);
@@ -656,6 +633,42 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         if (interval <= 0) return;
         callbacks.TimeSync(new(interval));
         nextRecommendedInterval = currentFrame.Number + options.RecommendationInterval;
+    }
+
+    void SyncListeners(Frame minConfirmedFrame)
+    {
+        if (inputListener is null) return;
+
+        GameInput<ConfirmedInputs<TInput>> confirmed = new(nextListenerFrame);
+        while (nextListenerFrame <= minConfirmedFrame)
+        {
+            if (!synchronizer.GetConfirmedInputGroup(in nextListenerFrame, ref confirmed))
+                break;
+
+            logger.Write(LogLevel.Trace, $"pushing frame {nextListenerFrame} to listener");
+            inputListener.OnConfirmed(in confirmed.Frame, in confirmed.Data);
+
+            nextListenerFrame++;
+        }
+    }
+
+    void SyncSpectators(in Frame minConfirmedFrame, Span<PeerConnection<ConfirmedInputs<TInput>>> specs)
+    {
+        if (NumberOfSpectators <= 0) return;
+
+        GameInput<ConfirmedInputs<TInput>> confirmed = new(nextSpectatorFrame);
+        while (nextSpectatorFrame <= minConfirmedFrame)
+        {
+            if (!synchronizer.GetConfirmedInputGroup(in nextSpectatorFrame, ref confirmed))
+                break;
+
+            logger.Write(LogLevel.Trace, $"pushing frame {nextSpectatorFrame} to spectators");
+            for (var s = 0; s < specs.Length; s++)
+                if (specs[s].IsRunning)
+                    specs[s].SendInput(in confirmed);
+
+            nextSpectatorFrame++;
+        }
     }
 
     void ConsumeProtocolInputEvents()
@@ -859,4 +872,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         callbacks.OnPeerEvent(player, new(PeerEvent.Disconnected));
         CheckInitialSync();
     }
+
+    public IReadOnlyList<ConfirmedInputs<TInput>> GetConfirmedInputs() =>
+        (inputListener as MemoryInputListener<TInput>)?.Inputs ?? [];
 }

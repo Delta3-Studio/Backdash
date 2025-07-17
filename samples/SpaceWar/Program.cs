@@ -28,6 +28,7 @@ static INetcodeSession<PlayerInputs> ParseSessionArgs(string[] args)
         .WithPlayerCount(playerCount)
         .WithInputDelayFrames(2)
         .WithLogLevel(LogLevel.Information)
+        .WithConfirmedInputHistory()
         .ConfigureProtocol(options =>
         {
             options.NumberOfSyncRoundTrips = 10;
@@ -53,9 +54,7 @@ static INetcodeSession<PlayerInputs> ParseSessionArgs(string[] args)
 
         case ["replay", { } replayFile]:
             return builder
-                .ForReplay(options =>
-                    options.InputList = InputsFileListener.GetInputs(playerCount, replayFile).ToArray()
-                )
+                .ForReplay(options => options.WithInputProvider(new InputsFileProvider(replayFile)))
                 .Build();
 
         case ["sync-test-auto", ..]:

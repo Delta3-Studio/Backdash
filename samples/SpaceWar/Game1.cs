@@ -56,6 +56,8 @@ public class Game1 : Game
 
     protected override void Dispose(bool disposing)
     {
+        Console.WriteLine($"Confirmed Inputs: {session.GetConfirmedInputs().Count}");
+
         session.Dispose();
         base.Dispose(disposing);
     }

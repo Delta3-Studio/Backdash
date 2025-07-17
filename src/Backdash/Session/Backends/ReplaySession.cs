@@ -29,6 +29,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     readonly IChecksumProvider checksumProvider;
     readonly IDeterministicRandom<TInput> random;
     readonly Endianness endianness;
+
     public int FixedFrameRate { get; }
     public SessionReplayControl ReplayController { get; }
 
@@ -42,7 +43,6 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         ArgumentNullException.ThrowIfNull(replayOptions);
         ArgumentNullException.ThrowIfNull(services);
 
-        inputList = replayOptions.InputList;
         ReplayController = replayOptions.ReplayController ?? new();
         logger = services.Logger;
         stateStore = services.StateStore;
@@ -58,6 +58,12 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
             .ToFrozenSet();
         playerMap = fakePlayers.ToFrozenDictionary(x => x.Id, x => x);
         stateStore.Initialize(ReplayController.MaxBackwardFrames);
+
+        InputContext<TInput> inputContext1 = new(
+            options, services.InputSerializer,
+            new ConfirmedInputsSerializer<TInput>(services.InputSerializer)
+        );
+        inputList = replayOptions.InputProvider?.GetInputs(inputContext1) ?? [];
     }
 
     public void Dispose()

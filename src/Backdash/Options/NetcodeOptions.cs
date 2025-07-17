@@ -113,6 +113,12 @@ public sealed record NetcodeOptions
     /// <value>Defaults to <c>0</c></value>
     public uint DeterministicRandomInitialSeed { get; set; }
 
+    /// <summary>
+    ///     If true, a <see cref="SessionMode.Remote"/> session will keep all the confirmed inputs in-memory
+    /// </summary>
+    /// <value>Defaults to <c>false</c></value>
+    public bool SaveConfirmedInputHistory { get; set; }
+
     /// <summary>Time synchronization options.</summary>
     /// <seealso cref="TimeSyncOptions" />
     public TimeSyncOptions TimeSync { get; set; } = new();
