@@ -332,5 +332,5 @@ public interface INetcodeSession<TInput> : INetcodeSession where TInput : unmana
     ///     Return bytes for all  confirmed inputs of a <see cref="SessionMode.Remote"/> session.
     ///     Requires <see cref="NetcodeOptions.SaveConfirmedInputHistory"/> to be <c>true</c>.
     /// </summary>
-    ReadOnlyMemory<byte> GetConfirmedInputsBytes() => Memory<byte>.Empty;
+    byte[] GetConfirmedInputsBytes() => [];
 }

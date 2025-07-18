@@ -70,7 +70,7 @@ public class Game1 : Game
             return;
 
         var inputs = session.GetConfirmedInputsBytes();
-        File.WriteAllBytes($"player{player.Number}.inputs", inputs.ToArray());
+        File.WriteAllBytes($"player{player.Number}.inputs", inputs);
     }
 
     protected override void LoadContent()

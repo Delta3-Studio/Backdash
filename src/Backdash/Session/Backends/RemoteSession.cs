@@ -1,6 +1,4 @@
-using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
-using System.IO.Compression;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Backdash.Core;
@@ -878,6 +876,6 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     public IReadOnlyList<ConfirmedInputs<TInput>> GetConfirmedInputs() =>
         (inputListener as MemoryInputListener<TInput>)?.Inputs ?? [];
 
-    public ReadOnlyMemory<byte> GetConfirmedInputsBytes() =>
-        (inputListener as MemoryInputListener<TInput>)?.GetCompressedInputs() ?? ReadOnlyMemory<byte>.Empty;
+    public byte[] GetConfirmedInputsBytes() =>
+        (inputListener as MemoryInputListener<TInput>)?.GetCompressedInputs() ?? [];
 }

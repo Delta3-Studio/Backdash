@@ -78,7 +78,7 @@ public sealed class BinaryInputProvider<TInput> : IInputProvider<TInput> where T
             result.Add(confirmedInput);
         }
 
-        inputs = [..result];
+        inputs = [.. result];
 
         inputBytes?.Dispose();
         inputBytes = null;

@@ -43,10 +43,10 @@ public sealed class MemoryInputListener<TInput> : IInputListener<TInput>, IEnume
     /// <summary>
     /// Return all input bytes compressed with Deflate
     /// </summary>
-    public ReadOnlyMemory<byte> GetCompressedInputs()
+    public byte[] GetCompressedInputs()
     {
         if (inputContext is null)
-            return ReadOnlyMemory<byte>.Empty;
+            return [];
 
         var span = CollectionsMarshal.AsSpan(inputList);
         ArrayBufferWriter<byte> bufferWriter = new(inputContext.ConfirmedInputSize * span.Length);
