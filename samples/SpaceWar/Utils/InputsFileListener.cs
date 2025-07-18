@@ -7,7 +7,7 @@ using SpaceWar.Logic;
 namespace SpaceWar;
 
 /// <summary>
-/// Sample of an implementation for saving inputs.
+/// Sample of an implementation for listening inputs.
 /// </summary>
 sealed class InputsFileListener(string fileName) : IInputListener<PlayerInputs>
 {

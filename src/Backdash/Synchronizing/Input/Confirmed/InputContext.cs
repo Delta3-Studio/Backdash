@@ -63,8 +63,8 @@ public sealed class InputContext<TInput> where TInput : unmanaged
     public void Write(ArrayBufferWriter<byte> bufferWriter, in TInput input)
     {
         var span = bufferWriter.GetSpan(PlayerInputSize);
-        var written = PlayerInputSerializer.Serialize(in input, span);
-        bufferWriter.Advance(written);
+        PlayerInputSerializer.Serialize(in input, span);
+        bufferWriter.Advance(PlayerInputSize);
     }
 
     /// <summary>
@@ -72,9 +72,9 @@ public sealed class InputContext<TInput> where TInput : unmanaged
     /// </summary>
     public void Write(ArrayBufferWriter<byte> bufferWriter, in ConfirmedInputs<TInput> inputs)
     {
-        var span = bufferWriter.GetSpan(PlayerInputSize);
-        var written = Serializer.Serialize(in inputs, span);
-        bufferWriter.Advance(written);
+        var span = bufferWriter.GetSpan(ConfirmedInputSize);
+        Serializer.Serialize(in inputs, span);
+        bufferWriter.Advance(ConfirmedInputSize);
     }
 
     /// <summary>

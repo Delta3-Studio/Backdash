@@ -36,4 +36,18 @@ public sealed record SessionReplayOptions<TInput> where TInput : unmanaged
     /// <inheritdoc cref="IInputProvider{TInput}" />
     public SessionReplayOptions<TInput> WithInputs(IEnumerable<ConfirmedInputs<TInput>> inputs) =>
         WithInputProvider(new EnumerableInputProvider<TInput>(inputs));
+
+    /// <inheritdoc cref="IInputProvider{TInput}" />
+    public SessionReplayOptions<TInput> WithInputs(ReadOnlySpan<byte> inputs) =>
+        WithInputProvider(new BinaryInputProvider<TInput>(inputs));
+
+    /// <inheritdoc cref="IInputProvider{TInput}" />
+    public SessionReplayOptions<TInput> WithInputsFile(string inputFile)
+    {
+        if (!File.Exists(inputFile))
+            throw new InvalidOperationException("Invalid input file");
+
+        var inputs = File.ReadAllBytes(inputFile);
+        return WithInputs(inputs);
+    }
 }

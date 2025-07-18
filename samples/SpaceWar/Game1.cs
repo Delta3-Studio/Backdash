@@ -56,10 +56,21 @@ public class Game1 : Game
 
     protected override void Dispose(bool disposing)
     {
-        Console.WriteLine($"Confirmed Inputs: {session.GetConfirmedInputs().Count}");
+        SaveInputsFile();
 
         session.Dispose();
         base.Dispose(disposing);
+    }
+
+    void SaveInputsFile()
+    {
+        Console.WriteLine($"Confirmed Inputs: {session.GetConfirmedInputs().Count}");
+
+        if (!session.TryGetLocalPlayer(out var player))
+            return;
+
+        var inputs = session.GetConfirmedInputsBytes();
+        File.WriteAllBytes($"player{player.Number}.inputs", inputs.ToArray());
     }
 
     protected override void LoadContent()

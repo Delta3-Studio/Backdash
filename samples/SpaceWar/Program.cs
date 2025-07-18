@@ -54,7 +54,9 @@ static INetcodeSession<PlayerInputs> ParseSessionArgs(string[] args)
 
         case ["replay", { } replayFile]:
             return builder
-                .ForReplay(options => options.WithInputProvider(new InputsFileProvider(replayFile)))
+                .ForReplay(options =>
+                    // options.WithInputProvider(new InputsFileProvider(replayFile)))
+                    options.WithInputsFile(replayFile))
                 .Build();
 
         case ["sync-test-auto", ..]:
@@ -76,10 +78,9 @@ static INetcodeSession<PlayerInputs> ParseSessionArgs(string[] args)
 
         default:
             // defaults to remote session
-
             if (lastArgs is ["--save-to", { } filename, .. var argsAfterSave])
             {
-                // save confirmed inputs to file
+                // enable real-time input listener
                 builder.WithInputListener(new InputsFileListener(filename));
                 lastArgs = argsAfterSave;
             }

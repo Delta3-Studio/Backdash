@@ -59,11 +59,16 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         playerMap = fakePlayers.ToFrozenDictionary(x => x.Id, x => x);
         stateStore.Initialize(ReplayController.MaxBackwardFrames);
 
-        InputContext<TInput> inputContext1 = new(
+        InputContext<TInput> inputContext = new(
             options, services.InputSerializer,
             new ConfirmedInputsSerializer<TInput>(services.InputSerializer)
         );
-        inputList = replayOptions.InputProvider?.GetInputs(inputContext1) ?? [];
+
+        if (replayOptions.InputProvider is { } provider)
+            using (provider)
+                inputList = provider.GetInputs(inputContext);
+        else
+            inputList = [];
     }
 
     public void Dispose()
