@@ -48,7 +48,7 @@
         ],
         "output": "_site",
         "sitemap": {
-            "baseUrl": "https://lucasteles.github.io/Backdash"
+            "baseUrl": "https://delta3-studio.github.io/Backdash"
         },
         "postProcessors": [
             "ExtractSearchIndex"

@@ -33,7 +33,7 @@ $ dotnet add package Backdash
 ```
 
 > [!TIP]
-> 💡 Please check the **[DOCUMENTATION](https://lucasteles.github.io/Backdash/docs/introduction)** for usage details.
+> 💡 Please check the **[DOCUMENTATION](https://delta3-studio.github.io/Backdash/docs/introduction)** for usage details.
 
 ### Demos:
 

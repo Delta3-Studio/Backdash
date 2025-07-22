@@ -75,10 +75,10 @@ screen, or the attenuation of audio samples_).
 
 > [!INFORMATION]
 > We provide an implementation of a
-_[Deterministic Random](https://lucasteles.github.io/Backdash/api/Backdash.Synchronizing.Random.IDeterministicRandom.html)_
+_[Deterministic Random](https://delta3-studio.github.io/Backdash/api/Backdash.Synchronizing.Random.IDeterministicRandom.html)_
 > out of the box
 > which can be accessed directly from the
-_[Rollback Session](https://lucasteles.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_Random)_
+_[Rollback Session](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_Random)_
 
 ## Beware of Dangling References
 
@@ -165,7 +165,7 @@ determinism.
 When running in a **sync-test session**, [Backdash](https://github.com/lucasteles/Backdash) by default will
 execute a 1 frame rollback for every frame of your game. It compares the state of the frame when it was executed the
 first time to the state executed during the rollback, and raises an error if they differ during your game's execution.
-If you set the [`LogLevel`](https://lucasteles.github.io/Backdash/api/Backdash.Core.LogLevel.html) to at
+If you set the [`LogLevel`](https://delta3-studio.github.io/Backdash/api/Backdash.Core.LogLevel.html) to at
 least `Information` the json of the states will be also logged, you can diff the log of the initial frame vs the log of
 the rollback frame to track down errors.
 
@@ -247,7 +247,7 @@ sealed class DiffPlexDesyncHandler : IStateDesyncHandler
 
 This document describes the most basic features of [Backdash](https://github.com/lucasteles/Backdash).
 To learn more, I recommend starting with reading
-the [API Docs](https://lucasteles.github.io/Backdash/docs/introduction.html) and exploring
+the [API Docs](https://delta3-studio.github.io/Backdash/docs/introduction.html) and exploring
 the [examples](https://github.com/lucasteles/Backdash/tree/master/samples).
 
 Good luck!

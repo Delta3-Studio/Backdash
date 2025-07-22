@@ -18,7 +18,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://lucasteles.github.io/Backdash</PackageProjectUrl>
+    <PackageProjectUrl>https://delta3-studio.github.io/Backdash</PackageProjectUrl>
     <RepositoryUrl>https://github.com/lucasteles/Backdash.git</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
