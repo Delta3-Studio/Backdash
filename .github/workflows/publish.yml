@@ -111,7 +111,7 @@ jobs:
                     path: ./build_artifacts
 
             -   name: Add NuGet source
-                run: dotnet nuget add source --username lucasteles --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/lucasteles/index.json"
+                run: dotnet nuget add source --username Delta3-Studio --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/Delta3-Studio/index.json"
 
             -   name: Release GitHub package
                 run: dotnet nuget push build_artifacts/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
