@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Backdash;
 
 /// <summary>
-///     Int Math
+///     Integer Math
 /// </summary>
 public static class MathI
 {

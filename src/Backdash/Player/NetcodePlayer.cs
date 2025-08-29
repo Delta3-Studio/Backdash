@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Numerics;
 using System.Text;
@@ -16,6 +17,7 @@ public class NetcodePlayer :
     IEqualityOperators<NetcodePlayer, NetcodePlayer, bool>
 
 {
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     sbyte queueIndex;
 
     /// <summary>
