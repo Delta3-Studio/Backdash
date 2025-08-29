@@ -14,7 +14,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
     <Authors>Lucas Teles - lucas.teles@outlook.com</Authors>
-    <Company>lucasteles.dev</Company>
+    <Company>Delta3 Studio</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -25,6 +25,10 @@
 
     <!-- uncomment to enable AOT build -->
     <!-- <DefineConstants>AOT_ENABLED</DefineConstants> -->
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsCSharp Condition=" '$(MSBuildProjectExtension)' == '.csproj' ">true</IsCSharp>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
@@ -45,9 +49,11 @@
     <None Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
-
+  <ItemGroup Label="Analysers" Condition="'$(IsCSharp)'=='true'">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="SonarAnalyzer.CSharp" Version="10.15.*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
