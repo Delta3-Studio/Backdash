@@ -13,8 +13,6 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-    <Authors>Lucas Teles - lucas.teles@outlook.com</Authors>
-    <Company>Delta3 Studio</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -22,6 +20,12 @@
     <RepositoryUrl>https://github.com/Delta3-Studio/Backdash.git</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <Product>Backdash</Product>
+    <Title>Backdash - Rollback Netcode SDK</Title>
+    <Company>Delta3 Studio</Company>
+    <Authors>Lucas Teles - me@lucasteles.dev</Authors>
+    <Copyright>Copyright © lucasteles.dev 2020</Copyright>
 
     <!-- uncomment to enable AOT build -->
     <!-- <DefineConstants>AOT_ENABLED</DefineConstants> -->
