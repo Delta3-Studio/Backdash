@@ -19,7 +19,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://delta3-studio.github.io/Backdash</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/lucasteles/Backdash.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Delta3-Studio/Backdash.git</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
@@ -48,7 +48,7 @@
   <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
 
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.14.*">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.15.*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -13,11 +14,17 @@ namespace Backdash.Data;
 ///     A collection data structure that uses a single fixed-size buffer as if it were connected end-to-end.
 /// </summary>
 [DebuggerDisplay("Size = {count}")]
-public sealed class CircularBuffer<T>(int capacity) : IReadOnlyList<T>, IEquatable<CircularBuffer<T>>
+public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuffer<T>>
 {
-    readonly T[] array = new T[capacity];
+    readonly T[] array;
     int head, tail;
     int count;
+
+    /// <inheritdoc cref="CircularBuffer{T}"/>
+    public CircularBuffer(T[] buffer) => array = buffer;
+
+    /// <inheritdoc cref="CircularBuffer{T}"/>
+    public CircularBuffer(int capacity) : this(new T[capacity]) { }
 
     public int Size => count;
     public int LastIndex => tail;

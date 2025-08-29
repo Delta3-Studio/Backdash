@@ -14,6 +14,33 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backdash.Utils", "src\Backd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backdash.Analyzers", "src\Backdash.Analyzers\Backdash.Analyzers.csproj", "{FD3F38F9-3D7B-4D8E-ABE7-81A78D6309BA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{E7EC8E08-0C4B-43E5-9107-672E09FA3FC9}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		global.json = global.json
+		README.md = README.md
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{622151AC-10D8-40E1-A4D4-5DE491C04E19}"
+	ProjectSection(SolutionItems) = preProject
+		GitVersion.yml = GitVersion.yml
+		.github\dependabot.yml = .github\dependabot.yml
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+		.github\workflows\pull_request.yml = .github\workflows\pull_request.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{8C28409B-491E-4392-BB44-4B1FCF3EF699}"
+	ProjectSection(SolutionItems) = preProject
+		.github\scripts\GitHub.fsx = .github\scripts\GitHub.fsx
+		.github\scripts\prunePrivatePackages.fsx = .github\scripts\prunePrivatePackages.fsx
+		.github\scripts\utils.fsx = .github\scripts\utils.fsx
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +71,7 @@ Global
 		{F578F51B-2E4C-4421-A40B-342C4DFFBD66} = {59B7ED54-BE47-4A60-A4BB-532AAE6BE6AE}
 		{BA97CA2F-E2BB-40FE-9911-FCBD620A8D96} = {53EC6C8F-493B-4116-85D1-0AA416FF59DE}
 		{FD3F38F9-3D7B-4D8E-ABE7-81A78D6309BA} = {53EC6C8F-493B-4116-85D1-0AA416FF59DE}
+		{622151AC-10D8-40E1-A4D4-5DE491C04E19} = {E7EC8E08-0C4B-43E5-9107-672E09FA3FC9}
+		{8C28409B-491E-4392-BB44-4B1FCF3EF699} = {622151AC-10D8-40E1-A4D4-5DE491C04E19}
 	EndGlobalSection
 EndGlobal

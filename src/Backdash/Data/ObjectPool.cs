@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace Backdash.Data;
 
 /// <summary>
@@ -20,7 +22,7 @@ public interface IObjectPool<T>
 /// <summary>
 ///     Default object pool for types with empty constructor
 /// </summary>
-public sealed class DefaultObjectPool<T> : IObjectPool<T> where T : class, new()
+public sealed class DefaultObjectPool<T> : IObjectPool<T>, IEnumerable<T> where T : class, new()
 {
     /// <summary>
     ///     Default object pool singleton.
@@ -105,4 +107,11 @@ public sealed class DefaultObjectPool<T> : IObjectPool<T> where T : class, new()
     ///     Number of instances in the object pool
     /// </summary>
     public int Count => numItems + (fastItem is null ? 0 : 1);
+
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+    public Stack<T>.Enumerator GetEnumerator() => items.GetEnumerator();
+
+    IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
