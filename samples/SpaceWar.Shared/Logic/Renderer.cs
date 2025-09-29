@@ -257,7 +257,7 @@ public sealed class Renderer(
 
         statsString.Clear();
         statsString.Append($"ping: {maxPing.TotalMilliseconds:f2} ms  ");
-        statsString.Append($"rollback: {ngs.RollbackFrames.FrameCount}");
+        statsString.Append($"rollback: {ngs.RollbackFrames.Frames}");
         var statsSize = gameAssets.MainFont.MeasureString(statsString) * statsScale;
         Vector2 statsPos = new(
             (gs.Bounds.Width - statsSize.X) / 2,

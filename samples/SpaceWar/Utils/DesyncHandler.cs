@@ -10,7 +10,7 @@ namespace SpaceWar;
 /// </summary>
 sealed class DiffPlexDesyncHandler : IStateDesyncHandler
 {
-    public void Handle(INetcodeSession session, in StateSnapshot previous, in StateSnapshot current)
+    public void Handle(INetcodeSession session, in DesyncState previous, in DesyncState current)
     {
         var diff = InlineDiffBuilder.Diff(previous.Value, current.Value);
 

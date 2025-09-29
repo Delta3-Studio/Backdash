@@ -22,12 +22,12 @@ session.SetHandler(game);
 // start background worker, like network IO, async messaging
 session.Start(cts.Token);
 
-// timer based game loop
+// timer-based game loop
 await game.Run(cts.Token);
 
 // finishing the session
 session.Dispose();
-await session.WaitToStop();
+await session.WaitUntilFinish();
 
 return;
 

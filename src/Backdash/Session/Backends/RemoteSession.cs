@@ -155,7 +155,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         Close();
         await udp.DisposeAsync();
         DisposeInternal();
-        await WaitToStop();
+        await WaitUntilFinish();
     }
 
     void DisposeInternal()
@@ -232,7 +232,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         backgroundJobTask = jobManager.Start(options.UseBackgroundThread, stoppingToken);
     }
 
-    public Task WaitToStop(CancellationToken stoppingToken = default)
+    public Task WaitUntilFinish(CancellationToken stoppingToken = default)
     {
         if (!jobManager.IsRunning)
             return Task.CompletedTask;

@@ -82,7 +82,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     public async ValueTask DisposeAsync()
     {
         Dispose();
-        await WaitToStop();
+        await WaitUntilFinish();
     }
 
     public void Close()
@@ -158,7 +158,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         isSynchronizing = false;
     }
 
-    public Task WaitToStop(CancellationToken stoppingToken = default) => Task.CompletedTask;
+    public Task WaitUntilFinish(CancellationToken stoppingToken = default) => Task.CompletedTask;
 
     [MemberNotNull(nameof(callbacks))]
     public void SetHandler(INetcodeSessionHandler handler)

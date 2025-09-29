@@ -4,7 +4,7 @@ using Backdash.Data;
 namespace Backdash.Synchronizing.State;
 
 /// <summary>
-///     Represents a save-state at specific frame.
+///     A specific frame saved state entry.
 /// </summary>
 /// <param name="Frame">Saved frame number</param>
 /// <param name="GameState">Game state on <paramref name="Frame" /></param>
@@ -18,7 +18,7 @@ public sealed record SavedFrame(Frame Frame, ArrayBufferWriter<byte> GameState, 
     public uint Checksum = Checksum;
 
     /// <summary>Saved game state</summary>
-    public ArrayBufferWriter<byte> GameState = GameState;
+    public readonly ArrayBufferWriter<byte> GameState = GameState;
 
     /// <summary>Saved state size</summary>
     public ByteSize Size => ByteSize.FromBytes(GameState.WrittenCount);

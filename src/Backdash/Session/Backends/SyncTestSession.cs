@@ -108,7 +108,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public async ValueTask DisposeAsync()
     {
         Dispose();
-        await WaitToStop();
+        await WaitUntilFinish();
     }
 
     public int NumberOfPlayers => Math.Max(addedPlayers.Count, 1);
@@ -145,7 +145,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         backGroundJobTask = tsc.Task.WaitAsync(stoppingToken);
     }
 
-    public async Task WaitToStop(CancellationToken stoppingToken = default)
+    public async Task WaitUntilFinish(CancellationToken stoppingToken = default)
     {
         // ReSharper disable once MethodSupportsCancellation
         tsc.SetCanceled(stoppingToken);

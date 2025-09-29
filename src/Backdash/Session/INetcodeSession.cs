@@ -16,7 +16,7 @@ namespace Backdash;
 public interface INetcodeSessionInfo
 {
     /// <summary>
-    ///     Returns the number of player in the current session.
+    ///     Returns the number of players in the current session.
     /// </summary>
     int NumberOfPlayers { get; }
 
@@ -58,7 +58,7 @@ public interface INetcodeSessionInfo
     int LocalPort { get; }
 
     /// <summary>
-    ///     Returns true if the session is in rollback state
+    ///     Returns true if the session is in a rollback state
     /// </summary>
     bool IsInRollback { get; }
 
@@ -157,7 +157,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     /// <summary>
     ///     Waits for the session background work to finish.
     /// </summary>
-    Task WaitToStop(CancellationToken stoppingToken = default);
+    Task WaitUntilFinish(CancellationToken stoppingToken = default);
 
     /// <summary>
     ///     Set the handler for the current session.

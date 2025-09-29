@@ -110,7 +110,7 @@ public sealed class GameSession(
 
     public void TimeSync(FrameSpan framesAhead)
     {
-        Log($"=> TIME SYNC REQUESTED {framesAhead.FrameCount}");
+        Log($"=> TIME SYNC REQUESTED {framesAhead.Frames}");
         nonGameState.SleepTime = framesAhead.Duration();
     }
 

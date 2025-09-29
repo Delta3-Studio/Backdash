@@ -10,13 +10,13 @@ public interface IStateDesyncHandler
     /// <summary>
     ///     Handles the states binary representations
     /// </summary>
-    void Handle(INetcodeSession session, in StateSnapshot previous, in StateSnapshot current);
+    void Handle(INetcodeSession session, in DesyncState previous, in DesyncState current);
 }
 
 /// <summary>
 ///  State desync snapshot
 /// </summary>
-public readonly ref struct StateSnapshot(
+public readonly ref struct DesyncState(
     string value,
     ref readonly BinaryBufferReader reader,
     uint checksum,
