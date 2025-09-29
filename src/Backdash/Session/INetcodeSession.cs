@@ -68,6 +68,11 @@ public interface INetcodeSessionInfo
     SavedFrame GetCurrentSavedFrame();
 
     /// <summary>
+    ///     Returns the last saved state snapshot.
+    /// </summary>
+    StateSnapshot CurrentStateSnapshot() => GetCurrentSavedFrame().ToSnapshot();
+
+    /// <summary>
     ///     Returns the checksum of the current saved state.
     /// </summary>
     uint CurrentChecksum => GetCurrentSavedFrame().Checksum;
@@ -131,7 +136,13 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     bool LoadFrame(Frame frame);
 
     ///     <inheritdoc cref="LoadFrame(Backdash.Frame)"/>
-    bool LoadFrame(int frame) => LoadFrame(new Frame(frame));
+    bool LoadFrame(int frame) => LoadFrame(new(frame));
+
+    /// <summary>
+    ///     Load state snapshot />.
+    /// </summary>
+    /// <returns>true if succeeded.</returns>
+    void LoadSnapshot(StateSnapshot snapshot);
 
     /// <summary>
     ///     Try to get the session <see cref="SessionReplayControl" />
@@ -180,6 +191,11 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     ///     Return true if the session is <see cref="SessionMode.Spectator" />
     /// </summary>
     bool IsSpectator() => Mode is SessionMode.Spectator;
+
+    /// <summary>
+    ///     Return true if the session is an online session.
+    /// </summary>
+    bool IsOnline() => Mode is SessionMode.Spectator or SessionMode.Remote;
 
     /// <summary>
     ///     Return true if the session is <see cref="SessionMode.Local" />

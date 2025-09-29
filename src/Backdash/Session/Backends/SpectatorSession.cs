@@ -376,6 +376,9 @@ sealed class SpectatorSession<TInput> :
         return true;
     }
 
+    public void LoadSnapshot(StateSnapshot snapshot) =>
+        throw new InvalidOperationException("Loading snapshot is not support by this session type");
+
     bool IProtocolInputEventPublisher<ConfirmedInputs<TInput>>.Publish(in GameInputEvent<ConfirmedInputs<TInput>> evt)
     {
         lastReceivedInputTime = Stopwatch.GetTimestamp();

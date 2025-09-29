@@ -202,7 +202,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     uint extraSeedState;
     public void SetRandomSeed(uint seed, uint extraState = 0) => extraSeedState = unchecked(seed + extraState);
 
-    public void SaveCurrentFrame()
+    void SaveCurrentFrame()
     {
         var currentFrame = CurrentFrame;
         ref var nextState = ref stateStore.Next();
@@ -240,5 +240,15 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         callbacks.LoadState(in frame, in reader);
         CurrentFrame = savedFrame.Frame;
         return true;
+    }
+
+    public void LoadSnapshot(StateSnapshot snapshot)
+    {
+        if (snapshot.Frame.Number >= 0)
+            CurrentFrame = snapshot.Frame;
+
+        var offset = 0;
+        BinaryBufferReader reader = new(snapshot.State, ref offset, endianness);
+        callbacks.LoadState(CurrentFrame, in reader);
     }
 }

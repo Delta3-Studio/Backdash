@@ -1,5 +1,6 @@
 #nullable disable
 using Backdash;
+using Backdash.Synchronizing.State;
 using SpaceWar.Logic;
 
 namespace SpaceWar;
@@ -15,6 +16,7 @@ public class Game1 : Game
     Matrix scaleMatrix = Matrix.CreateScale(1);
 
     bool paused;
+    StateSnapshot snapshot;
 
     public Game1(INetcodeSession<PlayerInputs> netcodeSession)
     {
@@ -98,7 +100,7 @@ public class Game1 : Game
                     ConfigurePlayerWindow(player);
                     ngs.LocalPlayer = player;
                 }
-                // used for local session, 2nd player that mirrors the player 1
+                // used for local session, 2nd player that mirrors player 1
                 else if (ngs.MirrorPlayer is null)
                     ngs.MirrorPlayer = player;
                 else
@@ -163,37 +165,34 @@ public class Game1 : Game
         if (keyboard.IsKeyPressed(Keys.Escape))
             Exit();
 
-        if (session.IsRemote() || session.IsSpectator())
+        if (session.IsOnline())
             return;
+
+        if (keyboard.IsKeyPressed(Keys.S))
+        {
+            snapshot = session.CurrentStateSnapshot();
+            session.WriteLog($"Snapshot saved {snapshot?.Frame}");
+        }
+        else if (keyboard.IsKeyPressed(Keys.L) && snapshot is not null)
+        {
+            session.LoadSnapshot(snapshot);
+            session.WriteLog("Snapshot loaded");
+        }
 
         if (session.IsReplay())
         {
             if (keyboard.IsKeyPressed(Keys.Space))
-            {
                 session.ReplayController.TogglePause();
-                return;
-            }
-
-            if (keyboard.IsKeyPressed(Keys.Right))
-            {
+            else if (keyboard.IsKeyPressed(Keys.Right))
                 session.ReplayController.Play();
-                return;
-            }
-
-            if (keyboard.IsKeyPressed(Keys.Left))
-            {
+            else if (keyboard.IsKeyPressed(Keys.Left))
                 session.ReplayController.Play(isBackwards: true);
-                return;
-            }
 
             return;
         }
 
         if (keyboard.IsKeyPressed(Keys.P))
-        {
             paused = !paused;
-            return;
-        }
 
         if (!paused) return;
 

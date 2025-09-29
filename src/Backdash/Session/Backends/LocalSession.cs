@@ -223,7 +223,26 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
         callbacks.LoadState(in frame, in reader);
         CurrentFrame = frame;
+        DiscardInputsAfter(in frame);
 
+        return true;
+    }
+
+    public void LoadSnapshot(StateSnapshot snapshot)
+    {
+        if (snapshot.Frame.Number >= 0)
+        {
+            CurrentFrame = snapshot.Frame;
+            DiscardInputsAfter(CurrentFrame);
+        }
+
+        var offset = 0;
+        BinaryBufferReader reader = new(snapshot.State, ref offset, endianness);
+        callbacks.LoadState(CurrentFrame, in reader);
+    }
+
+    void DiscardInputsAfter(in Frame frame)
+    {
         var prevFrame = frame.Previous();
         ref var current = ref MemoryMarshal.GetReference(inputQueues.AsSpan());
         ref var limit = ref Unsafe.Add(ref current, inputQueues.Length);
@@ -232,11 +251,9 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
             current.DiscardInputsAfter(in prevFrame);
             current = ref Unsafe.Add(ref current, 1)!;
         }
-
-        return true;
     }
 
-    public void SaveCurrentFrame()
+    void SaveCurrentFrame()
     {
         var currentFrame = CurrentFrame;
         ref var nextState = ref stateStore.Next();

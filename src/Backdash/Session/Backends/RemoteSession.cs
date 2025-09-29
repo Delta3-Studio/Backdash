@@ -451,6 +451,9 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         return synchronizer.TryLoadFrame(in frame);
     }
 
+    public void LoadSnapshot(StateSnapshot snapshot) =>
+        throw new InvalidOperationException("Loading snapshot is not support by this session type");
+
     public PlayerConnectionStatus GetPlayerStatus(NetcodePlayer player)
     {
         if (!IsPlayerKnown(player)) return PlayerConnectionStatus.Unknown;

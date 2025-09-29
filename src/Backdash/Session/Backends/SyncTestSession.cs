@@ -272,6 +272,8 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         return synchronizer.TryLoadFrame(in frame);
     }
 
+    public void LoadSnapshot(StateSnapshot snapshot) { }
+
     public void AdvanceFrame()
     {
         logger.Write(LogLevel.Trace, $"End of frame ({synchronizer.CurrentFrame.Number})...");

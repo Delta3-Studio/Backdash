@@ -22,4 +22,7 @@ public sealed record SavedFrame(Frame Frame, ArrayBufferWriter<byte> GameState, 
 
     /// <summary>Saved state size</summary>
     public ByteSize Size => ByteSize.FromBytes(GameState.WrittenCount);
+
+    /// <summary>Returns a snapshot of the current saved state</summary>
+    public StateSnapshot ToSnapshot() => new(Frame, GameState.WrittenSpan.ToArray());
 }

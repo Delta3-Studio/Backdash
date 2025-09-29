@@ -87,11 +87,13 @@ sealed class InputQueue<TInput> where TInput : unmanaged
         lastFrameRequested = frame;
         lastAddedFrame = frame + LocalFrameDelay;
 
-        if (!inputs.IsEmpty) return;
-        var firstInput = inputs.Front();
-        firstInput.Frame = frame;
-        lastAddedFrame = frame;
-        inputs.Add(firstInput);
+        if (inputs.IsEmpty)
+        {
+            var firstInput = inputs.Front();
+            firstInput.Frame = frame;
+            lastAddedFrame = frame;
+            inputs.Add(firstInput);
+        }
     }
 
     public bool GetConfirmedInput(in Frame requestedFrame, ref GameInput<TInput> input)
