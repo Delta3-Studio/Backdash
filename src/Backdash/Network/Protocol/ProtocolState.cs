@@ -1,6 +1,5 @@
 using Backdash.Core;
 using Backdash.Data;
-using Backdash.Serialization.Internal;
 
 namespace Backdash.Network.Protocol;
 
@@ -71,7 +70,7 @@ sealed class ProtocolState(
         )
         {
             bytesWritten = 0;
-            Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
+            Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
             writer.Write("{Bandwidth: "u8);
             writer.Write(Bandwidth.KibiBytes, "f2");
             writer.Write(" KBps; Packets: "u8);

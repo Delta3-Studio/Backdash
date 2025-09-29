@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
+using Backdash.Core;
 using Backdash.Serialization;
-using Backdash.Serialization.Internal;
 
 namespace Backdash.Network.Messages;
 

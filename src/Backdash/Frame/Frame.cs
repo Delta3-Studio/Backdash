@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Numerics;
-using Backdash.Serialization.Internal;
 using Backdash.Core;
 
 namespace Backdash;
@@ -103,7 +102,7 @@ public readonly record struct Frame :
     {
         bytesWritten = 0;
         if (format.IsEmpty) format = DefaultFormat;
-        Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
+        Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
         return writer.Write(Number, format);
     }
 

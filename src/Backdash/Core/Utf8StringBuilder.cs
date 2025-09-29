@@ -1,13 +1,13 @@
 using System.Runtime.CompilerServices;
 
-namespace Backdash.Serialization.Internal;
+namespace Backdash.Core;
 
-readonly ref struct Utf8StringWriter
+readonly ref struct Utf8StringBuilder
 {
     readonly Span<byte> buffer;
     readonly ref int offset;
 
-    public Utf8StringWriter(in Span<byte> bufferArg, ref int offset)
+    public Utf8StringBuilder(in Span<byte> bufferArg, ref int offset)
     {
         buffer = bufferArg;
         this.offset = ref offset;
@@ -73,7 +73,7 @@ readonly ref struct Utf8StringWriter
 
 readonly ref struct Utf8ObjectStringWriter
 {
-    readonly Utf8StringWriter writer;
+    readonly Utf8StringBuilder writer;
     readonly int firstOffset;
     readonly ref int offset;
 

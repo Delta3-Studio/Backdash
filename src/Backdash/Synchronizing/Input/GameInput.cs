@@ -1,4 +1,4 @@
-using Backdash.Serialization.Internal;
+using Backdash.Core;
 
 namespace Backdash.Synchronizing.Input;
 
@@ -20,7 +20,7 @@ record struct GameInput<T>(T Data, Frame Frame) : IUtf8SpanFormattable where T :
     )
     {
         bytesWritten = 0;
-        Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
+        Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
         return writer.Write("Input{Frame: "u8)
                && writer.Write(Frame.Number)
                && writer.Write("}"u8);

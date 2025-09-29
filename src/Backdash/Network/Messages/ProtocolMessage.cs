@@ -1,7 +1,6 @@
 using System.Runtime.InteropServices;
 using Backdash.Core;
 using Backdash.Serialization;
-using Backdash.Serialization.Internal;
 
 namespace Backdash.Network.Messages;
 
@@ -138,7 +137,7 @@ struct ProtocolMessage(MessageType type = MessageType.Unknown) : IEquatable<Prot
     )
     {
         bytesWritten = 0;
-        Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
+        Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
         if (!writer.Write("Msg("u8)) return false;
         if (!writer.WriteEnum(in Header.Type)) return false;
         if (!writer.Write(")"u8)) return false;

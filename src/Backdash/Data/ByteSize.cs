@@ -1,7 +1,6 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Backdash.Core;
-using Backdash.Serialization.Internal;
 
 namespace Backdash.Data;
 
@@ -177,7 +176,7 @@ public readonly record struct ByteSize(long ByteCount)
         IFormatProvider? provider)
     {
         bytesWritten = 0;
-        Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
+        Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
         format = format.IsEmpty ? decimalFormat : format;
         if (format.Equals(binaryFormat, StringComparison.OrdinalIgnoreCase))
         {

@@ -3,7 +3,6 @@ using System.Net;
 using System.Numerics;
 using System.Text;
 using Backdash.Core;
-using Backdash.Serialization.Internal;
 
 namespace Backdash;
 
@@ -81,7 +80,7 @@ public class NetcodePlayer :
         ReadOnlySpan<char> format, IFormatProvider? provider)
     {
         bytesWritten = 0;
-        Utf8StringWriter writer = new(utf8Destination, ref bytesWritten);
+        Utf8StringBuilder writer = new(utf8Destination, ref bytesWritten);
         if (!writer.Write("{"u8)) return false;
         if (IsSpectator())
         {

@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
+using Backdash.Core;
 using Backdash.Options;
-using Backdash.Serialization.Internal;
 
 namespace Backdash;
 
@@ -108,7 +108,7 @@ public readonly struct PeerEventInfo(PeerEvent type) : IUtf8SpanFormattable
     )
     {
         bytesWritten = 0;
-        Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
+        Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
         if (!writer.Write("Peer Event: "u8)) return false;
         if (!writer.WriteEnum(Type)) return false;
         if (!writer.Write(' ')) return false;

@@ -1,4 +1,4 @@
-using Backdash.Serialization.Internal;
+using Backdash.Core;
 
 namespace Backdash.Network.Protocol;
 
@@ -26,7 +26,7 @@ struct ProtocolEventInfo(ProtocolEvent type, NetcodePlayer player) : IUtf8SpanFo
         IFormatProvider? provider)
     {
         bytesWritten = 0;
-        Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
+        Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
         if (!writer.Write("P"u8)) return false;
         if (!writer.Write(Player.Index)) return false;
         if (!writer.Write(" ProtoEvt "u8)) return false;

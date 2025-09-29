@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
 using Backdash.Core;
-using Backdash.Serialization.Internal;
 
 namespace Backdash;
 
@@ -139,7 +138,7 @@ public readonly record struct FrameSpan :
     {
         bytesWritten = 0;
         if (format.IsEmpty) format = DefaultFormat;
-        Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
+        Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
         if (!writer.Write(Count, format, provider)) return false;
         if (!writer.Write(" frames"u8)) return false;
         return true;
