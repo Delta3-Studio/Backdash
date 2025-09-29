@@ -1,7 +1,7 @@
 # Best Practices and Troubleshooting
 
 Below is a list of recommended best practices you should consider while porting your application
-to [Backdash](https://github.com/lucasteles/Backdash). Many of these recommendations are easy to follow even if you're
+to [Backdash](https://github.com/lucasteles/Backdash). Many of these recommendations are easy to follow, even if you're
 not starting a game from scratch. Most applications will already conform to most of the recommendations below.
 
 ## Isolate **Game State** from **Non-Game State**
@@ -14,7 +14,7 @@ not involved in the calculation of the game state. These do not need to be saved
 
 You should isolate **non-game state** from the **game state** as **much as possible**. For example, you may consider
 encapsulating all your game state into a single `class`/`record` type. This both clearly delineates what is
-**game state** and was is not and makes it trivial to implement the save and load callbacks.
+**game state** and what is not, and makes it trivial to implement the save and load callbacks.
 
 ## Define a Fixed Time Quanta for Advancing Your Game State
 
@@ -25,7 +25,7 @@ game state advanced by a fixed time quanta per frame, even if your render loop d
 ## Separate Updating Game State from Rendering in Your Game Loop
 
 [Backdash](https://github.com/lucasteles/Backdash) will call your advance frame callback many times during a rollback.
-Any effects or sounds which are generated
+Any effects or sounds that are generated
 during the rollback need to be deferred until after the rollback is finished. This is most easily accomplished by
 separating your game state from your render state. When you're finished, your game loop may look something like this:
 
@@ -43,34 +43,40 @@ separating your game state from your render state. When you're finished, your ga
    while (!finished);
 ```
 
-In other words, your game state should be determined solely by the inputs, your rendering code should be driven by the
-current game state and you should have a way to easily advance the game state forward using a set of inputs without
+In other words, your game state should be determined solely by the inputs, and your rendering code should be driven by the
+current game state, and you should have a way to easily advance the game state forward using a set of inputs without
 rendering.
 
 ## Make Sure Your Game State Advances Deterministically
 
 Once you have your game state identified, make sure the next game state is computed solely from your game inputs. This
-should happen naturally if you have correctly identified all the game state and inputs, but it can be tricky sometimes.
+should happen naturally if you have correctly identified all the game states and inputs, but it can be tricky sometimes.
 Here are some things that are easy to overlook:
 
 ### Beware of Random Number Generators
 
-Many games use random numbers in the computing of the next game state. If you use one, you must ensure that they are
+Many games use random numbers in the computation of the next game state. If you use one, you must ensure that they are
 fully deterministic, that the seed for the random number generator is the same at frame 0 for both players, and that the
-state of the random number generator is included in your game state. Doing both of these will ensure that the random
-numbers which get generated for a particular frame are always the same, regardless of how many
+state/seed of the random number generator is included in your game state. Doing both of these will ensure that the random
+numbers that get generated for a particular frame are always the same, regardless of how many
 times [Backdash](https://github.com/lucasteles/Backdash) needs to rollback to that frame.
+
+Luckily, *Backdash* already gives you a deterministic random number generator in the [`INetcodeSession<>`](https://delta3.studio/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_Random) class:
+
+```csharp
+session.Random.NextInt();
+```
 
 ### Beware of External Time Sources (eg. random, clock time)
 
 Be careful if you use the current time of day in your game state calculation. This may be used for an effect on the game
-or to derive another game state (e.g. using the timer as a seed to the random number generator). The time on two
+or to derive another game state (e.g., using the timer as a seed to the random number generator). The time on two
 computers
-or game consoles is almost never in sync and using time in your game state calculations can lead to synchronization
+Or game consoles are almost never in sync, and using time in your game state calculations can lead to synchronization
 issues. You should either eliminate the use of time in your game state or include the current time for one of the
 players as part of the input to a frame and always use that time in your calculations.
 
-The use of external time sources in **non-game state** calculations is fine (_e.g. computing the duration of effects on
+The use of external time sources in **non-game state** calculations is fine (_e.g, computing the duration of effects on
 screen, or the attenuation of audio samples_).
 
 > [!INFORMATION]
@@ -82,7 +88,7 @@ _[Rollback Session](https://delta3-studio.github.io/Backdash/api/Backdash.INetco
 
 ## Beware of Dangling References
 
-If your game state contains any reference type be very careful in your `save` and `load` functions to rebase
+If your game state contains any reference type, be very careful in your `save` and `load` functions to rebase
 your reference pointers as you `save` and `load` your data. When copying data, be sure that you are no copying an object
 reference instead of the values.
 
@@ -159,34 +165,34 @@ var session = RollbackNetcode
     .Build();
 ```
 
-The sync test session is a special session which is designed to find errors in your simulation's
+The sync test session is a special session that is designed to find errors in your simulation's
 determinism.
 
 When running in a **sync-test session**, [Backdash](https://github.com/lucasteles/Backdash) by default will
-execute a 1 frame rollback for every frame of your game. It compares the state of the frame when it was executed the
+execute a 1-frame rollback for every frame of your game. It compares the state of the frame when it was executed the
 first time to the state executed during the rollback, and raises an error if they differ during your game's execution.
 If you set the [`LogLevel`](https://delta3-studio.github.io/Backdash/api/Backdash.Core.LogLevel.html) to at
-least `Information` the json of the states will be also logged, you can diff the log of the initial frame vs the log of
+least `Information`, the JSON of the states will also be logged, and you can diff the log of the initial frame vs the log of
 the rollback frame to track down errors.
 
-By running **sync-test** on developer systems continuously when writing game code, you can identify **de-sync** causing
+By running **sync-test** on developer systems continuously when writing game code, you can identify **desync** causing
 bugs immediately after they're introduced.
 
 ### Configuring
 
-You can configure a wide range of options to help debug you state, like:
+You can configure a wide range of options to help debug your state, like:
 
 ```csharp
 .ForSyncTest(options => options
-    .UseJsonStateParser() // tries to display you state as json on desync
+    .UseJsonStateParser() // tries to display your state as JSON on desync
     .UseDesyncHandler<YourDesyncHandler>() // custom handler to deal wih a desync
     .UseRandomInputProvider() // generate random inputs
     .CheckDistance(4) // the forced rollback check distance in frames
 )
 ```
 
-If you need better meaningful string representation of your state in the sync-test, it is recommended to implement
-the optional method `INetcodeSessionHandler.CreateState`. This will be used to materialize previous saved states
+If you need a better, meaningful string representation of your state in the sync-test, it is recommended to implement
+the optional method `INetcodeSessionHandler.CreateState`. This will be used to materialize previously saved states
 before passing them to the `DesyncHandler`.
 
 > [!NOTE]
@@ -194,10 +200,10 @@ before passing them to the `DesyncHandler`.
 
 #### Implement a DesyncHandler
 
-a `DesyncHandler` will help you to handle whenever a desync happens in a `SyncTest` session.
+A `DesyncHandler` will help you handle whenever a desync happens in a `SyncTest` session.
 
-As example, a `DesyncHandler` that uses [DiffPlex](https://github.com/mmanela/diffplex) to print on the console
-the state diff when a desync occurs:
+For example, a `DesyncHandler` that uses [DiffPlex](https://github.com/mmanela/diffplex) to print on the console
+The state diff when a desync occurs:
 
 ```csharp
 using Backdash;
@@ -207,7 +213,7 @@ using DiffPlex.DiffBuilder.Model;
 
 sealed class DiffPlexDesyncHandler : IStateDesyncHandler
 {
-    public void Handle(INetcodeSession session, in StateSnapshot previous, in StateSnapshot current)
+    public void Handle(INetcodeSession session, in DesyncState previous, in DesyncState current)
     {
         var diff = InlineDiffBuilder.Diff(previous.Value, current.Value);
 
