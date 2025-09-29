@@ -86,7 +86,7 @@ abstract class DataGenerator
     public static Arbitrary<CircularBuffer<T>> CircularBufferGenerator<T>(Arbitrary<T[]> valueArb) =>
         (
             from values in valueArb.Generator
-            from size in Gen.Choose(values.Length, values.Length * 10)
+            from size in FsCheck.Fluent.Gen.Choose(values.Length, values.Length * 10)
             select (size, values)
         )
         .Select(v =>
@@ -180,7 +180,7 @@ abstract class DataGenerator
     );
 
     public static Arbitrary<KeepAlive> KeepAliveGenerator() =>
-        Gen.Constant(new KeepAlive()).ToArbitrary();
+        FsCheck.Fluent.Gen.Constant(new KeepAlive()).ToArbitrary();
 
     public static Arbitrary<QualityReply> QualityReplyGenerator() => Arb.From(
         from pong in Generate<uint>()
@@ -220,7 +220,7 @@ abstract class DataGenerator
     );
 
     public static Arbitrary<PeerStatusBuffer> PeerStatusBufferGenerator() =>
-        Gen.Sized(testSize =>
+        FsCheck.Fluent.Gen.Sized(testSize =>
             {
                 var size = Math.Min(testSize, Max.NumberOfPlayers);
                 return Generate<ConnectStatus>().ArrayOf(size);
@@ -258,10 +258,10 @@ abstract class DataGenerator
             from startFrame in Generate<Frame>()
             from disconnectReq in Generate<bool>()
             from ackFrame in Generate<Frame>()
-            from peerCount in Gen.Choose(0, Max.NumberOfPlayers - 1)
+            from peerCount in FsCheck.Fluent.Gen.Choose(0, Max.NumberOfPlayers - 1)
             from peerConnectStats in connectStatusGenerator.Generator.ArrayOf(peerCount)
-            from inputSize in Gen.Choose(sizeof(byte), sizeof(long))
-            from inputBufferSize in Gen.Choose(0, Max.CompressedBytes - 1)
+            from inputSize in FsCheck.Fluent.Gen.Choose(sizeof(byte), sizeof(long))
+            from inputBufferSize in FsCheck.Fluent.Gen.Choose(0, Max.CompressedBytes - 1)
             from inputBuffer in Generate<byte>().ArrayOf(inputBufferSize)
             select new InputMessage
             {
@@ -389,7 +389,7 @@ abstract class DataGenerator
     public static Arbitrary<PendingGameInputs> PendingGameInputBufferGenerator(
         Arbitrary<GameInput> inputGenerator
     ) =>
-        Gen.Sized(testSize =>
+        FsCheck.Fluent.Gen.Sized(testSize =>
             {
                 var size = Math.Clamp(testSize, 1, sizeof(int) * 2);
                 var index = 1;
@@ -434,7 +434,7 @@ abstract class DataGenerator
     );
 
     public static Arbitrary<ConfirmedInputs<T>> InputGroupGenerator<T>() where T : unmanaged =>
-        Gen.Sized(testSize =>
+        FsCheck.Fluent.Gen.Sized(testSize =>
             {
                 var size = Math.Min(testSize, InputArray<T>.Capacity);
                 return Generate<T>().ArrayOf(size);

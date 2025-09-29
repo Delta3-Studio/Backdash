@@ -1,16 +1,20 @@
 using System.Numerics;
 using Backdash.Core;
+using Backdash.Data;
 using Backdash.Network;
 
 namespace Backdash.Tests.TestUtils;
 
-static class Generate
+static class Gen
 {
     public static readonly Faker Faker = new();
     public static Randomizer Random => Faker.Random;
     public static Vector2 Vector2() => new(Random.Float(), Random.Float());
     public static Vector3 Vector3() => new(Random.Float(), Random.Float(), Random.Float());
     public static PeerAddress Peer() => Faker.Internet.IpEndPoint();
+    public static Frame Frame() => new(Faker.Random.Int(0));
+    public static FrameSpan FrameSpan() => new(Faker.Random.Int(0));
+    public static ByteSize ByteSize() => new(Faker.Random.Long(0));
     public static ConnectionsState ConnectionsState() => new(Max.NumberOfPlayers);
 
     public static NetcodePlayer NetcodePlayer()

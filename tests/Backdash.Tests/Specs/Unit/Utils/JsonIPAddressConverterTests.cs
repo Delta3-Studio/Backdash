@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Backdash.JsonConverters;
+using Backdash.Tests.TestUtils;
 
 namespace Backdash.Tests.Specs.Unit.Utils;
 
@@ -8,8 +9,6 @@ using static JsonSerializer;
 
 public class JsonIPAddressConverterTests
 {
-    static readonly Faker faker = new();
-
     static readonly JsonSerializerOptions options = new()
     {
         Converters =
@@ -23,7 +22,7 @@ public class JsonIPAddressConverterTests
     [Fact]
     public void ShouldParseIPv4()
     {
-        var expected = faker.Internet.IpAddress();
+        var expected = Gen.Faker.Internet.IpAddress();
         var value = Deserialize<TestType>($$"""{"Data": "{{expected.ToString()}}"}""", options);
         value!.Data.Should().Be(expected);
     }
@@ -31,7 +30,7 @@ public class JsonIPAddressConverterTests
     [Fact]
     public void ShouldParseIPv6()
     {
-        var expected = faker.Internet.Ipv6Address();
+        var expected = Gen.Faker.Internet.Ipv6Address();
         var value = Deserialize<TestType>($$"""{"Data": "{{expected.ToString()}}"}""", options);
         value!.Data.Should().Be(expected);
     }
@@ -39,7 +38,7 @@ public class JsonIPAddressConverterTests
     [Fact]
     public void ShouldSerializeIPv4()
     {
-        var value = faker.Internet.IpAddress();
+        var value = Gen.Faker.Internet.IpAddress();
         var result = Serialize(new TestType(value), options);
         var expected = $$"""{"Data":"{{value}}"}""";
         result.Should().Be(expected);
@@ -48,7 +47,7 @@ public class JsonIPAddressConverterTests
     [Fact]
     public void ShouldSerializeIPv6()
     {
-        var value = faker.Internet.Ipv6Address();
+        var value = Gen.Faker.Internet.Ipv6Address();
         var result = Serialize(new TestType(value), options);
         var expected = $$"""{"Data":"{{value}}"}""";
         result.Should().Be(expected);

@@ -1,21 +1,22 @@
 using System.Diagnostics;
 using System.Numerics;
+using Backdash.Core;
 using Backdash.Serialization.Internal;
 
 namespace Backdash;
 
 /// <summary>
-///     Value representation of a span of frames
+///     Value representation of a frame count
 ///     Uses the FPS defined in <seealso cref="FrameTime"/>.<see cref="FrameTime.CurrentFrameRate"/>
 /// </summary>
 /// <seealso cref="FrameTime.set_CurrentFrameRate"/>
 [Serializable]
+[UnsafeInt32JsonConverter<FrameSpan>]
 [DebuggerDisplay("{ToString()}")]
-
 public readonly record struct FrameSpan :
     IComparable<FrameSpan>,
     IUtf8SpanFormattable,
-    IFormattable,
+    ISpanFormattable,
     IComparisonOperators<FrameSpan, FrameSpan, bool>,
     IAdditionOperators<FrameSpan, FrameSpan, FrameSpan>,
     ISubtractionOperators<FrameSpan, FrameSpan, FrameSpan>,
@@ -36,93 +37,95 @@ public readonly record struct FrameSpan :
     public static readonly FrameSpan MaxValue = new(int.MaxValue);
 
     /// <summary>Returns the <see cref="int" /> count of frames in the current frame span <see cref="Frame" />.</summary>
-    public readonly int FrameCount = 0;
+    public readonly int Count = 0;
 
     /// <summary>
-    ///     Initialize new <see cref="FrameSpan" /> for frame <paramref name="frameCount" />.
+    ///     Initialize new <see cref="FrameSpan" /> for frame <paramref name="count" />.
     /// </summary>
-    /// <param name="frameCount"></param>
-    public FrameSpan(int frameCount) => FrameCount = frameCount;
+    /// <param name="count"></param>
+    public FrameSpan(int count) => Count = count;
 
     /// <summary>Returns the time value for the current frame span in seconds.</summary>
-    public double Seconds(int fps) => FrameTime.GetSeconds(FrameCount, fps);
+    public double Seconds(int fps) => FrameTime.GetSeconds(Count, fps);
 
     /// <summary>Returns the time value for the current frame span in seconds.</summary>
-    public double Seconds() => FrameTime.GetSeconds(FrameCount);
+    public double Seconds() => FrameTime.GetSeconds(Count);
 
     /// <summary>Returns the time value for the current frame span in <see cref="TimeSpan" />.</summary>
-    public TimeSpan Duration(int fps) => FrameTime.GetDuration(FrameCount, fps);
+    public TimeSpan Duration(int fps) => FrameTime.GetDuration(Count, fps);
 
     /// <summary>Returns the time value for the current frame span in <see cref="TimeSpan" />.</summary>
-    public TimeSpan Duration() => FrameTime.GetDuration(FrameCount);
+    public TimeSpan Duration() => FrameTime.GetDuration(Count);
 
     /// <summary>Returns the value for the current frame span as a <see cref="Frame" />.</summary>
-    public Frame FrameValue => new(FrameCount);
+    public Frame ToFrame() => new(Count);
 
     /// <summary>
-    ///     Returns frame at the time position in milliseconds
+    ///     Returns a frame at the time position in milliseconds
     /// </summary>
     public Frame GetFrameAtMilliSecond(double millis, int fps)
     {
         var span = FromMilliseconds(millis, fps);
-        if (span.FrameCount > FrameCount)
+        if (span.Count > Count)
             throw new InvalidOperationException("Out of range frame time");
 
-        return span.FrameValue;
+        return span.ToFrame();
     }
 
     /// <summary>
-    ///     Returns frame at the time position in milliseconds
+    ///     Returns a frame at the time position in milliseconds
     /// </summary>
     public Frame GetFrameAtMilliSecond(double millis)
     {
         var span = FromMilliseconds(millis);
-        if (span.FrameCount > FrameCount)
+        if (span.Count > Count)
             throw new InvalidOperationException("Out of range frame time");
 
-        return span.FrameValue;
+        return span.ToFrame();
     }
 
     /// <summary>
-    ///     Returns frame at the time position in seconds
+    ///     Returns a frame at the time position in seconds
     /// </summary>
     public Frame GetFrameAtSecond(double seconds, int fps)
     {
         var span = FromSeconds(seconds, fps);
-        if (span.FrameCount > FrameCount)
+        if (span.Count > Count)
             throw new InvalidOperationException("Out of range frame time");
 
-        return span.FrameValue;
+        return span.ToFrame();
     }
 
     /// <summary>
-    ///     Returns frame at the time position in seconds
+    ///     Returns a frame at the time position in seconds
     /// </summary>
     public Frame GetFrameAtSecond(double seconds)
     {
         var span = FromSeconds(seconds);
-        if (span.FrameCount > FrameCount)
+        if (span.Count > Count)
             throw new InvalidOperationException("Out of range frame time");
 
-        return span.FrameValue;
+        return span.ToFrame();
     }
 
     /// <summary>
-    ///     Returns frame at the timespan position
+    ///     Returns a frame at the timespan position
     /// </summary>
     public Frame GetFrameAt(TimeSpan duration, int fps) => GetFrameAtMilliSecond(duration.TotalMilliseconds, fps);
 
     /// <summary>
-    ///     Returns frame at the timespan position
+    ///     Returns a frame at the timespan position
     /// </summary>
     public Frame GetFrameAt(TimeSpan duration) => GetFrameAtMilliSecond(duration.TotalMilliseconds);
 
     /// <inheritdoc />
-    public int CompareTo(FrameSpan other) => FrameCount.CompareTo(other.FrameCount);
+    public int CompareTo(FrameSpan other) => Count.CompareTo(other.Count);
+
+    const string DefaultFormat = "0 frames;-# frames";
 
     /// <inheritdoc />
     public string ToString(string? format, IFormatProvider? formatProvider) =>
-        FrameCount.ToString(format ?? "0 frames;-# frames", formatProvider);
+        Count.ToString(format ?? DefaultFormat, formatProvider);
 
     /// <inheritdoc />
     public override string ToString() => ToString(null, null);
@@ -135,10 +138,19 @@ public readonly record struct FrameSpan :
     )
     {
         bytesWritten = 0;
+        if (format.IsEmpty) format = DefaultFormat;
         Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
-        if (!writer.Write(FrameCount, format, provider)) return false;
+        if (!writer.Write(Count, format, provider)) return false;
         if (!writer.Write(" frames"u8)) return false;
         return true;
+    }
+
+    /// <inheritdoc />
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format,
+        IFormatProvider? provider)
+    {
+        if (format.IsEmpty) format = DefaultFormat;
+        return Count.TryFormat(destination, out charsWritten, format, provider);
     }
 
     /// <inheritdoc cref="FrameSpan(int)" />
@@ -185,59 +197,59 @@ public readonly record struct FrameSpan :
     public static FrameSpan Max(in FrameSpan left, in FrameSpan right) => left >= right ? left : right;
 
     /// <inheritdoc />
-    public static bool operator >(FrameSpan left, FrameSpan right) => left.FrameCount > right.FrameCount;
+    public static bool operator >(FrameSpan left, FrameSpan right) => left.Count > right.Count;
 
     /// <inheritdoc />
-    public static bool operator >=(FrameSpan left, FrameSpan right) => left.FrameCount >= right.FrameCount;
+    public static bool operator >=(FrameSpan left, FrameSpan right) => left.Count >= right.Count;
 
     /// <inheritdoc />
-    public static bool operator <(FrameSpan left, FrameSpan right) => left.FrameCount < right.FrameCount;
+    public static bool operator <(FrameSpan left, FrameSpan right) => left.Count < right.Count;
 
     /// <inheritdoc />
-    public static bool operator <=(FrameSpan left, FrameSpan right) => left.FrameCount <= right.FrameCount;
+    public static bool operator <=(FrameSpan left, FrameSpan right) => left.Count <= right.Count;
 
     /// <inheritdoc />
-    public static FrameSpan operator %(FrameSpan left, int right) => new(left.FrameCount % right);
+    public static FrameSpan operator %(FrameSpan left, int right) => new(left.Count % right);
 
     /// <inheritdoc />
-    public static FrameSpan operator +(FrameSpan left, int right) => new(left.FrameCount + right);
+    public static FrameSpan operator +(FrameSpan left, int right) => new(left.Count + right);
 
     /// <inheritdoc />
-    public static FrameSpan operator -(FrameSpan left, int right) => new(left.FrameCount - right);
+    public static FrameSpan operator -(FrameSpan left, int right) => new(left.Count - right);
 
     /// <inheritdoc />
-    public static FrameSpan operator *(FrameSpan left, int right) => new(left.FrameCount * right);
+    public static FrameSpan operator *(FrameSpan left, int right) => new(left.Count * right);
 
     /// <inheritdoc cref="op_Multiply(Backdash.FrameSpan,int)" />
     public static FrameSpan operator *(int left, FrameSpan right) => right * left;
 
     /// <inheritdoc />
-    public static FrameSpan operator +(FrameSpan left, Frame right) => new(left.FrameCount + right.Number);
+    public static FrameSpan operator +(FrameSpan left, Frame right) => new(left.Count + right.Number);
 
     /// <inheritdoc />
-    public static FrameSpan operator -(FrameSpan left, Frame right) => new(left.FrameCount - right.Number);
+    public static FrameSpan operator -(FrameSpan left, Frame right) => new(left.Count - right.Number);
 
     /// <inheritdoc />
-    public static FrameSpan operator +(FrameSpan left, FrameSpan right) => new(left.FrameCount + right.FrameCount);
+    public static FrameSpan operator +(FrameSpan left, FrameSpan right) => new(left.Count + right.Count);
 
     /// <inheritdoc />
-    public static FrameSpan operator -(FrameSpan left, FrameSpan right) => new(left.FrameCount - right.FrameCount);
+    public static FrameSpan operator -(FrameSpan left, FrameSpan right) => new(left.Count - right.Count);
 
     /// <summary>
     ///     Returns the absolute value of a Frame.
     /// </summary>
-    public static FrameSpan Abs(in FrameSpan frame) => new(Math.Abs(frame.FrameCount));
+    public static FrameSpan Abs(in FrameSpan frame) => new(Math.Abs(frame.Count));
 
     /// <summary>
     ///     Clamps frame value to a range
     /// </summary>
-    public static FrameSpan Clamp(in FrameSpan frame, int min, int max) => new(Math.Clamp(frame.FrameCount, min, max));
+    public static FrameSpan Clamp(in FrameSpan frame, int min, int max) => new(Math.Clamp(frame.Count, min, max));
 
     /// <summary>
     ///     Clamps frame value to a range
     /// </summary>
     public static FrameSpan Clamp(in FrameSpan frame, in FrameSpan min, in FrameSpan max) =>
-        Clamp(in frame, min.FrameCount, max.FrameCount);
+        Clamp(in frame, min.Count, max.Count);
 
     /// <summary>
     ///     Clamps frame value to a range

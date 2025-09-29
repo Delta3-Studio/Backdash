@@ -87,7 +87,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
     public bool AddLocalInput(NetcodePlayer queue, ref GameInput<TInput> input)
     {
-        if (currentFrame.Number >= options.PredictionFrames && FramesBehind.FrameCount >= options.PredictionFrames)
+        if (currentFrame.Number >= options.PredictionFrames && FramesBehind.Count >= options.PredictionFrames)
         {
             logger.Write(reachedPredictionBarrier ? LogLevel.Information : LogLevel.Warning,
                 $"Rejecting input for frame {currentFrame.Number} from emulator: reached prediction barrier");
@@ -172,7 +172,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
     public void UpdateRollbackFrameCounter() =>
         rollbackFrameCounter = ((1f - options.RollbackFramesSmoothFactor) * rollbackFrameCounter) +
-                               (options.RollbackFramesSmoothFactor * FramesBehind.FrameCount);
+                               (options.RollbackFramesSmoothFactor * FramesBehind.Count);
 
     public void AdjustSimulation(in Frame seekTo)
     {

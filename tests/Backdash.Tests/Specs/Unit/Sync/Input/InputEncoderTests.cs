@@ -9,12 +9,12 @@ public class InputEncoderTests
     [Fact]
     public void ShouldCompressAndDecompressSample()
     {
-        var lastAcked = Generate.GameInput(0, [1, 0]);
+        var lastAcked = Gen.GameInput(0, [1, 0]);
         GameInput[] nextInputs =
         [
-            Generate.GameInput(1, [0, 2]),
-            Generate.GameInput(2, [2, 4]),
-            Generate.GameInput(3, [4, 8]),
+            Gen.GameInput(1, [0, 2]),
+            Gen.GameInput(2, [2, 4]),
+            Gen.GameInput(3, [4, 8]),
         ];
         var compressed = GetCompressedInput(in lastAcked, nextInputs);
         var decompressedInputs = DecompressToList(compressed, lastAcked);
@@ -31,20 +31,20 @@ public class InputEncoderTests
     [Fact]
     public void ShouldCompressAndDecompressSampleSkippingFrames()
     {
-        var lastAcked = Generate.GameInput(0, [1, 0]);
+        var lastAcked = Gen.GameInput(0, [1, 0]);
         GameInput[] sendInputs =
         [
-            Generate.GameInput(1, [0, 2]),
-            Generate.GameInput(2, [2, 4]),
-            Generate.GameInput(3, [4, 8]),
-            Generate.GameInput(4, [8, 16]),
+            Gen.GameInput(1, [0, 2]),
+            Gen.GameInput(2, [2, 4]),
+            Gen.GameInput(3, [4, 8]),
+            Gen.GameInput(4, [8, 16]),
         ];
         var compressed = GetCompressedInput(in lastAcked, sendInputs);
-        var lastReceived = Generate.GameInput(2, [2, 4]);
+        var lastReceived = Gen.GameInput(2, [2, 4]);
         var decompressedInputs = DecompressToList(compressed, lastReceived);
         decompressedInputs.Should().BeEquivalentTo([
-            Generate.GameInput(3, [4, 8]),
-            Generate.GameInput(4, [8, 16]),
+            Gen.GameInput(3, [4, 8]),
+            Gen.GameInput(4, [8, 16]),
         ]);
         decompressedInputs
             .Select(x => x.Data.ToString())
@@ -57,11 +57,11 @@ public class InputEncoderTests
     [Fact]
     public void ShouldCompressAndDecompressSample2()
     {
-        var lastAcked = Generate.GameInput(0, [0]);
+        var lastAcked = Gen.GameInput(0, [0]);
         GameInput[] inputList =
         [
-            Generate.GameInput(1, [4]),
-            Generate.GameInput(2, [16]),
+            Gen.GameInput(1, [4]),
+            Gen.GameInput(2, [16]),
         ];
         var compressed = GetCompressedInput(in lastAcked, inputList);
         var decompressedInputs = DecompressToList(compressed, lastAcked);

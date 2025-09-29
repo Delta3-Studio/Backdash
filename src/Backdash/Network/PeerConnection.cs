@@ -339,7 +339,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
             QualityReport = new()
             {
                 Ping = Stopwatch.GetTimestamp(),
-                FrameAdvantage = state.Fairness.LocalFrameAdvantage.FrameCount,
+                FrameAdvantage = state.Fairness.LocalFrameAdvantage.Count,
             },
         });
     }

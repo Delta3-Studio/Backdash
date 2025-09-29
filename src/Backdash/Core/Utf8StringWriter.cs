@@ -15,7 +15,7 @@ readonly ref struct Utf8StringWriter
 
     Span<byte> CurrentBuffer => offset >= buffer.Length ? [] : buffer[offset..];
 
-    public bool WriteChars(ReadOnlySpan<char> value)
+    public bool Write(ReadOnlySpan<char> value)
     {
         Span<byte> dest = CurrentBuffer;
         if (dest.IsEmpty) return false;
@@ -51,14 +51,15 @@ readonly ref struct Utf8StringWriter
     }
 
     public bool Write<T>(in T value) where T : IUtf8SpanFormattable => Write(in value, []);
+
     const int MaxLocalStringSize = 24;
 
-    public bool WriteFormat<T>(T value, ReadOnlySpan<char> format = default) where T : ISpanFormattable
+    public bool WriteFormat<T>(in T value, ReadOnlySpan<char> format = default) where T : ISpanFormattable
     {
         Span<byte> dest = CurrentBuffer;
         if (dest.IsEmpty) return false;
         Span<char> charBuffer = stackalloc char[MaxLocalStringSize];
-        return value.TryFormat(charBuffer, out int written, format, null) && WriteChars(charBuffer[..written]);
+        return value.TryFormat(charBuffer, out int written, format, null) && Write(charBuffer[..written]);
     }
 
     public bool WriteEnum<T>(in T value, ReadOnlySpan<char> format = default) where T : struct, Enum
@@ -66,17 +67,17 @@ readonly ref struct Utf8StringWriter
         Span<byte> dest = CurrentBuffer;
         if (dest.IsEmpty) return false;
         Span<char> charBuffer = stackalloc char[MaxLocalStringSize];
-        return Enum.TryFormat(value, charBuffer, out int written, format) && WriteChars(charBuffer[..written]);
+        return Enum.TryFormat(value, charBuffer, out int written, format) && Write(charBuffer[..written]);
     }
 }
 
-readonly ref struct Utf8ObjectWriter
+readonly ref struct Utf8ObjectStringWriter
 {
     readonly Utf8StringWriter writer;
     readonly int firstOffset;
     readonly ref int offset;
 
-    public Utf8ObjectWriter(in Span<byte> bufferArg, ref int offset)
+    public Utf8ObjectStringWriter(in Span<byte> bufferArg, ref int offset)
     {
         writer = new(in bufferArg, ref offset);
         this.offset = ref offset;
@@ -92,7 +93,7 @@ readonly ref struct Utf8ObjectWriter
     ) where T : IUtf8SpanFormattable
     {
         if (firstOffset != offset && !writer.Write(", "u8)) return false;
-        if (!writer.WriteChars(name)) return false;
+        if (!writer.Write(name)) return false;
         if (!writer.Write(": "u8)) return false;
         return writer.Write(value, format);
     }

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 using Backdash.Core;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -13,6 +14,7 @@ namespace Backdash.Data;
 ///     A collection data structure that uses a single fixed-size buffer as if it were connected end-to-end.
 /// </summary>
 [DebuggerDisplay("Size = {count}")]
+[JsonConverter(typeof(CircularBufferJsonConverter))]
 public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuffer<T>>
 {
     readonly T[] array;
@@ -310,5 +312,13 @@ public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuf
             index = 0;
             current = default;
         }
+    }
+
+    public static CircularBuffer<T> CreateFrom(T[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        CircularBuffer<T> result = new(values);
+        result.count = result.tail = values.Length;
+        return result;
     }
 }

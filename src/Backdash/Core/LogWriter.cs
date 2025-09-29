@@ -1,7 +1,7 @@
 namespace Backdash.Core;
 
 /// <summary>
-///     Defines how and where the log's should be written.
+///     Defines how and where the log should be written.
 /// </summary>
 public interface ILogWriter : IDisposable
 {

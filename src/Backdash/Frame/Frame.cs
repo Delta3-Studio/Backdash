@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using Backdash.Serialization.Internal;
+using Backdash.Core;
 
 namespace Backdash;
 
@@ -9,12 +10,13 @@ namespace Backdash;
 /// </summary>
 [Serializable]
 [DebuggerDisplay("{ToString()}")]
+[UnsafeInt32JsonConverter<Frame>]
 public readonly record struct Frame :
     IComparable<Frame>,
     IComparable<int>,
     IEquatable<int>,
     IUtf8SpanFormattable,
-    IFormattable,
+    ISpanFormattable,
     IComparisonOperators<Frame, Frame, bool>,
     IAdditionOperators<Frame, Frame, Frame>,
     ISubtractionOperators<Frame, Frame, Frame>,
@@ -83,9 +85,11 @@ public readonly record struct Frame :
     /// <inheritdoc />
     public bool Equals(int other) => Number == other;
 
+    const string DefaultFormat = "(Frame 0);(Frame -#)";
+
     /// <inheritdoc />
     public string ToString(string? format, IFormatProvider? formatProvider) =>
-        Number.ToString(format ?? "(Frame 0);(Frame -#)", formatProvider);
+        Number.ToString(format ?? DefaultFormat, formatProvider);
 
     /// <inheritdoc />
     public override string ToString() => ToString(null, null);
@@ -98,8 +102,17 @@ public readonly record struct Frame :
     )
     {
         bytesWritten = 0;
+        if (format.IsEmpty) format = DefaultFormat;
         Utf8StringWriter writer = new(in utf8Destination, ref bytesWritten);
         return writer.Write(Number, format);
+    }
+
+    /// <inheritdoc />
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format,
+        IFormatProvider? provider)
+    {
+        if (format.IsEmpty) format = DefaultFormat;
+        return Number.TryFormat(destination, out charsWritten, format, provider);
     }
 
     /// <inheritdoc cref="Number" />

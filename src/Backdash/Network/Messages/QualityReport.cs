@@ -26,7 +26,7 @@ record struct QualityReport : IUtf8SpanFormattable
         IFormatProvider? provider)
     {
         bytesWritten = 0;
-        using Utf8ObjectWriter writer = new(in utf8Destination, ref bytesWritten);
+        using Utf8ObjectStringWriter writer = new(in utf8Destination, ref bytesWritten);
         return writer.Write(in FrameAdvantage) && writer.Write(in Ping);
     }
 }

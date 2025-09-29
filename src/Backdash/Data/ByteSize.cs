@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Backdash.Core;
 using Backdash.Serialization.Internal;
 
 namespace Backdash.Data;
@@ -7,10 +8,11 @@ namespace Backdash.Data;
 /// <summary>
 ///     Represents a byte size value
 /// </summary>
+[UnsafeInt64JsonConverter<ByteSize>]
 public readonly record struct ByteSize(long ByteCount)
     :
         IComparable<ByteSize>,
-        IFormattable,
+        ISpanFormattable,
         IUtf8SpanFormattable,
         IComparisonOperators<ByteSize, ByteSize, bool>,
         IAdditionOperators<ByteSize, ByteSize, ByteSize>,
@@ -181,35 +183,71 @@ public readonly record struct ByteSize(long ByteCount)
         {
             var maxBinarySymbol = GetMaxBinarySymbol();
             var binaryValue = GetValueForSymbol(maxBinarySymbol);
-            writer.Write(binaryValue, defaultFormat, provider);
-            writer.Write(" "u8);
-            return writer.WriteChars(maxBinarySymbol);
+            return writer.Write(binaryValue, defaultFormat, provider) &&
+                   writer.Write(" "u8) &&
+                   writer.Write(maxBinarySymbol);
         }
 
         if (format.Equals(decimalFormat, StringComparison.OrdinalIgnoreCase))
         {
             var maxDecimalSymbol = GetMaxDecimalSymbol();
             var decimalValue = GetValueForSymbol(maxDecimalSymbol);
-            writer.Write(decimalValue, defaultFormat, provider);
-            writer.Write(" "u8);
-            return writer.WriteChars(maxDecimalSymbol);
+            return writer.Write(decimalValue, defaultFormat, provider) &&
+                   writer.Write(" "u8) &&
+                   writer.Write(maxDecimalSymbol);
         }
 
         var symbol = FindSymbol(format);
         if (symbol.IsEmpty)
             return writer.Write(ByteCount, format, provider);
+
         var value = GetValueForSymbol(symbol);
-        if (
-            (!format.Contains('#') && !format.Contains('0'))
-            || symbol.Equals(format, StringComparison.OrdinalIgnoreCase)
-        )
-        {
-            writer.Write(value, defaultFormat, provider);
-            writer.Write(" "u8);
-            return writer.WriteChars(symbol);
-        }
+        if ((!format.Contains('#') && !format.Contains('0'))
+            || symbol.Equals(format, StringComparison.OrdinalIgnoreCase))
+            return writer.Write(value, defaultFormat, provider) &&
+                   writer.Write(" "u8) &&
+                   writer.Write(symbol);
 
         return writer.Write(value, format, provider);
+    }
+
+    /// <inheritdoc />
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format,
+        IFormatProvider? provider)
+    {
+        charsWritten = 0;
+        SpanStringBuilder writer = new(in destination, ref charsWritten);
+        format = format.IsEmpty ? decimalFormat : format;
+        if (format.Equals(binaryFormat, StringComparison.OrdinalIgnoreCase))
+        {
+            var maxBinarySymbol = GetMaxBinarySymbol();
+            var binaryValue = GetValueForSymbol(maxBinarySymbol);
+            return writer.Write(binaryValue, defaultFormat) &&
+                   writer.Write(" ") &&
+                   writer.Write(maxBinarySymbol);
+        }
+
+        if (format.Equals(decimalFormat, StringComparison.OrdinalIgnoreCase))
+        {
+            var maxDecimalSymbol = GetMaxDecimalSymbol();
+            var decimalValue = GetValueForSymbol(maxDecimalSymbol);
+            return writer.Write(decimalValue, defaultFormat) &&
+                   writer.Write(" ") &&
+                   writer.Write(maxDecimalSymbol);
+        }
+
+        var symbol = FindSymbol(format);
+        if (symbol.IsEmpty)
+            return writer.Write(ByteCount, format);
+
+        var value = GetValueForSymbol(symbol);
+        if ((!format.Contains('#') && !format.Contains('0'))
+            || symbol.Equals(format, StringComparison.OrdinalIgnoreCase))
+            return writer.Write(value, defaultFormat) &&
+                   writer.Write(" ") &&
+                   writer.Write(symbol);
+
+        return writer.Write(value, format);
     }
 
     static ReadOnlySpan<char> FindSymbol(ReadOnlySpan<char> str)

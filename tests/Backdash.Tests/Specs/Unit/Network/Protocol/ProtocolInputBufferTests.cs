@@ -33,10 +33,10 @@ public class ProtocolInputBufferTests
 
     static GameInput[] GetSampleInputs(int startFrame = 0) =>
     [
-        Generate.GameInput(startFrame + 0, [1 << 0]),
-        Generate.GameInput(startFrame + 1, [1 << 1]),
-        Generate.GameInput(startFrame + 2, [1 << 2]),
-        Generate.GameInput(startFrame + 3, [1 << 3]),
+        Gen.GameInput(startFrame + 0, [1 << 0]),
+        Gen.GameInput(startFrame + 1, [1 << 1]),
+        Gen.GameInput(startFrame + 2, [1 << 2]),
+        Gen.GameInput(startFrame + 3, [1 << 3]),
     ];
 
     [Fact]
@@ -52,7 +52,7 @@ public class ProtocolInputBufferTests
         var faker = GetFaker();
         var queue = faker.Generate<ProtocolInputBuffer<TestInput>>();
         var sender = faker.Resolve<IMessageSender>();
-        var input = Generate.GameInput(0, [0, 0, 0, 2]);
+        var input = Gen.GameInput(0, [0, 0, 0, 2]);
         A.CallTo(() => faker.Resolve<IProtocolInbox<TestInput>>().LastAckedFrame).Returns(Frame.Null);
         ProtocolMessage message = new(MessageType.Input)
         {
@@ -98,8 +98,8 @@ public class ProtocolInputBufferTests
         // setting up first inputs
         GameInput[] previousInputs =
         [
-            Generate.GameInput(0, [1 << 5]),
-            Generate.GameInput(1, [0]),
+            Gen.GameInput(0, [1 << 5]),
+            Gen.GameInput(1, [0]),
         ];
         foreach (var input in previousInputs)
             queue.SendInput(input).Should().Be(SendInputResult.Ok);
@@ -125,7 +125,7 @@ public class ProtocolInputBufferTests
         var faker = GetFakerWithSender();
         var queue = faker.Generate<ProtocolInputBuffer<TestInput>>();
         var sender = faker.Resolve<IMessageSender>();
-        var inputs = Generate.GameInputRange(Max.CompressedBytes * 4);
+        var inputs = Gen.GameInputRange(Max.CompressedBytes * 4);
         List<GameInput> successfullySend = [];
         foreach (var input in inputs)
         {
@@ -160,9 +160,9 @@ public class ProtocolInputBufferTests
             MaxPendingInputs = 1024,
         };
         ProtocolState state = new(
-            Generate.NetcodePlayer(),
-            Generate.Peer(),
-            Generate.ConnectionsState(),
+            Gen.NetcodePlayer(),
+            Gen.Peer(),
+            Gen.ConnectionsState(),
             42
         )
         {

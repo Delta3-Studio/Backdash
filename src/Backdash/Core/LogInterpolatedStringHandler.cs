@@ -32,14 +32,14 @@ ref struct LogInterpolatedStringHandler
     {
         if (!Enabled) return;
         Utf8StringWriter writer = new(Buffer, ref Length);
-        writer.WriteChars(t);
+        writer.Write(t);
     }
 
     public void AppendFormatted(ReadOnlySpan<char> t)
     {
         if (!Enabled) return;
         Utf8StringWriter writer = new(Buffer, ref Length);
-        writer.WriteChars(t);
+        writer.Write(t);
     }
 
     public void AppendFormatted(ReadOnlySpan<byte> t)
@@ -64,9 +64,9 @@ ref struct LogInterpolatedStringHandler
         var printableStack = st.ToString().ReplaceLineEndings(string.Empty).Replace("   at ", ">");
 
         Utf8StringWriter writer = new(Buffer, ref Length);
-        writer.WriteChars(t.Message);
+        writer.Write(t.Message);
         writer.Write("; "u8);
-        writer.WriteChars(printableStack);
+        writer.Write(printableStack);
     }
 
     public void AppendFormatted(IPAddress t)
@@ -95,7 +95,7 @@ ref struct LogInterpolatedStringHandler
 
         if (!Enabled) return;
         Utf8StringWriter writer = new(Buffer, ref Length);
-        writer.WriteChars(t.ToString());
+        writer.Write(t.ToString());
     }
 
     public void AppendFormatted<T>(T t) where T : IUtf8SpanFormattable

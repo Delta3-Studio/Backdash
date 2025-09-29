@@ -46,15 +46,15 @@ public record GameState
     {
         GameState result = new()
         {
-            Value1 = Generate.Random.Int(),
-            Value2 = Generate.Random.Long(),
-            Value3 = Generate.Random.Bool(),
-            Value4 = Generate.Vector2(),
-            Value5 = Generate.Vector3(),
+            Value1 = Gen.Random.Int(),
+            Value2 = Gen.Random.Long(),
+            Value3 = Gen.Random.Bool(),
+            Value4 = Gen.Vector2(),
+            Value5 = Gen.Vector3(),
         };
 
         for (int i = 0; i < result.MoreValues.Length; i++)
-            result.MoreValues[i] = Generate.Random.Byte();
+            result.MoreValues[i] = Gen.Random.Byte();
 
         return result;
     }
