@@ -14,6 +14,7 @@ static class Gen
     public static PeerAddress Peer() => Faker.Internet.IpEndPoint();
     public static Frame Frame() => new(Faker.Random.Int(0));
     public static FrameSpan FrameSpan() => new(Faker.Random.Int(0));
+    public static FrameRange FrameRange() => new(Faker.Random.Int(0), Faker.Random.Int(0));
     public static ByteSize ByteSize() => new(Faker.Random.Long(0));
     public static ConnectionsState ConnectionsState() => new(Max.NumberOfPlayers);
 

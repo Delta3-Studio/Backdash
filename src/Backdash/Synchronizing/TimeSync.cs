@@ -41,7 +41,7 @@ sealed class TimeSync<TInput>(
     }
 
     public void AdvanceFrame(in GameInput<TInput> input, in ProtocolState.AdvantageState state) =>
-        AdvanceFrame(in input, state.LocalFrameAdvantage.Count, state.RemoteFrameAdvantage.Count);
+        AdvanceFrame(in input, state.LocalFrameAdvantage.Frames, state.RemoteFrameAdvantage.Frames);
 
     public int RecommendFrameWaitDuration()
     {

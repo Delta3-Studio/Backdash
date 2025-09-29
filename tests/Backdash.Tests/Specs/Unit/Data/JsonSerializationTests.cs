@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Backdash.Data;
 using Backdash.Tests.TestUtils;
 
@@ -14,7 +14,15 @@ public class FrameJsonSerializationTests() :
 }
 
 public class FrameSpanJsonSerializationTests() :
-    BaseJsonConverterTests<FrameSpan>(Gen.FrameSpan, x => $"{x.Count}")
+    BaseJsonConverterTests<FrameSpan>(Gen.FrameSpan, x => $"{x.Frames}")
+{
+    [Fact] public void ShouldDeserialize() => DeserializeTest();
+    [Fact] public void ShouldSerialize() => SerializeTest();
+}
+
+public class FrameRangeJsonSerializationTests() :
+    BaseJsonConverterTests<FrameRange>(Gen.FrameRange, x =>
+        $"[{x.Start.Number},{x.End.Number}]")
 {
     [Fact] public void ShouldDeserialize() => DeserializeTest();
     [Fact] public void ShouldSerialize() => SerializeTest();

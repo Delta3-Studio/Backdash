@@ -118,7 +118,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     bool UpdateNetworkStats(NetcodePlayer player);
 
     /// <summary>
-    ///     Change the amount of delay frames for local input.
+    ///     Change the number of delay frames for local input.
     /// </summary>
     /// <param name="player"></param>
     /// <param name="delayInFrames"></param>
@@ -155,7 +155,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     void Start(CancellationToken stoppingToken = default);
 
     /// <summary>
-    ///     Waits the session background work to finish.
+    ///     Waits for the session background work to finish.
     /// </summary>
     Task WaitToStop(CancellationToken stoppingToken = default);
 
@@ -192,7 +192,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     bool IsSyncTest() => Mode is SessionMode.SyncTest;
 
     /// <summary>
-    /// Writes a log message into the current session log writer
+    ///     Writes a log message into the current session log writer
     /// </summary>
     void WriteLog(LogLevel level, string message);
 
@@ -225,7 +225,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     NetcodePlayer? FindPlayer(Guid id);
 
     /// <summary>
-    ///     Tries to get first player of type <paramref name="playerType"/>
+    ///     Tries to get the first player of type <paramref name="playerType"/>
     /// </summary>
     bool TryGetPlayer(PlayerType playerType, [NotNullWhen(true)] out NetcodePlayer? player)
     {
@@ -284,7 +284,7 @@ public interface INetcodeSession<TInput> : INetcodeSession where TInput : unmana
     void SetRandomSeed(uint seed, uint extraState = 0);
 
     /// <summary>
-    ///     Return all synchronized inputs with connect status.
+    ///     Return all synchronized inputs with status connected.
     ///     This must be called after <see cref="SynchronizeInputs" />
     /// </summary>
     ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs { get; }
@@ -326,7 +326,6 @@ public interface INetcodeSession<TInput> : INetcodeSession where TInput : unmana
     ///     Requires <see cref="NetcodeOptions.SaveConfirmedInputHistory"/> to be <c>true</c>.
     /// </summary>
     IReadOnlyList<ConfirmedInputs<TInput>> GetConfirmedInputs() => [];
-
 
     /// <summary>
     ///     Return bytes for all  confirmed inputs of a <see cref="SessionMode.Remote"/> session.
