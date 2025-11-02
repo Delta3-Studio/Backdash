@@ -1,6 +1,6 @@
 namespace Backdash.Core;
 
-static class Max
+public static class Max
 {
     /// <value>4</value>
     public const int NumberOfPlayers = 4;
