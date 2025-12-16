@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Backdash.Core;
@@ -40,7 +41,7 @@ sealed class HexStateStringParser : IStateStringParser
 }
 
 /// <summary>
-///     Try to get the json string representation of the state.
+///     Try to get the JSON string representation of the state.
 /// </summary>
 public sealed class JsonStateStringParser(
     JsonSerializerOptions? options = null,
@@ -55,6 +56,7 @@ public sealed class JsonStateStringParser(
         IncludeFields = true,
         AllowTrailingCommas = true,
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         Converters = { new JsonStringEnumConverter() },
     };
 
