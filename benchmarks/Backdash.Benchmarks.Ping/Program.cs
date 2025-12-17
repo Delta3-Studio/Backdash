@@ -3,6 +3,7 @@ using Backdash.Benchmarks.Ping;
 using Backdash.Core;
 using Backdash.Network.Client;
 using Backdash.Serialization.Internal;
+using static Backdash.Core.NetcodeConstants;
 
 var totalDuration = TimeSpan.FromSeconds(10);
 var snapshotInterval = TimeSpan.FromSeconds(0);

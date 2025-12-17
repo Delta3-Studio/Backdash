@@ -1,4 +1,3 @@
-using Backdash.Core;
 using Backdash.Network;
 using Backdash.Network.Client;
 using Backdash.Synchronizing.State;
@@ -20,8 +19,8 @@ public sealed record NetcodeOptions
     public int LocalPort { get; set; }
 
     /// <summary>
-    ///     Number of players
-    ///     Can not be greater than <see cref="Max.NumberOfPlayers" />
+    ///     Session number of players
+    ///     Can't be greater than <see cref="Max.NumberOfPlayers" />
     /// </summary>
     /// <value>Defaults to <c>2</c></value>
     public int NumberOfPlayers { get; set; } = 2;
