@@ -82,7 +82,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
 
     public IReadOnlySet<NetcodePlayer> GetSpectators() => FrozenSet<NetcodePlayer>.Empty;
 
-    public NetcodePlayer? FindPlayer(Guid id) => allPlayers.GetValueOrDefault(id);
+    public NetcodePlayer? GetPlayer(Guid id) => allPlayers.GetValueOrDefault(id);
     public void DisconnectPlayer(NetcodePlayer player) { }
 
     public void Start(CancellationToken stoppingToken = default)

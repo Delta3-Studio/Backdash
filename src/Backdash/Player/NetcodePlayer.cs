@@ -22,7 +22,7 @@ public class NetcodePlayer :
     /// <summary>
     ///     Player unique ID
     /// </summary>
-    public Guid Id { get; } = Guid.NewGuid();
+    public Guid Id { get; }
 
     /// <summary>
     ///     Player type
@@ -32,7 +32,7 @@ public class NetcodePlayer :
     /// <summary>
     ///     Custom user id value
     /// </summary>
-    public int CustomId { get; set; }
+    public virtual int CustomId { get; set; }
 
     /// <summary>
     ///     Network stats for the peer
@@ -40,10 +40,13 @@ public class NetcodePlayer :
     /// <seealso cref="INetcodeSession.UpdateNetworkStats"/>
     public PeerNetworkStats NetworkStats = new();
 
-    internal NetcodePlayer(sbyte queueIndex, PlayerType type, EndPoint? endPoint = null)
+    internal NetcodePlayer(sbyte queueIndex, PlayerType type, EndPoint? endPoint = null, Guid? id = null)
     {
         ThrowIf.InvalidEnum(type);
+        if (id is not null && id == Guid.Empty)
+            throw new ArgumentException("Player id cannot be empty", nameof(id));
 
+        Id = id ?? Guid.NewGuid();
         Type = type;
         EndPoint = endPoint;
         this.queueIndex = queueIndex;
@@ -52,12 +55,12 @@ public class NetcodePlayer :
     /// <summary>
     /// Initializes a new netcode player
     /// </summary>
-    public NetcodePlayer(PlayerType type, EndPoint? endPoint = null) : this(-1, type, endPoint) { }
+    public NetcodePlayer(PlayerType type, EndPoint? endPoint = null, Guid? id = null) : this(-1, type, endPoint, id) { }
 
     /// <summary>
     /// Initializes a new netcode player
     /// </summary>
-    public NetcodePlayer() : this(-1, PlayerType.Local) { }
+    public NetcodePlayer(Guid? id = null) : this(-1, PlayerType.Local, null, id) { }
 
     /// <summary>
     ///     Holds data for a  player IP Endpoint
@@ -126,6 +129,10 @@ public class NetcodePlayer :
         }
 
         builder.Append(Index);
+
+        if (CustomId != 0)
+            builder.Append($"(Id: ${CustomId})");
+
         builder.Append('}');
         return builder.ToString();
     }
@@ -143,7 +150,7 @@ public class NetcodePlayer :
     {
         if (ReferenceEquals(left, right)) return true;
         if (left is null || right is null) return false;
-        return left.Type == right.Type && left.queueIndex == right.queueIndex;
+        return left.Type == right.Type && left.Index == right.Index;
     }
 
     /// <inheritdoc />
@@ -155,39 +162,41 @@ public class NetcodePlayer :
     /// <summary>
     ///   Create new <see cref="NetcodePlayer"/> of type <see cref="PlayerType.Local"/>
     /// </summary>
-    public static NetcodePlayer CreateLocal() => new(PlayerType.Local);
+    public static NetcodePlayer CreateLocal(Guid? id = null) => new(PlayerType.Local, id: id);
 
     /// <summary>
     ///   Create new <see cref="NetcodePlayer"/> of type <see cref="PlayerType.Remote"/>
     /// </summary>
-    public static NetcodePlayer CreateRemote(EndPoint endPoint) => new(PlayerType.Remote, endPoint);
+    public static NetcodePlayer CreateRemote(EndPoint endPoint, Guid? id = null) =>
+        new(PlayerType.Remote, endPoint, id);
 
     /// <summary>
     ///   Create new <see cref="NetcodePlayer"/> of type <see cref="PlayerType.Remote"/>
     /// </summary>
-    public static NetcodePlayer CreateRemote(IPAddress address, int port) =>
-        CreateRemote(new IPEndPoint(address, port));
+    public static NetcodePlayer CreateRemote(IPAddress address, int port, Guid? id = null) =>
+        CreateRemote(new IPEndPoint(address, port), id);
 
     /// <summary>
     ///   Create new localhost <see cref="NetcodePlayer"/> of type <see cref="PlayerType.Remote"/>
     /// </summary>
-    public static NetcodePlayer CreateRemote(int port) =>
-        CreateRemote(IPAddress.Loopback, port);
+    public static NetcodePlayer CreateRemote(int port, Guid? id = null) =>
+        CreateRemote(IPAddress.Loopback, port, id);
 
     /// <summary>
     ///   Create new <see cref="NetcodePlayer"/> of type <see cref="PlayerType.Spectator"/>
     /// </summary>
-    public static NetcodePlayer CreateSpectator(EndPoint endPoint) => new(PlayerType.Spectator, endPoint);
+    public static NetcodePlayer CreateSpectator(EndPoint endPoint, Guid? id = null) =>
+        new(PlayerType.Spectator, endPoint, id);
 
     /// <summary>
     ///   Create new <see cref="NetcodePlayer"/> of type <see cref="PlayerType.Spectator"/>
     /// </summary>
-    public static NetcodePlayer CreateSpectator(IPAddress address, int port) =>
-        CreateSpectator(new IPEndPoint(address, port));
+    public static NetcodePlayer CreateSpectator(IPAddress address, int port, Guid? id = null) =>
+        CreateSpectator(new IPEndPoint(address, port), id);
 
     /// <summary>
     ///   Create new localhost <see cref="NetcodePlayer"/> of type <see cref="PlayerType.Spectator"/>
     /// </summary>
-    public static NetcodePlayer CreateSpectator(int port) =>
-        CreateSpectator(IPAddress.Loopback, port);
+    public static NetcodePlayer CreateSpectator(int port, Guid? id = null) =>
+        CreateSpectator(IPAddress.Loopback, port, id);
 }

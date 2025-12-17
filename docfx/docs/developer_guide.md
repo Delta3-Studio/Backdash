@@ -20,23 +20,22 @@ Your game probably has many moving parts. [Backdash](https://github.com/lucastel
   current score, etc.
 
 - **Game Inputs** are the set of things that modify the game state. These obviously include the joystick and button
-  presses done by the player but can include other non-obvious inputs as well. For example, if your game uses the
+  presses done by the player, but can also include other non-obvious inputs as well. For example, if your game uses the
   current time of day to calculate something in the game, the current time of day at the beginning of a frame is also an
   input.
 
 There are many other things in your game engine that are neither game state nor inputs. For example, your audio and
-video renderers are not game state since they don't have an effect on the outcome of the game. If you have a special
+video renderers are not game state since they don't affect the outcome of the game. If you have a special
 effects engine that's generating effects that do not have an impact on the game, they can be excluded from the game
 state as well.
 
 ## Using State and Inputs for Synchronization
 
-Each player in a [Backdash](https://github.com/lucasteles/Backdash) networked game has a complete copy of your game
-running. [Backdash](https://github.com/lucasteles/Backdash) needs to keep both copies of the
+Each player in a [Backdash](https://github.com/lucasteles/Backdash) networked game has a complete copy of the game running. [Backdash](https://github.com/lucasteles/Backdash) needs to keep both copies of the
 game state in sync to ensure that both players are experiencing the same game. It would be much too expensive to send an
 entire copy of the game state between players every frame. Instead, [Backdash](https://github.com/lucasteles/Backdash)
 sends the players' inputs to each other and has
-each player step the game forward. In order for this to work, your game engine must meet three criteria:
+each player step the game forward. For this to work, your game engine must meet three criteria:
 
 1. The game simulation must be fully deterministic. That is, for any given game state and inputs, advancing the game
    state by exactly 1 frame must result in identical game states for all players.
@@ -82,7 +81,7 @@ public enum MyGameInput {
 }
 ```
 
-To create a new session bounded to port `9001`:
+To create a new session bound to port `9001`:
 
 ```csharp
 using Backdash;
@@ -144,31 +143,47 @@ And then, set it into the session:
 session.SetHandler(new MySessionHandler());
 ```
 
-The [`INetcodeSession`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html) object should only
-be used for a single game session. If you need to connect to another opponent, dispose your existing object using
-the [`.Dispose`](https://learn.microsoft.com/pt-br/dotnet/api/system.idisposable.dispose?view=net-8.0)
-method and start a new one:
+The [`INetcodeSession`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html) object should only be used for a single game session. If you need to connect to another opponent, you must close the existing session object using
+[`.Dispose`](https://learn.microsoft.com/pt-br/dotnet/api/system.idisposable.dispose?view=net-8.0) method first, and then start a new one:
 
 ```csharp
 /* Close the current session to start a new one */
 session.Dispose();
 ```
 
-### Sending Player Locations
+### Setting Players
 
-When you created the [`INetcodeSession`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html)
-you don't specify any information about the players participating in the game. To do so, call
-the [`.AddPlayer()`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html#Backdash_INetcodeSession_2_AddPlayers_System_Collections_Generic_IReadOnlyList_Backdash_Player__)
+When you created the [`INetcodeSession`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html), you didn't specify any information about the players participating in the game.
+To do so, call the [`.AddPlayer()`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html#Backdash_INetcodeSession_2_AddPlayers_System_Collections_Generic_IReadOnlyList_Backdash_Player__)
 method function with an instance of [`Player`](https://delta3-studio.github.io/Backdash/api/Backdash.Player.html) for each
-player. The following example shows how you might
-use [`.AddPlayer()`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html#Backdash_INetcodeSession_2_AddPlayers_System_Collections_Generic_IReadOnlyList_Backdash_Player__)
-in a 2-player game:
+player. The following example shows how you might use [`.AddPlayer()`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html#Backdash_INetcodeSession_2_AddPlayers_System_Collections_Generic_IReadOnlyList_Backdash_Player__) in a 2-player game:
 
 ```csharp
-LocalPlayer player1 = new(1); // local player number 1
+var player1 = NetcodePlayer.CreateLocal(); // local player number 1
 
 var player2Endpoint = IPEndPoint.Parse("192.168.0.100:8001"); // player 2 ip and port
-RemotePlayer player2 = new(2, player2Endpoint); // remote player number 2
+var player2 = NetcodePlayer.CreateRemote(player2Endpoint); // remote player number 2
+
+// add players in session builder
+var session = RollbackNetcode
+    .WithInputType<MyGameInput>()
+    .WithPort(9001)
+    .WithPlayers(player1, player2) // player list
+    .ForRemote()
+    .Build();
+
+// ...
+```
+
+It is also possible to add the players after building and before starting the session :
+
+```csharp
+
+var session = RollbackNetcode
+    .WithInputType<MyGameInput>()
+    .WithPort(9001)
+    .ForRemote()
+    .Build();
 
 ResultCode result;
 result = session.AddPlayer(player1);
@@ -177,13 +192,58 @@ result = session.AddPlayer(player2);
 // ...
 ```
 
-Check the [samples](https://github.com/lucasteles/Backdash/tree/master/samples) for more complete code.
+Every instance of [`NetcodePlayer`](https://delta3.studio/Backdash/api/Backdash.NetcodePlayer) will have an unique [**`Guid` Id**](https://delta3.studio/Backdash/api/Backdash.NetcodePlayer.html#Backdash_NetcodePlayer_Id) _(It can be set when you are instantiating the player)_
+
+When a [`NetcodePlayer`](https://delta3.studio/Backdash/api/Backdash.NetcodePlayer) is added to a session, it will receive a unique [`Index`](https://delta3.studio/Backdash/api/Backdash.NetcodePlayer#Backdash_NetcodePlayer_Index) and [`Number`](https://delta3.studio/Backdash/api/Backdash.NetcodePlayer#Backdash_NetcodePlayer_Number)
+
+If you need to set a custom _player number_ or _id_ to a player, you can use [`CustomId`](https://delta3.studio/Backdash/api/Backdash.NetcodePlayer#Backdash_NetcodePlayer_CustomId) property.
+
+
+```csharp
+var player1 = NetcodePlayer.CreateLocal(); // local player number 1
+player1.CustomId = 10;
+var player2 = NetcodePlayer.CreateRemote(player2Endpoint); // remote player number 2
+player2.CustomId = 20;
+
+if (session.TryGetPlayerByCustomId(20, out var foundPlayer))
+    Console.WriteLine($"Player 20 found: {foundPlayer.Id}")
+
+// ...
+```
+
+Another useful option is to inherit the class `NetcodePlayer` and customize it as needed:
+
+```csharp
+public enum PlayerSide
+{
+    Left = -1,
+    Right = 1,
+}
+
+public sealed class SessionPlayer : NetcodePlayer
+{
+    public SessionPlayer(
+        int playerNumber, PlayerSide side,
+        PlayerType type, IPEndPoint? endPoint = null
+    ) : base(type, endPoint)
+    {
+        PlayerSide = side;
+        CustomId = number;
+    }
+
+    public readonly PlayerSide PlayerSide;
+
+    // ...
+}
+
+```
+
+> For further, more complex setups, check the [samples](https://github.com/lucasteles/Backdash/tree/master/samples).
 
 ### Starting session
 
-After setting up players you must call the
-session [.Start()](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html#Backdash_INetcodeSession_2_Start_System_Threading_CancellationToken_)
-method. This will start all the background work like socket receiver, input queue, peer synchronization, etc.
+After setting up the players, you must call the
+session [.Start()](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html#Backdash_INetcodeSession_2_Start_System_Threading_CancellationToken_) method. This will start all the background work, like the socket receiver, input queue, peer synchronization, etc.
 
 ```csharp
 session.Start();
@@ -199,14 +259,13 @@ for each local player
 and [`SynchronizeInputs`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_SynchronizeInputs)
 to fetch the inputs for remote players. Be sure to check the return value of `SynchronizeInputs`. If it returns a value
 other than [ResultCode.Ok`](https://delta3-studio.github.io/Backdash/api/Backdash.ResultCode.html), you should
-**not advance your game state**. This usually happens because [Backdash](https://github.com/lucasteles/Backdash) has not
-received packets from the remote player in a while and has reached its internal prediction limit.
+**Do not advance your game state**. This usually happens because [Backdash](https://github.com/lucasteles/Backdash) has not received packets from the remote player in a while and has reached its internal prediction limit.
 
-After synchronizing you can read the player's inputs using
+After synchronizing, you can read the player's inputs using
 the [`GetInput`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_GetInput_System_Int32_)
-method for a single-player
+method for a single player
 or [`GetInputs`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_GetInputs_System_Span_Backdash_Data_SynchronizedInput__0___)
-to load all player's inputs into a buffer.
+to load all players' inputs into a buffer.
 
 For example, if your code looks like this currently for a local game:
 
@@ -244,13 +303,7 @@ if (result is ResultCode.Ok)
 You should
 call [`SynchronizeInputs`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_SynchronizeInputs)
 every frame, even those that happen during a rollback. Make sure you always use the values returned
-from [`GetInputs`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_GetInputs_System_Span_Backdash_Data_SynchronizedInput__0___)
-rather than the values you've read from the local controllers to advance your game state. During a
-rollback [`SynchronizeInputs`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_SynchronizeInputs)
-will replace the values passed
-into [`AddLocalInput`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_AddLocalInput_Backdash_PlayerHandle__0_)
-with the values used for previous frames. Also, if you've manually added input delay for the local player to smooth out
-the effect of rollbacks, the inputs you pass
+from [`GetInputs`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_GetInputs_System_Span_Backdash_Data_SynchronizedInput__0___) rather than the values you've read from the local controllers to advance your game state. During a rollback [`SynchronizeInputs`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_SynchronizeInputs) will replace the values passed into [`AddLocalInput`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_AddLocalInput_Backdash_PlayerHandle__0_) with the values used for previous frames. Also, if you've manually added an input delay for the local player to smooth out the effect of rollbacks, the inputs you pass
 into [`AddLocalInput`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_AddLocalInput_Backdash_PlayerHandle__0_)
 won't actually be returned
 in [`GetInputs`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_GetInputs_System_Span_Backdash_Data_SynchronizedInput__0___)
@@ -265,7 +318,7 @@ The [`SaveState`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcode
 The [`LoadState`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_LoadState_Backdash_Data_Frame___0__) function should restore the game state from a previously saved binary buffer using the `BinaryBufferReader`, reading each member.
 
 > [!IMPORTANT]
-> **⚠️:** You must read and write member in the **SAME ORDER** and also ensure the same size (like arrays or lists).
+> **⚠️:** You must read and write members in the **SAME ORDER** and also ensure the same size (like arrays or lists).
 
 For example:
 
@@ -308,12 +361,11 @@ public class MySessionHandler : INetcodeSessionHandler
 
 The saved **Game State** will have a calculated [checksum](https://en.wikipedia.org/wiki/Checksum) based on its binary representation. The default implementation is [Fletcher 32](http://en.wikipedia.org/wiki/Fletcher%27s_checksum) algorithm by the class `Fletcher32ChecksumProvider`.
 
-You can also use you own checksum algorithm, for this just implement the interface
-[`IChecksumProvider`](https://delta3-studio.github.io/Backdash/api/Backdash.Sync.State.IChecksumProvider-1.html).
+You can also use your own checksum algorithm; for this, just implement the interface [`IChecksumProvider`](https://delta3-studio.github.io/Backdash/api/Backdash.Sync.State.IChecksumProvider-1.html).
 
 ### Custom State Serializer
 
-If you don't want to write/read each member or just need to use other serialization method for the state, you is able to access the `IBufferWriter` for _save_ and the raw `ReadOnlySpan<byte>` for _load_:
+If you don't want to write/read each member or just need to use another serialization method for the state, you can access the `IBufferWriter` for _save_ and the raw `ReadOnlySpan<byte>` for _load_:
 
 Example for [MemoryPack](https://github.com/Cysharp/MemoryPack);
 
@@ -354,8 +406,7 @@ public class MySessionHandler : INetcodeSessionHandler
 ### Advance Frame Callback
 
 This callback is called when a rollback occurs, just after
-the [`SaveState`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_SaveState_Backdash_Data_Frame___0__)
-here you must synchronize inputs and advance the state.
+the [`SaveState`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_SaveState_Backdash_Data_Frame___0__) here, you must synchronize inputs and advance the state.
 
 Usually something like:
 ```csharp
@@ -384,7 +435,7 @@ We're almost done. The last step is notify [Backdash](https://github.com/lucaste
 starts and every time the **game state** finishes advancing by one frame.
 
 Just call [`BeginFrame`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_BeginFrame)
-method on session at the beginning of each frame
+method in the session at the beginning of each frame
 and [`AdvanceFrame`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_AdvanceFrame)
 after you've finished one frame **but before you've started the next**.
 
@@ -421,7 +472,7 @@ a [`Enum`](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/bu
 important
 because the inputs are what is transmitted over the network to other players.
 
-For example, we can encode all usable digital buttons of a **XBox DPad** using only
+For example, we can encode all usable digital buttons of an **XBox DPad** using only
 [a `short` type](https://learn.microsoft.com/en-us/dotnet/api/system.int16) (_only 2 bytes_):
 
 ```csharp
@@ -450,16 +501,13 @@ public enum PadButtonInputs : short
 The serialization of enums and mostly of primitive types is automatically handled
 by [Backdash](https://github.com/lucasteles/Backdash).
 
-
 > [!CAUTION]
 > We can also handle serialization of complex structs that **do not** contain any reference type member. for those
 > no [`Endianess Convertion`](https://delta3-studio.github.io/Backdash/api/Backdash.NetcodeOptions.html#Backdash_NetcodeOptions_NetworkEndianness) is applied.
 
 ### Custom Serializer
 
-If you need a more complex input type and
-support [`Endianess convertion`](https://delta3-studio.github.io/Backdash/api/Backdash.NetcodeOptions.html#Backdash_NetcodeOptions_NetworkEndianness)
-you must implement
+If you need a more complex input type with [`Endianess conversion`](https://delta3-studio.github.io/Backdash/api/Backdash.NetcodeOptions.html#Backdash_NetcodeOptions_NetworkEndianness) support, you must implement
 an [`IBinarySerializer<TInput>`](https://delta3-studio.github.io/Backdash/api/Backdash.Serialization.IBinarySerializer-1.html)
 for your input type.
 
@@ -566,13 +614,13 @@ In general, you should try to make your frame delay as high as possible without 
 the game. For example, a fighting game requires pixel-perfect accuracy, excellent timing, and extremely tightly
 controlled joystick motions. For this type of game, any frame delay larger than 1 can be noticed by most intermediate
 players, and expert players may even notice a single frame of delay. On the other hand, board games or puzzle games
-which do not have very strict timing requirements may get away with setting the frame latency as high as 4 or 5 before
+that do not have very strict timing requirements may get away with setting the frame latency as high as 4 or 5 before
 users begin to notice.
 
 Another reason to set the frame delay high is to eliminate the glitching that can occur during a rollback. The longer
 the rollback, the more likely the user is to notice the discontinuities caused by temporarily executing the incorrect
 prediction frames. For example, suppose your game has a feature where the entire screen will flash for exactly 2 frames
-immediately after the user presses a button. Suppose further that you've chosen a value of 1 for the frame latency and
+immediately after the user presses a button. Suppose further that you've chosen a value of 1 for the frame latency, and
 the time to transmit a packet is 4 frames. In this case, a rollback is likely to be around 3 frames (4 – 1 = 3). If the
 flash occurs on the first frame of the rollback, your 2-second flash will be entirely consumed by the rollback, and the
 remote player will never get to see it!  In this case, you're better off either specifying a higher frame latency value
@@ -586,7 +634,7 @@ There are examples for up to 4 players:
 
 - [Simple console game](https://github.com/lucasteles/Backdash/tree/master/samples/ConsoleGame)
 - [Monogame SpaceWar](https://github.com/lucasteles/Backdash/tree/master/samples/SpaceWar)
-- [Monogame SpaceWar with lobby over internet](https://github.com/lucasteles/Backdash/tree/master/samples/SpaceWar.Lobby)
-- [Godot SpaceWar with lobby over internet](https://github.com/lucasteles/BackdashGodotSample)
+- [Monogame SpaceWar with lobby over the internet](https://github.com/lucasteles/Backdash/tree/master/samples/SpaceWar.Lobby)
+- [Godot SpaceWar with lobby over the internet](https://github.com/lucasteles/BackdashGodotSample)
 
 > See the `.cmd`/`.sh` files in the `scripts` directory for examples on how to start 2, 3, and 4-player games.

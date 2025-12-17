@@ -238,7 +238,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     ///     Find player by unique ID
     /// </summary>
     /// <seealso cref="NetcodePlayer.Id"/>
-    NetcodePlayer? FindPlayer(Guid id);
+    NetcodePlayer? GetPlayer(Guid id);
 
     /// <summary>
     ///     Tries to get the first player of type <paramref name="playerType"/>
@@ -265,6 +265,25 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     /// </summary>
     bool TryGetRemotePlayer([NotNullWhen(true)] out NetcodePlayer? player) =>
         TryGetPlayer(PlayerType.Remote, out player);
+
+    /// <summary>
+    ///     Tries to get the first player with <see cref="NetcodePlayer.CustomId"/> equals to <paramref name="customId"/>
+    /// </summary>
+    bool TryGetPlayerByCustomId(int customId, [NotNullWhen(true)] out NetcodePlayer? player)
+    {
+        if (GetPlayers().Cast<NetcodePlayer?>().FirstOrDefault(p => p?.CustomId == customId) is { } found)
+        {
+            player = found;
+            return true;
+        }
+
+        player = null;
+        return false;
+    }
+
+    /// <inheritdoc cref="TryGetPlayerByCustomId"/>
+    NetcodePlayer? GetPlayerByCustomId(int customId) =>
+        TryGetPlayerByCustomId(customId, out var player) ? player : null;
 }
 
 /// <summary>

@@ -30,6 +30,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backdash.Benchmarks", "..\b
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backdash.Benchmarks.Ping", "..\benchmarks\Backdash.Benchmarks.Ping\Backdash.Benchmarks.Ping.csproj", "{015D19EA-8A66-4203-A974-940A41A85F9B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_files", "_files", "{0F13703F-53D5-45EF-B74C-3A31BBC40B70}"
+	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
+		..\.gitattributes = ..\.gitattributes
+		..\.gitignore = ..\.gitignore
+		..\Backdash.sln.DotSettings = ..\Backdash.sln.DotSettings
+		..\GitVersion.yml = ..\GitVersion.yml
+		..\global.json = ..\global.json
+		..\.config\dotnet-tools.json = ..\.config\dotnet-tools.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{79955002-3B66-49BE-82D3-6EA518A87F5E}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		SpaceWar.Shared\.config\dotnet-tools.json = SpaceWar.Shared\.config\dotnet-tools.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,5 +110,6 @@ Global
 		{2C929464-D962-4EF7-8043-ED8688A46955} = {C24EEF04-35A8-4574-8968-CCE1DE334185}
 		{D5C0102D-ED9B-441A-8F95-7AF16161CCC6} = {C6F08499-1C15-43BC-90D4-6B0E7E540D33}
 		{015D19EA-8A66-4203-A974-940A41A85F9B} = {C6F08499-1C15-43BC-90D4-6B0E7E540D33}
+		{79955002-3B66-49BE-82D3-6EA518A87F5E} = {0F13703F-53D5-45EF-B74C-3A31BBC40B70}
 	EndGlobalSection
 EndGlobal

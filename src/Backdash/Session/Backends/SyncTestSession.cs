@@ -131,7 +131,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         addedPlayers.Count is 0 ? localPlayerFallback : addedPlayers.Keys.ToHashSet();
 
     public IReadOnlySet<NetcodePlayer> GetSpectators() => addedSpectators;
-    public NetcodePlayer? FindPlayer(Guid id) => allPlayers.GetValueOrDefault(id);
+    public NetcodePlayer? GetPlayer(Guid id) => allPlayers.GetValueOrDefault(id);
     public void DisconnectPlayer(NetcodePlayer player) { }
 
     public void Start(CancellationToken stoppingToken = default)

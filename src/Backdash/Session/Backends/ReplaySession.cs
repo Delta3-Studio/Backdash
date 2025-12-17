@@ -111,7 +111,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     public ResultCode AddLocalInput(NetcodePlayer player, in TInput localInput) => ResultCode.Ok;
     public IReadOnlySet<NetcodePlayer> GetPlayers() => fakePlayers;
     public IReadOnlySet<NetcodePlayer> GetSpectators() => FrozenSet<NetcodePlayer>.Empty;
-    public NetcodePlayer? FindPlayer(Guid id) => playerMap.GetValueOrDefault(id);
+    public NetcodePlayer? GetPlayer(Guid id) => playerMap.GetValueOrDefault(id);
 
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;

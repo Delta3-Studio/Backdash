@@ -166,7 +166,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         inputListener?.Dispose();
     }
 
-    public void Close()
+    void Close()
     {
         if (closed) return;
         closed = true;
@@ -207,7 +207,20 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
     public IReadOnlySet<NetcodePlayer> GetPlayers() => addedPlayers;
     public IReadOnlySet<NetcodePlayer> GetSpectators() => addedSpectators;
-    public NetcodePlayer? FindPlayer(Guid id) => allPlayers.GetValueOrDefault(id);
+    public NetcodePlayer? GetPlayer(Guid id) => allPlayers.GetValueOrDefault(id);
+
+    public bool TryGetPlayerByCustomId(int customId, [NotNullWhen(true)] out NetcodePlayer? player)
+    {
+        foreach (var p in addedPlayers)
+        {
+            if (p.CustomId != customId) continue;
+            player = p;
+            return true;
+        }
+
+        player = null;
+        return false;
+    }
 
     public bool TryGetPlayer(PlayerType playerType, [NotNullWhen(true)] out NetcodePlayer? player)
     {
