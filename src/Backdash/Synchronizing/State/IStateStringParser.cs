@@ -49,19 +49,20 @@ public sealed class JsonStateStringParser(
 ) : IStateStringParser
 {
     internal Logger? Logger = null;
-
-    readonly JsonSerializerOptions jsonOptions = options ?? new()
-    {
-        WriteIndented = true,
-        IncludeFields = true,
-        AllowTrailingCommas = true,
-        ReferenceHandler = ReferenceHandler.IgnoreCycles,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        Converters = { new JsonStringEnumConverter() },
-    };
-
+    readonly JsonSerializerOptions jsonOptions = options ?? CreateDefaultJsonOptions();
     readonly IStateStringParser fallback = stateStringFallback ?? new DefaultStateStringParser();
     readonly HexStateStringParser nullFallback = new();
+
+    internal static JsonSerializerOptions CreateDefaultJsonOptions() =>
+        new()
+        {
+            WriteIndented = true,
+            IncludeFields = true,
+            AllowTrailingCommas = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters = { new JsonStringEnumConverter() },
+        };
 
     /// <inheritdoc />
     public string GetStateString(in Frame frame, ref readonly BinaryBufferReader reader, object? currentState)

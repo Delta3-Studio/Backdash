@@ -488,7 +488,7 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         WithSocketFactory(new DelegateSocketFactory(factory));
 
     /// <summary>
-    ///     Add plugin type
+    ///     Register a plugin by type
     /// </summary>
     /// <seealso cref="ServicesConfig{TInput}" />
     [MemberNotNull(nameof(sessionServices))]
@@ -508,8 +508,9 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
 
 
     /// <summary>
-    ///     Add new custom job
+    ///     Add a new custom job
     /// </summary>
+    /// <seealso cref="ServicesConfig{TInput}" />
     [MemberNotNull(nameof(sessionServices))]
     public NetcodeSessionBuilder<TInput> AddJob(INetcodeJob job)
     {
@@ -517,10 +518,7 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         return ConfigureServices(services => services.Jobs.Add(job));
     }
 
-    /// <summary>
-    ///     Add new custom job
-    /// </summary>
-    /// <seealso cref="ServicesConfig{TInput}" />
+    /// <inheritdoc cref="AddJob(INetcodeJob)" />
     [MemberNotNull(nameof(sessionServices))]
     public NetcodeSessionBuilder<TInput> AddJob<TPlugin>() where TPlugin : INetcodeJob, new() =>
         AddJob(new TPlugin());
@@ -700,9 +698,9 @@ public sealed class NetcodeSessionBuilder
             new(e => IntegerBinarySerializer.Create<T>(isUnsigned, e));
 
         /// <summary>
-        ///     Choose a raw unmanaged value type as input type.
+        ///     Choose a raw unmanaged value type as an input type.
         ///     Must not be a reference type or a value type that contains references.
-        ///     This *DO NOT* use custom <see cref="Endianness" /> for <typeparamref name="T" /> integer fields.
+        ///     This *DOES NOT* use custom <see cref="Endianness" /> for <typeparamref name="T" /> integer fields.
         /// </summary>
         /// <seealso cref="RuntimeHelpers.IsReferenceOrContainsReferences{T}" />
         public InputTypeSelected<T> Struct<T>() where T : unmanaged =>

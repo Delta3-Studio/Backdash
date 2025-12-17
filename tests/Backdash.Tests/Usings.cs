@@ -6,6 +6,6 @@ global using FakeItEasy.AutoFakeIt;
 global using FluentAssertions;
 global using FsCheck;
 global using Xunit;
-global using Max = Backdash.Core.NetcodeConstants.Max;
 global using GameInput = Backdash.Synchronizing.Input.GameInput<Backdash.Tests.TestUtils.TestInput>;
+global using Max = Backdash.Core.NetcodeConstants.Max;
 global using Random = System.Random;

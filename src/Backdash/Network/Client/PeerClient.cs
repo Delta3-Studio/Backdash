@@ -13,12 +13,12 @@ namespace Backdash.Network.Client;
 public interface IMessageHandler<T> where T : struct
 {
     /// <summary>
-    ///     Handles sent message.
+    ///     Handles messages sent.
     /// </summary>
     void AfterSendMessage(int bytesSent);
 
     /// <summary>
-    ///     Prepare message to be sent.
+    ///     Prepare messages to be sent.
     /// </summary>
     void BeforeSendMessage(ref T message);
 }
@@ -133,6 +133,7 @@ sealed class PeerClient<T> : INetcodeJob, IDisposable, IAsyncDisposable where T 
 
                     entry.Callback?.BeforeSendMessage(ref entry.Body);
 
+                    // LATER: move the .Span outside the loop (requires >=.NET10)
                     var bodySize = serializer.Serialize(in entry.Body, buffer.Span);
                     var sentSize = await socket.SendToAsync(buffer[..bodySize], entry.Recipient, cancellationToken)
                         .ConfigureAwait(false);
