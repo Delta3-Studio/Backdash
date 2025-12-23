@@ -47,10 +47,6 @@ sealed class IntegerBinaryLittleEndianSerializer<T>(bool isUnsigned)
 
 static class IntegerBinarySerializer
 {
-    public static IBinarySerializer<TInput> Create<TInput>(Endianness? endianness = null)
-        where TInput : unmanaged, IBinaryInteger<TInput>, IMinMaxValue<TInput>
-        => Create<TInput>(Mem.IsUnsigned<TInput>(), endianness);
-
     public static IBinarySerializer<TInput> Create<TInput>(bool isUnsigned, Endianness? endianness = null)
         where TInput : unmanaged, IBinaryInteger<TInput>
     {

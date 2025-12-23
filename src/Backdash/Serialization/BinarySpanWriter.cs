@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Backdash.Core;
 using Backdash.Network;
+using Backdash.Serialization.Internal;
 
 namespace Backdash.Serialization;
 
@@ -14,28 +15,47 @@ namespace Backdash.Serialization;
 [DebuggerDisplay("Written: {WrittenCount}")]
 public readonly ref struct BinarySpanWriter
 {
+    readonly ref int offset;
+    readonly Span<byte> buffer;
+    readonly EndiannessSerializer.INumberSerializer numberSerializer;
+
+    /// <summary>
+    ///     Initialize a new <see cref="BinarySpanWriter" /> for <paramref name="buffer" />
+    /// </summary>
+    /// <param name="buffer">Byte buffer to be written</param>
+    /// <param name="offset">Write offset reference</param>
+    /// <param name="numberSerializer">Number serializer instance</param>
+    public BinarySpanWriter(
+        scoped in Span<byte> buffer,
+        ref int offset,
+        EndiannessSerializer.INumberSerializer numberSerializer
+    )
+    {
+        ArgumentNullException.ThrowIfNull(numberSerializer);
+        this.buffer = buffer;
+        this.offset = ref offset;
+        this.numberSerializer = numberSerializer;
+    }
+
     /// <summary>
     ///     Initialize a new <see cref="BinarySpanWriter" /> for <paramref name="buffer" />
     /// </summary>
     /// <param name="buffer">Byte buffer to be written</param>
     /// <param name="offset">Write offset reference</param>
     /// <param name="endianness">Serialization endianness</param>
-    public BinarySpanWriter(
-        scoped in Span<byte> buffer,
-        ref int offset,
-        Endianness? endianness = null
-    )
-    {
-        this.buffer = buffer;
-        this.offset = ref offset;
-        Endianness = endianness ?? Platform.Endianness;
-    }
+    public BinarySpanWriter(scoped in Span<byte> buffer, ref int offset, Endianness endianness)
+        : this(in buffer, ref offset, EndiannessSerializer.Get(endianness)) { }
 
-    readonly ref int offset;
-    readonly Span<byte> buffer;
+    /// <summary>
+    ///     Initialize a new <see cref="BinarySpanWriter" /> for <paramref name="buffer" />
+    /// </summary>
+    /// <param name="buffer">Byte buffer to be written</param>
+    /// <param name="offset">Write offset reference</param>
+    public BinarySpanWriter(scoped in Span<byte> buffer, ref int offset)
+        : this(in buffer, ref offset, Platform.Endianness) { }
 
-    /// <summary>Gets or init the value to define which endianness should be used for serialization.</summary>
-    public readonly Endianness Endianness;
+    /// <summary>Gets current serialization endianness.</summary>
+    public Endianness Endianness => numberSerializer.Endianness;
 
     /// <summary>Total written byte count.</summary>
     public int WrittenCount => offset;

@@ -7,6 +7,7 @@ using System.Text;
 using Backdash.Core;
 using Backdash.Data;
 using Backdash.Network;
+using Backdash.Serialization.Internal;
 
 namespace Backdash.Serialization;
 
@@ -16,24 +17,46 @@ namespace Backdash.Serialization;
 [DebuggerDisplay("Read: {ReadCount}")]
 public readonly ref struct BinaryBufferReader
 {
+    readonly ref int offset;
+    readonly ReadOnlySpan<byte> buffer;
+    readonly EndiannessSerializer.INumberSerializer numberSerializer;
+
+    /// <summary>
+    ///     Initialize a new <see cref="BinaryBufferReader" /> for <paramref name="buffer" />
+    /// </summary>
+    /// <param name="buffer">Byte buffer to be read</param>
+    /// <param name="offset">Read offset reference</param>
+    /// <param name="numberSerializer">Number serializer instance</param>
+    public BinaryBufferReader(
+        ReadOnlySpan<byte> buffer, ref int offset,
+        EndiannessSerializer.INumberSerializer numberSerializer
+    )
+    {
+        ArgumentNullException.ThrowIfNull(numberSerializer);
+        this.offset = ref offset;
+        this.buffer = buffer;
+        this.numberSerializer = numberSerializer;
+    }
+
     /// <summary>
     ///     Initialize a new <see cref="BinaryBufferReader" /> for <paramref name="buffer" />
     /// </summary>
     /// <param name="buffer">Byte buffer to be read</param>
     /// <param name="offset">Read offset reference</param>
     /// <param name="endianness">Deserialization endianness</param>
-    public BinaryBufferReader(ReadOnlySpan<byte> buffer, ref int offset, Endianness? endianness = null)
-    {
-        this.offset = ref offset;
-        this.buffer = buffer;
-        Endianness = endianness ?? Platform.Endianness;
-    }
+    public BinaryBufferReader(ReadOnlySpan<byte> buffer, ref int offset, Endianness endianness)
+        : this(buffer, ref offset, EndiannessSerializer.Get(endianness)) { }
 
-    readonly ref int offset;
-    readonly ReadOnlySpan<byte> buffer;
+    /// <summary>
+    ///     Initialize a new <see cref="BinaryBufferReader" /> for <paramref name="buffer" />
+    /// </summary>
+    /// <param name="buffer">Byte buffer to be read</param>
+    /// <param name="offset">Read offset reference</param>
+    public BinaryBufferReader(ReadOnlySpan<byte> buffer, ref int offset)
+        : this(buffer, ref offset, Platform.Endianness) { }
 
-    /// <summary>Gets or init the value to define which endianness should be used for serialization.</summary>
-    public readonly Endianness Endianness;
+    /// <summary>Gets current serialization endianness.</summary>
+    public Endianness Endianness => numberSerializer.Endianness;
 
     /// <summary>Total read byte count.</summary>
     public int ReadCount => offset;
@@ -313,34 +336,15 @@ public readonly ref struct BinaryBufferReader
     /// <summary>Reads single <see cref="IBinaryInteger{T}" /> from buffer.</summary>
     /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
     /// <param name="isUnsigned">
-    ///     true if source represents an unsigned two's complement number; otherwise, false to indicate it
+    ///     true if value represents an unsigned two's complement number; otherwise, false to indicate it
     ///     represents a signed two's complement number
     /// </param>
     public T ReadNumber<T>(bool isUnsigned) where T : unmanaged, IBinaryInteger<T>
     {
-        var size = Unsafe.SizeOf<T>();
-        var result = Endianness switch
-        {
-            Endianness.LittleEndian => T.ReadLittleEndian(CurrentBuffer[..size], isUnsigned),
-            Endianness.BigEndian => T.ReadBigEndian(CurrentBuffer[..size], isUnsigned),
-            _ => default,
-        };
-        Advance(size);
+        var result = numberSerializer.Read<T>(CurrentBuffer, isUnsigned, out var written);
+        Advance(written);
         return result;
     }
-
-    /// <summary>Reads single <see cref="IBinaryInteger{T}" /> from buffer.</summary>
-    /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" /> and <see cref="IMinMaxValue{T}" />.</typeparam>
-    public T ReadNumber<T>() where T : unmanaged, IBinaryInteger<T>, IMinMaxValue<T> =>
-        ReadNumber<T>(T.IsZero(T.MinValue));
-
-    /// <inheritdoc cref="ReadNumber{T}()" />
-    public void ReadNumber<T>(ref T value) where T : unmanaged, IBinaryInteger<T>, IMinMaxValue<T> =>
-        value = ReadNumber<T>();
-
-    /// <inheritdoc cref="ReadNullableNumber{T}()" />
-    public void ReadNumber<T>(ref T? value) where T : unmanaged, IBinaryInteger<T>, IMinMaxValue<T> =>
-        value = ReadNullableNumber<T>();
 
     /// <inheritdoc cref="ReadNumber{T}(bool)" />
     public void ReadNumber<T>(ref T value, bool isUnsigned) where T : unmanaged, IBinaryInteger<T> =>
@@ -349,10 +353,6 @@ public readonly ref struct BinaryBufferReader
     /// <inheritdoc cref="ReadNullableNumber{T}(bool)" />
     public void ReadNumber<T>(ref T? value, bool isUnsigned) where T : unmanaged, IBinaryInteger<T> =>
         value = ReadNullableNumber<T>(isUnsigned);
-
-    /// <inheritdoc cref="ReadNumber{T}()" />
-    public T? ReadNullableNumber<T>() where T : unmanaged, IBinaryInteger<T>, IMinMaxValue<T> =>
-        ReadBoolean() ? ReadNumber<T>() : null;
 
     /// <inheritdoc cref="ReadNumber{T}(bool)" />
     public T? ReadNullableNumber<T>(bool isUnsigned) where T : unmanaged, IBinaryInteger<T> =>

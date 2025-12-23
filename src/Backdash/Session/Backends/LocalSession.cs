@@ -6,6 +6,7 @@ using Backdash.Core;
 using Backdash.Network;
 using Backdash.Options;
 using Backdash.Serialization;
+using Backdash.Serialization.Internal;
 using Backdash.Synchronizing.Input;
 using Backdash.Synchronizing.Random;
 using Backdash.Synchronizing.State;
@@ -26,7 +27,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
     readonly IDeterministicRandom<TInput> random;
-    readonly Endianness endianness;
+    readonly EndiannessSerializer.INumberSerializer endianness;
     readonly EqualityComparer<TInput> comparer;
     readonly NetcodeOptions options;
 
@@ -47,7 +48,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         checksumProvider = services.ChecksumProvider;
         random = services.DeterministicRandom;
         logger = services.Logger;
-        endianness = options.GetStateSerializationEndianness();
+        endianness = options.GetEndiannessNumberStateSerializer();
         callbacks = services.SessionHandler;
         comparer = services.InputComparer;
         stateStore.Initialize(options.TotalSavedFramesAllowed);

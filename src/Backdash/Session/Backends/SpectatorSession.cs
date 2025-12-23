@@ -9,6 +9,7 @@ using Backdash.Network.Messages;
 using Backdash.Network.Protocol;
 using Backdash.Options;
 using Backdash.Serialization;
+using Backdash.Serialization.Internal;
 using Backdash.Synchronizing.Input;
 using Backdash.Synchronizing.Input.Confirmed;
 using Backdash.Synchronizing.Random;
@@ -45,7 +46,7 @@ sealed class SpectatorSession<TInput> :
     bool closed;
     readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
-    readonly Endianness endianness;
+    readonly EndiannessSerializer.INumberSerializer endianness;
 
     public int FixedFrameRate { get; }
 
@@ -77,7 +78,7 @@ sealed class SpectatorSession<TInput> :
         PeerObserverGroup<ProtocolMessage> peerObservers = new();
         inputs = new GameInput<ConfirmedInputs<TInput>>[options.SpectatorInputBufferLength];
         callbacks = services.SessionHandler;
-        endianness = options.GetStateSerializationEndianness();
+        endianness = options.GetEndiannessNumberStateSerializer();
         udp = services.ProtocolClientFactory.CreateClient(options.LocalPort, peerObservers);
         ConfigureJobs(services);
 

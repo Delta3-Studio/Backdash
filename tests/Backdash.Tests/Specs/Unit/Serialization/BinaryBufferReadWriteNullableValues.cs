@@ -1,4 +1,5 @@
 using System.Numerics;
+using Backdash.Core;
 using Backdash.Network;
 using Backdash.Serialization;
 using Backdash.Serialization.Numerics;
@@ -376,7 +377,7 @@ public class BinaryBufferReadWriteNullableValues
             writer.WriteNumber(value);
             var reader = GetReader(writer);
             T? read = null;
-            reader.ReadNumber(ref read);
+            reader.ReadNumber(ref read, Mem.IsUnsigned<T>());
             reader.ReadCount.Should().Be(size);
             return EqualityComparer<T?>.Default.Equals(read, value);
         }

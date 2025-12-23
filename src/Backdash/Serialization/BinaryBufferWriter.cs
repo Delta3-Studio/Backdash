@@ -8,6 +8,7 @@ using System.Text;
 using Backdash.Core;
 using Backdash.Data;
 using Backdash.Network;
+using Backdash.Serialization.Internal;
 
 namespace Backdash.Serialization;
 
@@ -18,14 +19,27 @@ namespace Backdash.Serialization;
 ///     Initialize a new <see cref="BinaryBufferWriter" /> for <paramref name="buffer" />
 /// </remarks>
 /// <param name="buffer">Byte buffer to be written</param>
-/// <param name="endianness">Serialization endianness</param>
+/// <param name="numberSerializer">Number serializer instance</param>
 [DebuggerDisplay("Written: {WrittenCount}")]
-public readonly struct BinaryBufferWriter(ArrayBufferWriter<byte> buffer, Endianness? endianness = null)
+public readonly struct BinaryBufferWriter(
+    ArrayBufferWriter<byte> buffer,
+    EndiannessSerializer.INumberSerializer numberSerializer
+)
 {
     /// <summary>
-    ///     Gets or init the value to define which endianness should be used for serialization.
+    ///    Instantiate a new binary span writer.
     /// </summary>
-    public readonly Endianness Endianness = endianness ?? Platform.Endianness;
+    /// <param name="buffer">Byte buffer to be written</param>
+    /// <param name="endianness">Serialization endianness</param>
+    public BinaryBufferWriter(ArrayBufferWriter<byte> buffer, Endianness endianness) : this(buffer,
+        EndiannessSerializer.Get(endianness))
+    { }
+
+    /// <inheritdoc cref="BinaryBufferWriter(System.Buffers.ArrayBufferWriter{byte},Backdash.Network.Endianness)"/>
+    public BinaryBufferWriter(ArrayBufferWriter<byte> buffer) : this(buffer, Platform.Endianness) { }
+
+    /// <summary>Gets current serialization endianness.</summary>
+    public Endianness Endianness => numberSerializer.Endianness;
 
     /// <summary>
     ///     Backing IBufferWriter <see cref="IBufferWriter{T}" />
@@ -660,20 +674,7 @@ public readonly struct BinaryBufferWriter(ArrayBufferWriter<byte> buffer, Endian
     /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
     public void WriteNumber<T>(in T value) where T : unmanaged, IBinaryInteger<T>
     {
-        ref var valueRef = ref Unsafe.AsRef(in value);
-        var size = Unsafe.SizeOf<T>();
-        switch (Endianness)
-        {
-            case Endianness.LittleEndian:
-                valueRef.TryWriteLittleEndian(buffer.GetSpan(size), out size);
-                break;
-            case Endianness.BigEndian:
-                valueRef.TryWriteBigEndian(buffer.GetSpan(size), out size);
-                break;
-            default:
-                return;
-        }
-
+        numberSerializer.Write(buffer, in value, out var size);
         Advance(size);
     }
 

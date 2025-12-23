@@ -13,7 +13,7 @@ public class ConfirmedInputsTests
         var endianness = Platform.GetNetworkEndianness(network);
 
         var serializer = new ConfirmedInputsSerializer<int>(
-            IntegerBinarySerializer.Create<int>(endianness)
+            IntegerBinarySerializer.Create<int>(false, endianness)
         );
 
         Span<byte> buffer = stackalloc byte[(inputData.Count * sizeof(int)) + 1];

@@ -22,7 +22,7 @@ public sealed record ProtocolOptions
     public int UdpPacketBufferSize { get; set; }
 
     /// <summary>
-    ///     Max allowed pending inputs in sending queue.
+    ///     Max allowed pending inputs in the sending queue.
     ///     When reached <see cref="INetcodeSession{TInput}.AddLocalInput(Backdash.NetcodePlayer, in TInput)" /> will return
     ///     <see cref="ResultCode.InputDropped" />.
     /// </summary>
@@ -31,7 +31,7 @@ public sealed record ProtocolOptions
 
     /// <summary>
     ///     Max allowed pending UDP output messages.
-    ///     When reached removes and ignores the oldest package in the queue in order to make room for the new package.
+    ///     When reached, removes and ignores the oldest package in the queue in order to make room for the new package.
     /// </summary>
     /// <value>Defaults to <c>64</c></value>
     public int MaxPackageQueue { get; set; } = 64;

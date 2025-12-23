@@ -5,6 +5,7 @@ using Backdash.Network;
 using Backdash.Network.Messages;
 using Backdash.Options;
 using Backdash.Serialization;
+using Backdash.Serialization.Internal;
 using Backdash.Synchronizing.Input.Confirmed;
 using Backdash.Synchronizing.State;
 
@@ -26,7 +27,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     bool reachedPredictionBarrier;
     int NumberOfPlayers => players.Count;
 
-    readonly Endianness endianness;
+    readonly EndiannessSerializer.INumberSerializer endianness;
 
     public Synchronizer(
         NetcodeOptions options,
@@ -47,7 +48,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         this.inputComparer = inputComparer ?? EqualityComparer<TInput>.Default;
 
         inputQueues = new(2);
-        endianness = options.GetStateSerializationEndianness();
+        endianness = options.GetEndiannessNumberStateSerializer();
         stateStore.Initialize(options.TotalSavedFramesAllowed);
     }
 

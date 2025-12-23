@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Backdash.Core;
 using Backdash.Network;
 using Backdash.Serialization;
 using Backdash.Serialization.Numerics;
@@ -346,7 +347,7 @@ public class BinarySpanReadWriteValueTests
             var size = Setup<T>(endianness, out var writer, out var reader);
             writer.WriteNumber(value);
             writer.WrittenCount.Should().Be(size);
-            var read = reader.ReadNumber<T>();
+            var read = reader.ReadNumber<T>(Mem.IsUnsigned<T>());
             reader.ReadCount.Should().Be(size);
             return EqualityComparer<T>.Default.Equals(read, value);
         }

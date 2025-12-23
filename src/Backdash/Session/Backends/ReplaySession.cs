@@ -4,6 +4,7 @@ using Backdash.Core;
 using Backdash.Network;
 using Backdash.Options;
 using Backdash.Serialization;
+using Backdash.Serialization.Internal;
 using Backdash.Synchronizing;
 using Backdash.Synchronizing.Input.Confirmed;
 using Backdash.Synchronizing.Random;
@@ -28,7 +29,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
     readonly IDeterministicRandom<TInput> random;
-    readonly Endianness endianness;
+    readonly EndiannessSerializer.INumberSerializer endianness;
 
     public int FixedFrameRate { get; }
     public SessionReplayControl ReplayController { get; }
@@ -50,7 +51,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         random = services.DeterministicRandom;
         NumberOfPlayers = options.NumberOfPlayers;
         FixedFrameRate = options.FrameRate;
-        endianness = options.GetStateSerializationEndianness();
+        endianness = options.GetEndiannessNumberStateSerializer();
         callbacks = services.SessionHandler;
 
         fakePlayers = Enumerable.Range(0, NumberOfPlayers)

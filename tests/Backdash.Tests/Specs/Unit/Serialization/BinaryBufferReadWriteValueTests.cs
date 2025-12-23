@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Backdash.Core;
 using Backdash.Data;
 using Backdash.Network;
 using Backdash.Serialization;
@@ -536,7 +537,7 @@ public class BinaryBufferReadWriteValueTests
             writer.WriteNumber(value);
             var reader = GetReader(writer);
             T read = default;
-            reader.ReadNumber(ref read);
+            reader.ReadNumber(ref read, Mem.IsUnsigned<T>());
             reader.ReadCount.Should().Be(size);
             return EqualityComparer<T>.Default.Equals(read, value);
         }

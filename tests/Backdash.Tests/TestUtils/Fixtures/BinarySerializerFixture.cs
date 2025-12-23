@@ -20,8 +20,8 @@ readonly ref struct BinarySerializerFixture
         ReadOffset = ref offset.Read;
         WriteOffset = ref offset.Write;
         buffer = ArrayPool<byte>.Shared.Rent(Max.UdpPacketSize);
-        Reader = new(buffer, ref ReadOffset, endianness);
-        Writer = new(buffer, ref WriteOffset, endianness);
+        Reader = new(buffer, ref ReadOffset, endianness ?? Platform.Endianness);
+        Writer = new(buffer, ref WriteOffset, endianness ?? Platform.Endianness);
     }
 
     public void Dispose() => ArrayPool<byte>.Shared.Return(buffer, true);

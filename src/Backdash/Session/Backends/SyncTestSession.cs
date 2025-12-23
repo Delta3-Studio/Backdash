@@ -5,6 +5,7 @@ using Backdash.Core;
 using Backdash.Network;
 using Backdash.Options;
 using Backdash.Serialization;
+using Backdash.Serialization.Internal;
 using Backdash.Synchronizing.Input;
 using Backdash.Synchronizing.Input.Confirmed;
 using Backdash.Synchronizing.Random;
@@ -47,7 +48,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     readonly IStateStringParser stateParser;
     readonly IInputGenerator<TInput>? inputGenerator;
     readonly IDeterministicRandom<TInput> random;
-    readonly Endianness endianness;
+    readonly EndiannessSerializer.INumberSerializer endianness;
     readonly bool logStateOnDesync;
 
     INetcodeSessionHandler callbacks;
@@ -100,7 +101,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
             Callbacks = callbacks,
         };
 
-        endianness = options.GetStateSerializationEndianness();
+        endianness = options.GetEndiannessNumberStateSerializer();
     }
 
     public void Dispose() => tsc.SetResult();
