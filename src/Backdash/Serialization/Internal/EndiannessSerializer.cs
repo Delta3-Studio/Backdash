@@ -18,15 +18,27 @@ public static class EndiannessSerializer
         /// <summary>Serializer endianness</summary>
         Endianness Endianness { get; }
 
-        /// <summary>Reads number from the buffer</summary>
-        T Read<T>(ReadOnlySpan<byte> buffer, bool isUnsigned, out int bytesRead) where T : unmanaged, IBinaryInteger<T>;
-
         /// <summary>Write a number into a buffer</summary>
         bool Write<T>(Span<byte> buffer, in T value, out int size) where T : unmanaged, IBinaryInteger<T>;
 
         /// <summary>Write a number into an array buffer</summary>
         bool Write<T>(ArrayBufferWriter<byte> buffer, in T value, out int size)
             where T : unmanaged, IBinaryInteger<T>;
+
+        /// <summary>Reads number from the buffer</summary>
+        T Read<T>(ReadOnlySpan<byte> buffer, bool isUnsigned, out int bytesRead) where T : unmanaged, IBinaryInteger<T>;
+
+        /// <inheritdoc cref="Read{T}(System.ReadOnlySpan{byte},bool,out int)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T Read<T>(in ReadOnlySpan<byte> buffer, out int bytesRead)
+            where T : unmanaged, ISignedNumber<T>, IBinaryInteger<T> =>
+            Read<T>(buffer, false, out bytesRead);
+
+        /// <inheritdoc cref="Read{T}(System.ReadOnlySpan{byte},bool,out int)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T Read<T>(ReadOnlySpan<byte> buffer, out int bytesToRead)
+            where T : unmanaged, IUnsignedNumber<T>, IBinaryInteger<T> =>
+            Read<T>(buffer, true, out bytesToRead);
     }
 
     /// <summary>

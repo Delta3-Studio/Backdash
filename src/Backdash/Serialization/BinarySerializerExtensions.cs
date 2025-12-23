@@ -8,31 +8,30 @@ namespace Backdash.Serialization;
 /// </summary>
 public static class BinarySerializerSignedExtensions
 {
-    const bool IsUnsigned = false;
-
-    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}(bool)"/>
+    /// <inheritdoc cref="BinarySerializerSignedExtensions.ReadNullableNumber"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T ReadNumber<T>(ref readonly this BinaryBufferReader reader)
         where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
-        reader.ReadNumber<T>(IsUnsigned);
+        reader.ReadNumber<T>(false);
 
-    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}(ref T, bool)"/>
+    /// <inheritdoc cref="BinarySerializerSignedExtensions.ReadNullableNumber"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void ReadNumber<T>(ref readonly this BinaryBufferReader reader, ref T value)
         where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
-        reader.ReadNumber(ref value, IsUnsigned);
+        reader.ReadNumber(ref value, false);
 
-    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}( ref T?, bool)"/>
+    /// <inheritdoc cref="BinarySerializerSignedExtensions.ReadNullableNumber"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void ReadNumber<T>(ref readonly this BinaryBufferReader reader, ref T? value)
         where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
-        reader.ReadNumber(ref value, IsUnsigned);
+        reader.ReadNumber(ref value, false);
 
-    /// <inheritdoc cref="BinaryBufferReader.ReadNullableNumber{T}(bool)"/>
+    /// <summary>Reads single <see cref="IBinaryInteger{T}" /> from buffer.</summary>
+    /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T? ReadNullableNumber<T>(ref readonly this BinaryBufferReader reader)
         where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
-        reader.ReadNullableNumber<T>(IsUnsigned);
+        reader.ReadNullableNumber<T>(false);
 }
 
 /// <summary>
@@ -40,29 +39,28 @@ public static class BinarySerializerSignedExtensions
 /// </summary>
 public static class BinarySerializerUnsignedExtensions
 {
-    const bool IsUnsigned = true;
-
-    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}(bool)"/>
+    /// <inheritdoc cref="BinarySerializerUnsignedExtensions.ReadNullableNumber"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T ReadNumber<T>(ref readonly this BinaryBufferReader reader)
-        where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
-        reader.ReadNumber<T>(IsUnsigned);
+        where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> =>
+        reader.ReadNumber<T>(true);
 
-    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}(ref T, bool)"/>
+    /// <inheritdoc cref="BinarySerializerUnsignedExtensions.ReadNullableNumber"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void ReadNumber<T>(ref readonly this BinaryBufferReader reader, ref T value)
-        where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
-        reader.ReadNumber(ref value, IsUnsigned);
+        where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> =>
+        reader.ReadNumber(ref value, true);
 
-    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}( ref T?, bool)"/>
+    /// <inheritdoc cref="BinarySerializerUnsignedExtensions.ReadNullableNumber"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void ReadNumber<T>(ref readonly this BinaryBufferReader reader, ref T? value)
-        where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
-        reader.ReadNumber(ref value, IsUnsigned);
+        where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> =>
+        reader.ReadNumber(ref value, true);
 
-    /// <inheritdoc cref="BinaryBufferReader.ReadNullableNumber{T}(bool)"/>
+    /// <summary>Reads single <see cref="IBinaryInteger{T}" /> from buffer.</summary>
+    /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T? ReadNullableNumber<T>(ref readonly this BinaryBufferReader reader)
-        where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
-        reader.ReadNullableNumber<T>(IsUnsigned);
+        where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> =>
+        reader.ReadNullableNumber<T>(true);
 }

@@ -358,6 +358,45 @@ public readonly ref struct BinaryBufferReader
     public T? ReadNullableNumber<T>(bool isUnsigned) where T : unmanaged, IBinaryInteger<T> =>
         ReadBoolean() ? ReadNumber<T>(isUnsigned) : null;
 
+    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}(bool)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T ReadSigned<T>() where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
+        ReadNumber<T>(false);
+
+    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}(ref T, bool)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ReadSigned<T>(ref T value) where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
+        ReadNumber(ref value, false);
+
+    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}( ref T?, bool)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ReadSigned<T>(ref T? value) where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
+        ReadNumber(ref value, false);
+
+    /// <inheritdoc cref="BinaryBufferReader.ReadNullableNumber{T}(bool)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T? ReadNullableSigned<T>() where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
+        ReadNullableNumber<T>(false);
+
+    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}(bool)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T ReadUnsigned<T>() where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> => ReadNumber<T>(true);
+
+    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}(ref T, bool)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ReadUnsigned<T>(ref T value) where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> =>
+        ReadNumber(ref value, true);
+
+    /// <inheritdoc cref="BinaryBufferReader.ReadNumber{T}( ref T?, bool)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ReadUnsigned<T>(ref T? value) where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> =>
+        ReadNumber(ref value, true);
+
+    /// <inheritdoc cref="BinaryBufferReader.ReadNullableNumber{T}(bool)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T? ReadNullableUnsigned<T>() where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> =>
+        ReadNullableNumber<T>(true);
+
     /// <summary>Reads a <see cref="IBinarySerializable" /> <typeparamref name="T" /> from buffer.</summary>
     /// <typeparam name="T">A value type that implements <see cref="IBinarySerializable" />.</typeparam>
     public T? ReadNullable<T>() where T : struct, IBinarySerializable
