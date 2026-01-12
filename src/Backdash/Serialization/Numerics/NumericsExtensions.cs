@@ -10,7 +10,7 @@ public static class NumericsExtensions
 {
     #region BinaryBufferReader
 
-    /// <summary>Reads single <see cref="Vector2" /> from buffer.</summary>
+    /// <summary>Reads single <see cref="Vector2" /> from the buffer.</summary>
     public static Vector2 ReadVector2(in this BinaryBufferReader reader)
     {
         var x = reader.ReadFloat();
@@ -22,7 +22,7 @@ public static class NumericsExtensions
     public static Vector2? ReadNullableVector2(in this BinaryBufferReader reader) =>
         reader.ReadBoolean() ? reader.ReadVector2() : null;
 
-    /// <summary>Reads single <see cref="Vector3" /> from buffer.</summary>
+    /// <summary>Reads single <see cref="Vector3" /> from the buffer.</summary>
     public static Vector3 ReadVector3(in this BinaryBufferReader reader)
     {
         var x = reader.ReadFloat();
@@ -35,7 +35,7 @@ public static class NumericsExtensions
     public static Vector3? ReadNullableVector3(in this BinaryBufferReader reader) =>
         reader.ReadBoolean() ? reader.ReadVector3() : null;
 
-    /// <summary>Reads single <see cref="Vector4" /> from buffer.</summary>
+    /// <summary>Reads single <see cref="Vector4" /> from the buffer.</summary>
     public static Vector4 ReadVector4(in this BinaryBufferReader reader)
     {
         var x = reader.ReadFloat();
@@ -49,7 +49,7 @@ public static class NumericsExtensions
     public static Vector4? ReadNullableVector4(in this BinaryBufferReader reader) =>
         reader.ReadBoolean() ? reader.ReadVector4() : null;
 
-    /// <summary>Reads single <see cref="Quaternion" /> from buffer.</summary>
+    /// <summary>Reads single <see cref="Quaternion" /> from the buffer.</summary>
     public static Quaternion ReadQuaternion(in this BinaryBufferReader reader)
     {
         var x = reader.ReadFloat();

@@ -26,7 +26,7 @@ public static class BinarySerializerSignedExtensions
         where T : unmanaged, IBinaryInteger<T>, ISignedNumber<T> =>
         reader.ReadNumber(ref value, false);
 
-    /// <summary>Reads single <see cref="IBinaryInteger{T}" /> from buffer.</summary>
+    /// <summary>Reads single <see cref="IBinaryInteger{T}" /> from the buffer.</summary>
     /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T? ReadNullableNumber<T>(ref readonly this BinaryBufferReader reader)
@@ -57,7 +57,7 @@ public static class BinarySerializerUnsignedExtensions
         where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> =>
         reader.ReadNumber(ref value, true);
 
-    /// <summary>Reads single <see cref="IBinaryInteger{T}" /> from buffer.</summary>
+    /// <summary>Reads single <see cref="IBinaryInteger{T}" /> from the buffer.</summary>
     /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T? ReadNullableNumber<T>(ref readonly this BinaryBufferReader reader)
