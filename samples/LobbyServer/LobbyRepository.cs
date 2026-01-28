@@ -10,12 +10,10 @@ public sealed class LobbyRepository(
     IOptions<AppSettings> settings
 )
 {
-    const string LobbyCachePrefix = "lobby";
-
     public EnterLobbyResponse? EnterOrCreate(IPAddress remote, EnterLobbyRequest req)
     {
         var lobbyName = req.LobbyName.NormalizeName();
-        var lobbyKey = lobbyName.WithPrefix(LobbyCachePrefix);
+        var lobbyKey = MountLobbyKey(lobbyName);
         var userName = req.Username.NormalizeName();
         var expiration = settings.Value.LobbyExpiration;
         var peerId = Guid.NewGuid();
@@ -25,11 +23,13 @@ public sealed class LobbyRepository(
         {
             e.SetSlidingExpiration(expiration);
             return new Lobby(
+                key: lobbyKey,
                 name: lobbyName,
                 owner: peerId,
                 expiration: expiration,
                 purgeTimeout: settings.Value.PurgeTimeout,
-                createdAt: now
+                createdAt: now,
+                maxPlayers: req.MaxPlayers
             );
         });
 
@@ -58,19 +58,18 @@ public sealed class LobbyRepository(
             using var playerEntry = cache.CreateEntry(entry.Token);
             playerEntry.Value = entry;
             playerEntry.SetSlidingExpiration(expiration);
-
-            lobby.AddPeer(entry);
-
-            return new(
-                userName, lobbyName, entry.Peer.PeerId, entry.Token, remote);
+            entry = lobby.AddPeer(entry);
+            return new(userName, lobbyName, entry.Mode, entry.Peer.PeerId, entry.Token, remote);
         }
     }
 
     public Lobby? FindLobby(string name)
     {
-        var key = name.NormalizeName().WithPrefix(LobbyCachePrefix);
+        var key = MountLobbyKey(name.NormalizeName());
         return cache.Get<Lobby>(key);
     }
+
+    static string MountLobbyKey(string name) => name.WithPrefix("lobby_");
 
     public LobbyEntry? FindEntry(Guid peerToken)
     {
@@ -83,5 +82,5 @@ public sealed class LobbyRepository(
         return entry;
     }
 
-    public void Remove(Lobby lobby) => cache.Remove(lobby.Name.WithPrefix(LobbyCachePrefix));
+    public void Remove(Lobby lobby) => cache.Remove(lobby.Key);
 }

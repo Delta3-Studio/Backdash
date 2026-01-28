@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json.Serialization;
 
 namespace LobbyServer;
 
@@ -32,24 +33,30 @@ public sealed record LobbyEntry(Peer Peer, PeerMode Mode)
 
 public sealed record SpectatorMapping(PeerId Host, IEnumerable<PeerId> Watchers);
 
+[Serializable]
 public sealed class Lobby(
+    string key,
     string name,
     PeerId owner,
     TimeSpan expiration,
     TimeSpan purgeTimeout,
-    DateTimeOffset createdAt
+    DateTimeOffset createdAt,
+    int? maxPlayers = null
 )
 {
-    const int MaxPlayers = 4;
-
+    const int DefaultMaxPlayers = 4;
     readonly List<LobbyEntry> entries = [];
     public readonly object Locker = new();
+
+    [JsonIgnore]
+    internal string Key { get; } = key;
 
     public string Name { get; } = name;
     public PeerId Owner { get; private set; } = owner;
     public DateTimeOffset CreatedAt { get; } = createdAt;
 
     public DateTimeOffset ExpiresAt => CreatedAt + expiration;
+    public int MaxPlayers { get; } = maxPlayers ?? DefaultMaxPlayers;
 
     public bool Ready =>
         Players.Count() > 1 && Players.All(p => p is { Connected: true, Ready: true })
@@ -96,15 +103,16 @@ public sealed class Lobby(
         }
     }
 
-    public void AddPeer(LobbyEntry entry)
+    public LobbyEntry AddPeer(LobbyEntry entry)
     {
         lock (Locker)
         {
-            if (Ready) return;
+            if (Ready) return entry;
             if (Players.Count() >= MaxPlayers)
                 entry = entry with { Mode = PeerMode.Spectator };
 
             entries.Add(entry);
+            return entry;
         }
     }
 
@@ -155,16 +163,20 @@ public sealed class Lobby(
     }
 }
 
+[Serializable]
 public sealed record EnterLobbyRequest(
     string LobbyName,
     string Username,
     PeerMode Mode,
-    IPEndPoint? LocalEndpoint = null
+    IPEndPoint? LocalEndpoint = null,
+    int? MaxPlayers = null
 );
 
+[Serializable]
 public sealed record EnterLobbyResponse(
     string Username,
     string LobbyName,
+    PeerMode Mode,
     PeerId PeerId,
     PeerToken Token,
     IPAddress IP
