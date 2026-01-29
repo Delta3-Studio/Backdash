@@ -5,7 +5,7 @@ This shows a basic example of NAT traversal using [UDP hole punching](https://en
 # How does it work?
 
 This enables a P2P connection over the internet, this is possible using
-a [middle server](https://github.com/lucasteles/Backdash/tree/master/samples/LobbyServer)
+a [middle server](https://github.com/Delta3-Studio/LobbyServer)
 which all clients know.
 The server catches the IP address and port of a client and sends it to the others.
 
@@ -17,7 +17,7 @@ basic `Authentication` mechanism.
 
 The client uses HTTP pooling to get updated information on each lobby member/peer.
 
-When logged in, every client needs to send a `UDP` package with their token to the server. The server uses the package header metadata  
+When logged in, every client needs to send a `UDP` package with their token to the server. The server uses the package header metadata
 to keep track of their `IP` and open `Port`.
 
 > ⚠️ UDP Hole punching usually **does not** work with clients behind the same NAT. To mitigate this the server
@@ -33,7 +33,14 @@ to keep track of their `IP` and open `Port`.
 
 ### Server
 
-On the [server directory](https://github.com/lucasteles/Backdash/tree/master/samples/LobbyServer) run:
+**Preparing The server:**
+
+Ensure the server submodule is updated in the [server directory](https://github.com/Delta3-Studio/Backdash/tree/master/samples/LobbyServer)
+
+> [!TIP]
+> 💡 You can also, clone the [**LobbyServer Repository**](https://github.com/Delta3-Studio/LobbyServer) directly
+
+To start the server run:
 
 ```bash
 dotnet run .
@@ -43,7 +50,7 @@ dotnet run .
 - Default **UDP** : `8888`
 
 > [!TIP]
-> 💡 Check the swagger `API` docs at http://localhost:9999/swagger
+> 💡 Check the `API` docs at http://localhost:9999/docs
 
 ### Clients
 
@@ -80,7 +87,7 @@ You can also override the server URL and UDP Port configs:
 dotnet run --project .\LobbyClient -ServerUrl "https://lobby-server.fly.dev" -ServerUdpPort 8888
 ```
 
-Check the the [scripts directory](https://github.com/lucasteles/Backdash/tree/master/samples/SpaceWar.Lobby/scripts)
+Check the the [scripts directory](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar.Lobby/scripts)
 to run local instances of the server and clients.
 
 > ⚠️ The default configured server is a remote server. To connect to localhost server
