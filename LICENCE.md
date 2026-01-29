@@ -1,5 +1,5 @@
 MIT License
-Copyright (c) 2022 Lucas Teles
+Copyright (c) 2020 Delta3 Studio & lucasteles.dev
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights

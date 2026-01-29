@@ -1,12 +1,12 @@
 # Best Practices and Troubleshooting
 
 Below is a list of recommended best practices you should consider while porting your application
-to [Backdash](https://github.com/lucasteles/Backdash). Many of these recommendations are easy to follow, even if you're
+to [Backdash](https://github.com/Delta3-Studio/Backdash). Many of these recommendations are easy to follow, even if you're
 not starting a game from scratch. Most applications will already conform to most of the recommendations below.
 
 ## Isolate **Game State** from **Non-Game State**
 
-[Backdash](https://github.com/lucasteles/Backdash) will periodically request that you save and load the entire state of
+[Backdash](https://github.com/Delta3-Studio/Backdash) will periodically request that you save and load the entire state of
 your game. For most games, the state that needs to be saved is a tiny fraction of the entire game. Usually, the video
 and
 audio renderers, look-up tables, textures, sound data, and your code segments are either constant from frame to frame or
@@ -18,13 +18,13 @@ encapsulating all your game state into a single `class`/`record` type. This both
 
 ## Define a Fixed Time Quanta for Advancing Your Game State
 
-[Backdash](https://github.com/lucasteles/Backdash) will occasionally need to rollback and single-step your application
+[Backdash](https://github.com/Delta3-Studio/Backdash) will occasionally need to rollback and single-step your application
 frame by frame. This is difficult to do if your game state advances by a variable tick rate. You should try to make your
 game state advanced by a fixed time quanta per frame, even if your render loop does not.
 
 ## Separate Updating Game State from Rendering in Your Game Loop
 
-[Backdash](https://github.com/lucasteles/Backdash) will call your advance frame callback many times during a rollback.
+[Backdash](https://github.com/Delta3-Studio/Backdash) will call your advance frame callback many times during a rollback.
 Any effects or sounds that are generated
 during the rollback need to be deferred until after the rollback is finished. This is most easily accomplished by
 separating your game state from your render state. When you're finished, your game loop may look something like this:
@@ -59,7 +59,7 @@ Many games use random numbers in the computation of the next game state. If you 
 fully deterministic, that the seed for the random number generator is the same at frame 0 for both players, and that the
 state/seed of the random number generator is included in your game state. Doing both of these will ensure that the random
 numbers that get generated for a particular frame are always the same, regardless of how many
-times [Backdash](https://github.com/lucasteles/Backdash) needs to rollback to that frame.
+times [Backdash](https://github.com/Delta3-Studio/Backdash) needs to rollback to that frame.
 
 Luckily, *Backdash* already gives you a deterministic random number generator in the [`INetcodeSession<>`](https://delta3.studio/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_Random) class:
 
@@ -141,9 +141,9 @@ public class MySessionHandler : INetcodeSessionHandler
 }
 ```
 
-## Use the [Backdash](https://github.com/lucasteles/Backdash) SyncTest Feature. A Lot.
+## Use the [Backdash](https://github.com/Delta3-Studio/Backdash) SyncTest Feature. A Lot.
 
-Once you've ported your application to [Backdash](https://github.com/lucasteles/Backdash),
+Once you've ported your application to [Backdash](https://github.com/Delta3-Studio/Backdash),
 you can use tool called `SyncTest` to help track down synchronization issues which may be the result of a leaky game
 state.
 
@@ -168,7 +168,7 @@ var session = RollbackNetcode
 The sync test session is a special session that is designed to find errors in your simulation's
 determinism.
 
-When running in a **sync-test session**, [Backdash](https://github.com/lucasteles/Backdash) by default will
+When running in a **sync-test session**, [Backdash](https://github.com/Delta3-Studio/Backdash) by default will
 execute a 1-frame rollback for every frame of your game. It compares the state of the frame when it was executed the
 first time to the state executed during the rollback, and raises an error if they differ during your game's execution.
 If you set the [`LogLevel`](https://delta3-studio.github.io/Backdash/api/Backdash.Core.LogLevel.html) to at
@@ -247,14 +247,14 @@ sealed class DiffPlexDesyncHandler : IStateDesyncHandler
 
 > [!TIP]
 > You can see this implementation working with JSON in
-> the [SpaceWar](https://github.com/lucasteles/Backdash/tree/master/samples/SpaceWar) sample.
+> the [SpaceWar](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar) sample.
 
 ## Where to Go from Here
 
-This document describes the most basic features of [Backdash](https://github.com/lucasteles/Backdash).
+This document describes the most basic features of [Backdash](https://github.com/Delta3-Studio/Backdash).
 To learn more, I recommend starting with reading
 the [API Docs](https://delta3-studio.github.io/Backdash/docs/introduction.html) and exploring
-the [examples](https://github.com/lucasteles/Backdash/tree/master/samples).
+the [examples](https://github.com/Delta3-Studio/Backdash/tree/master/samples).
 
 Good luck!
 

@@ -1,6 +1,6 @@
 # Introduction
 
-[Backdash](https://github.com/lucasteles/Backdash) is a multiplayer network SDK to help you
+[Backdash](https://github.com/Delta3-Studio/Backdash) is a multiplayer network SDK to help you
 implement [Rollback Netcode](https://words.infil.net/w02-netcode.html) on your game.
 
 It started as [.NET](https://dotnet.microsoft.com) port of the first rollback netcode
@@ -36,10 +36,10 @@ remote players to do based on previously seen inputs. Since there's no waiting, 
 does offline. When those inputs finally arrive over the network, they can be compared to the ones that were predicted
 earlier. If they differ, the game can be re-simulated from the point of divergence to the current visible frame.
 
-Don't worry if that sounds like a headache. [Backdash](https://github.com/lucasteles/Backdash) was designed specifically
+Don't worry if that sounds like a headache. [Backdash](https://github.com/Delta3-Studio/Backdash) was designed specifically
 to implement the rollback algorithms and low-level networking logic in a way that's easy to integrate into your existing
 game loop. If you simply implement the functionality to save your game state, load it back up, and execute a frame of
-game state without rendering its outcome, [Backdash](https://github.com/lucasteles/Backdash) can take care of the rest.
+game state without rendering its outcome, [Backdash](https://github.com/Delta3-Studio/Backdash) can take care of the rest.
 
 ## Learning resources
 

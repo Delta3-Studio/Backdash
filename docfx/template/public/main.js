@@ -3,7 +3,7 @@
     iconLinks: [
         {
             icon: 'github',
-            href: 'https://github.com/lucasteles/Backdash',
+            href: 'https://github.com/Delta3-Studio/Backdash',
             title: 'GitHub'
         }
     ]

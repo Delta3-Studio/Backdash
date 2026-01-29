@@ -13,7 +13,7 @@ $ dotnet add package Backdash
 
 ## Game State and Inputs
 
-Your game probably has many moving parts. [Backdash](https://github.com/lucasteles/Backdash) only depends on these two:
+Your game probably has many moving parts. [Backdash](https://github.com/Delta3-Studio/Backdash) only depends on these two:
 
 - **Game State** describes the current state of everything in your game. In a shooter, this would include the position
   of the ship and all the enemies on the screen, the location of all the bullets, how much health each opponent has, the
@@ -31,9 +31,9 @@ state as well.
 
 ## Using State and Inputs for Synchronization
 
-Each player in a [Backdash](https://github.com/lucasteles/Backdash) networked game has a complete copy of the game running. [Backdash](https://github.com/lucasteles/Backdash) needs to keep both copies of the
+Each player in a [Backdash](https://github.com/Delta3-Studio/Backdash) networked game has a complete copy of the game running. [Backdash](https://github.com/Delta3-Studio/Backdash) needs to keep both copies of the
 game state in sync to ensure that both players are experiencing the same game. It would be much too expensive to send an
-entire copy of the game state between players every frame. Instead, [Backdash](https://github.com/lucasteles/Backdash)
+entire copy of the game state between players every frame. Instead, [Backdash](https://github.com/Delta3-Studio/Backdash)
 sends the players' inputs to each other and has
 each player step the game forward. For this to work, your game engine must meet three criteria:
 
@@ -46,21 +46,21 @@ each player step the game forward. For this to work, your game engine must meet 
 ## Programming Guide
 
 The following section contains a walk-through for porting your application
-to [Backdash](https://github.com/lucasteles/Backdash).
+to [Backdash](https://github.com/Delta3-Studio/Backdash).
 
 For a detailed description of the
-[Backdash](https://github.com/lucasteles/Backdash) API, please see
+[Backdash](https://github.com/Delta3-Studio/Backdash) API, please see
 the [API Reference Docs](https://delta3-studio.github.io/Backdash/api/Backdash.html).
 
-### Interfacing with [Backdash](https://github.com/lucasteles/Backdash)
+### Interfacing with [Backdash](https://github.com/Delta3-Studio/Backdash)
 
-[Backdash](https://github.com/lucasteles/Backdash) is designed to be easy to interface with new and existing game
+[Backdash](https://github.com/Delta3-Studio/Backdash) is designed to be easy to interface with new and existing game
 engines. It handles most of the implementation of handling rollbacks by calling out to your application via
 the [`INetcodeSessionHandler`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html) hooks.
 
 ### Creating the [`INetcodeSession`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html) Object
 
-The [`INetcodeSession<TInput>`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html) object is your interface to the [Backdash](https://github.com/lucasteles/Backdash) framework.
+The [`INetcodeSession<TInput>`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html) object is your interface to the [Backdash](https://github.com/Delta3-Studio/Backdash) framework.
 
 Create one with the `RollbackNetcode.WithInputType` builder:
 
@@ -238,7 +238,7 @@ public sealed class SessionPlayer : NetcodePlayer
 
 ```
 
-> For further, more complex setups, check the [samples](https://github.com/lucasteles/Backdash/tree/master/samples).
+> For further, more complex setups, check the [samples](https://github.com/Delta3-Studio/Backdash/tree/master/samples).
 
 ### Starting session
 
@@ -259,7 +259,7 @@ for each local player
 and [`SynchronizeInputs`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_SynchronizeInputs)
 to fetch the inputs for remote players. Be sure to check the return value of `SynchronizeInputs`. If it returns a value
 other than [ResultCode.Ok`](https://delta3-studio.github.io/Backdash/api/Backdash.ResultCode.html), you should
-**Do not advance your game state**. This usually happens because [Backdash](https://github.com/lucasteles/Backdash) has not received packets from the remote player in a while and has reached its internal prediction limit.
+**Do not advance your game state**. This usually happens because [Backdash](https://github.com/Delta3-Studio/Backdash) has not received packets from the remote player in a while and has reached its internal prediction limit.
 
 After synchronizing, you can read the player's inputs using
 the [`GetInput`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_GetInput_System_Int32_)
@@ -311,7 +311,7 @@ until after the frame delay.
 
 ### Implementing your `save` and `load` state handlers
 
-[Backdash](https://github.com/lucasteles/Backdash) will call the [`LoadState`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_LoadState_Backdash_Data_Frame___0__) and [`SaveState`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_SaveState_Backdash_Data_Frame___0__) callbacks to periodically _save_ and _restore_ the state of your game.
+[Backdash](https://github.com/Delta3-Studio/Backdash) will call the [`LoadState`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_LoadState_Backdash_Data_Frame___0__) and [`SaveState`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_SaveState_Backdash_Data_Frame___0__) callbacks to periodically _save_ and _restore_ the state of your game.
 
 The [`SaveState`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_SaveState_Backdash_Data_Frame___0__) function is called with a plain binary buffer writer (`BinaryBufferReader`). You need to call `.Write` on each of the state members.
 
@@ -431,7 +431,7 @@ Check the
 
 ### Frame Lifecycle
 
-We're almost done. The last step is notify [Backdash](https://github.com/lucasteles/Backdash) every time your frame
+We're almost done. The last step is notify [Backdash](https://github.com/Delta3-Studio/Backdash) every time your frame
 starts and every time the **game state** finishes advancing by one frame.
 
 Just call [`BeginFrame`](https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_BeginFrame)
@@ -499,7 +499,7 @@ public enum PadButtonInputs : short
 ```
 
 The serialization of enums and mostly of primitive types is automatically handled
-by [Backdash](https://github.com/lucasteles/Backdash).
+by [Backdash](https://github.com/Delta3-Studio/Backdash).
 
 > [!CAUTION]
 > We can also handle serialization of complex structs that **do not** contain any reference type member. for those
@@ -602,10 +602,10 @@ var session = RollbackNetcode.WithInputType(t => t.Custom(mySerializer));
 
 ## Tuning Your Application: Frame Delay vs. Speculative Execution
 
-[Backdash](https://github.com/lucasteles/Backdash) uses both frame delay and speculative execution to hide latency. It
+[Backdash](https://github.com/Delta3-Studio/Backdash) uses both frame delay and speculative execution to hide latency. It
 does so by allowing the application developer
 the choice of how many frames they'd like to delay input by. If it takes more time to transmit a packet than the
-number of frames specified by the game, [Backdash](https://github.com/lucasteles/Backdash) will use speculative
+number of frames specified by the game, [Backdash](https://github.com/Delta3-Studio/Backdash) will use speculative
 execution to hide the remaining latency. This number
 can be tuned by the application mid-game if you so desire. Choosing a proper value for the frame delay depends very much
 on your game. Here are some helpful hints.
@@ -628,13 +628,13 @@ or redesigning your video renderer to delay the flash until after the rollback o
 
 ## Sample Applications
 
-Check the samples on the [samples](https://github.com/lucasteles/Backdash/tree/master/samples) directory:
+Check the samples on the [samples](https://github.com/Delta3-Studio/Backdash/tree/master/samples) directory:
 
 There are examples for up to 4 players:
 
-- [Simple console game](https://github.com/lucasteles/Backdash/tree/master/samples/ConsoleGame)
-- [Monogame SpaceWar](https://github.com/lucasteles/Backdash/tree/master/samples/SpaceWar)
-- [Monogame SpaceWar with lobby over the internet](https://github.com/lucasteles/Backdash/tree/master/samples/SpaceWar.Lobby)
-- [Godot SpaceWar with lobby over the internet](https://github.com/lucasteles/BackdashGodotSample)
+- [Simple console game](https://github.com/Delta3-Studio/Backdash/tree/master/samples/ConsoleGame)
+- [Monogame SpaceWar](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar)
+- [Monogame SpaceWar with lobby over the internet](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar.Lobby)
+- [Godot SpaceWar with lobby over the internet](https://github.com/Delta3-Studio/BackdashGodotSample)
 
 > See the `.cmd`/`.sh` files in the `scripts` directory for examples on how to start 2, 3, and 4-player games.

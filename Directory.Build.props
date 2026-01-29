@@ -25,7 +25,7 @@
     <Title>Backdash - Rollback Netcode SDK</Title>
     <Company>Delta3 Studio</Company>
     <Authors>Lucas Teles - me@lucasteles.dev</Authors>
-    <Copyright>Copyright © lucasteles.dev 2020</Copyright>
+    <Copyright>Copyright © 2020 Delta3 Studio &amp; lucasteles.dev</Copyright>
 
     <!-- uncomment to enable AOT build -->
     <!-- <DefineConstants>AOT_ENABLED</DefineConstants> -->
@@ -58,7 +58,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.16.*">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.18.*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

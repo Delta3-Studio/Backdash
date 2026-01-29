@@ -1,14 +1,14 @@
 [![Nuget](https://img.shields.io/nuget/v/Backdash.svg?style=flat)](https://www.nuget.org/packages/Backdash)
-[![](https://raw.githubusercontent.com/lucasteles/Backdash/site/dotnet_version_badge.svg)](#)
+[![](https://raw.githubusercontent.com/Delta3-Studio/Backdash/site/dotnet_version_badge.svg)](#)
 [![https://editorconfig.org/](https://img.shields.io/badge/style-EditorConfig-black)](#)
 
-[![CI](https://github.com/lucasteles/Backdash/actions/workflows/ci.yml/badge.svg)](https://github.com/lucasteles/Backdash/actions/workflows/ci.yml)
-[![](https://raw.githubusercontent.com/lucasteles/Backdash/site/test_report_badge.svg)](#)
-[![](https://raw.githubusercontent.com/lucasteles/Backdash/site/lines_of_code.svg)](#)
+[![CI](https://github.com/Delta3-Studio/Backdash/actions/workflows/ci.yml/badge.svg)](https://github.com/Delta3-Studio/Backdash/actions/workflows/ci.yml)
+[![](https://raw.githubusercontent.com/Delta3-Studio/Backdash/site/test_report_badge.svg)](#)
+[![](https://raw.githubusercontent.com/Delta3-Studio/Backdash/site/lines_of_code.svg)](#)
 
 # Backdash 🕹️
 
-[![](assets/images/banner.png)](https://github.com/lucasteles/Backdash)
+[![](assets/images/banner.png)](https://github.com/Delta3-Studio/Backdash)
 
 Highly configurable and extensible implementation
 of [Rollback Netcode](https://en.wikipedia.org/wiki/Netcode#Rollback) with full asynchronous IO.
@@ -21,7 +21,7 @@ Traditional techniques account for network transmission time by adding delay to 
 sluggish, laggy game-feel. Rollback networking uses input prediction and speculative execution to send player inputs to
 the game immediately, providing the illusion of a zero-latency network. Using rollback, the same timings, reactions,
 visual and audio queues, and muscle memory your players build up playing offline will translate directly
-online. [Backdash](https://github.com/lucasteles/Backdash) is designed to make incorporating rollback networking (_aka.
+online. [Backdash](https://github.com/Delta3-Studio/Backdash) is designed to make incorporating rollback networking (_aka.
 Rollback [Netcode](https://words.infil.net/w02-netcode.html)_) into new and existing games as easy as possible.
 
 ## Getting started
@@ -47,16 +47,16 @@ $ dotnet add package Backdash
 
 ## Samples
 
-Check the samples on the [/samples](https://github.com/lucasteles/Backdash/tree/master/samples) directory:
+Check the samples on the [/samples](https://github.com/Delta3-Studio/Backdash/tree/master/samples) directory:
 
 There are examples for up to 4 players:
 
-- [Simple console game](https://github.com/lucasteles/Backdash/tree/master/samples/ConsoleGame)
-- [Monogame SpaceWar](https://github.com/lucasteles/Backdash/tree/master/samples/SpaceWar) [^2]
-- [Monogame SpaceWar with lobby over internet](https://github.com/lucasteles/Backdash/tree/master/samples/SpaceWar.Lobby) [^1][^2]
-- [Godot SpaceWar with lobby over internet](https://github.com/lucasteles/BackdashGodotSample)
+- [Simple console game](https://github.com/Delta3-Studio/Backdash/tree/master/samples/ConsoleGame)
+- [Monogame SpaceWar](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar) [^2]
+- [Monogame SpaceWar with lobby over internet](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar.Lobby) [^1][^2]
+- [Godot SpaceWar with lobby over internet](https://github.com/Delta3-Studio/BackdashGodotSample)
 
-[^1]: The sample needs a [web server](https://github.com/lucasteles/Backdash/tree/master/samples/LobbyServer) to
+[^1]: The sample needs a [web server](https://github.com/Delta3-Studio/Backdash/tree/master/samples/LobbyServer) to
 exchange players addresses. check the sample `README.md` for more information.
 
 [^2]: If you are using *ARM* *MacOS*
@@ -66,7 +66,7 @@ to build some samples.
 ## Building from source
 
 You need to have installed [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download)
-![](https://raw.githubusercontent.com/lucasteles/Backdash/site/dotnet_version_badge.svg)
+![](https://raw.githubusercontent.com/Delta3-Studio/Backdash/site/dotnet_version_badge.svg)
 
 1. Clone this repository.
 2. Restore tools
@@ -79,7 +79,7 @@ You need to have installed [.NET 8 SDK](https://dotnet.microsoft.com/en-us/downl
 
 ## Licensing
 
-[Backdash](https://github.com/lucasteles/Backdash) is available under The MIT License. This
-means [Backdash](https://github.com/lucasteles/Backdash) is free for commercial and non-commercial use.
+[Backdash](https://github.com/Delta3-Studio/Backdash) is available under The MIT License. This
+means [Backdash](https://github.com/Delta3-Studio/Backdash) is free for commercial and non-commercial use.
 
 Attribution is not required, but appreciated.

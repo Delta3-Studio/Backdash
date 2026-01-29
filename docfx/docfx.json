@@ -61,12 +61,12 @@
             "_enableNewTab": true,
             "_appLogoPath": "docs/images/logo.png",
             "_appFaviconPath": "docs/images/favicon.ico",
-            "_appFooter": "<span>Developed by <a href=\"https://lucasteles.dev/\">Lucas Teles</a>.</span>",
+            "_appFooter": "<span>Developed by <a href=\"http://delta3.studio/\">Delta3</a> and <a href=\"https://lucasteles.dev/\">Lucas Teles</a>.</span>",
             "pdf": false,
             "_disableContribution": false,
             "_gitUrlPattern": "github",
             "_gitContribute": {
-                "repo": "https://github.com/lucasteles/Backdash",
+                "repo": "https://github.com/Delta3-Studio/Backdash",
                 "branch": "master",
                 "apiSpecFolder": "api"
             }
