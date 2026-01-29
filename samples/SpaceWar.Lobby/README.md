@@ -37,6 +37,10 @@ to keep track of their `IP` and open `Port`.
 
 Ensure the server submodule is updated in the [server directory](https://github.com/Delta3-Studio/Backdash/tree/master/samples/LobbyServer)
 
+```bash
+git submodule update --init --recursive
+```
+
 > [!TIP]
 > 💡 You can also, clone the [**LobbyServer Repository**](https://github.com/Delta3-Studio/LobbyServer) directly
 

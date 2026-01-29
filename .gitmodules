@@ -1,0 +1,3 @@
+[submodule "samples/LobbyServer"]
+	path = samples/LobbyServer
+	url = git@github.com:Delta3-Studio/LobbyServer.git

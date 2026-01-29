@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleGame", "ConsoleGame\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWar", "SpaceWar\SpaceWar.csproj", "{6863F6B9-30FD-4983-AB9F-611DB504C0B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LobbyServer", "LobbyServer\LobbyServer.csproj", "{52C94E0C-9B41-4CC3-9C74-92E700E98F7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LobbyServer", "LobbyServer\src\LobbyServer\LobbyServer.csproj", "{52C94E0C-9B41-4CC3-9C74-92E700E98F7E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceWar.Shared", "SpaceWar.Shared\SpaceWar.Shared.csproj", "{C3B63B4E-12DE-4BC0-9E06-0F12A433E79B}"
 EndProject
