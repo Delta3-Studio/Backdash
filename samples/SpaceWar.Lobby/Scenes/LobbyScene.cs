@@ -357,28 +357,21 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
         if (lobbyInfo is null) return;
 
         currentState = LobbyState.Starting;
-        List<NetcodePlayer> players = [];
-
-        for (var i = 0; i < lobbyInfo.Players.Length; i++)
-        {
-            var player = lobbyInfo.Players[i];
-
-            players.Add(
+        var players = lobbyInfo.Players
+            .Select(player =>
                 player.PeerId == user.PeerId
                     ? NetcodePlayer.CreateLocal()
-                    : NetcodePlayer.CreateRemote(LobbyUdpClient.GetFallbackEndpoint(user, player))
-            );
-        }
+                    : NetcodePlayer.CreateRemote(player.GetEndpointForUser(user)))
+            .ToList();
 
         if (lobbyInfo.SpectatorMapping.SingleOrDefault(m => m.Host == user.PeerId)
-            is { Watchers: { } spectatorIds })
+            is { Watchers: { Length: > 0 } spectatorIds })
         {
-            var spectators = lobbyInfo.Spectators.Where(s => spectatorIds.Contains(s.PeerId));
-            foreach (var spectator in spectators)
-            {
-                var spectatorEndpoint = LobbyUdpClient.GetFallbackEndpoint(user, spectator);
-                players.Add(NetcodePlayer.CreateSpectator(spectatorEndpoint));
-            }
+            var spectators = lobbyInfo.Spectators
+                .Where(s => spectatorIds.Contains(s.PeerId))
+                .Select(s => NetcodePlayer.CreateSpectator(s.GetEndpointForUser(user)));
+
+            players.AddRange(spectators);
         }
 
         var netcodeSession = NetcodeSessionBuilder()
@@ -391,12 +384,10 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
 
     void StartSpectatorBattleScene()
     {
-        var hostId = lobbyInfo.SpectatorMapping
-            .SingleOrDefault(x => x.Watchers.Contains(user.PeerId))
-            ?.Host;
+        var hostId = lobbyInfo.SpectatorMapping.SingleOrDefault(x => x.Watchers.Contains(user.PeerId))?.Host;
         var host = lobbyInfo.Players.Single(x => x.PeerId == hostId);
         var playerCount = lobbyInfo.Players.Length;
-        var hostEndpoint = LobbyUdpClient.GetFallbackEndpoint(user, host);
+        var hostEndpoint = host.GetEndpointForUser(user);
 
         Window.Title = $"Space War {Config.LocalPort} - {user.Username} watching {host.Username}";
 

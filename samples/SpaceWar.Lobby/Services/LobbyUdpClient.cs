@@ -11,8 +11,7 @@ public sealed class LobbyUdpClient : IDisposable
     readonly IPEndPoint serverEndpoint;
     readonly UdpSocket socket;
     readonly CancellationTokenSource cts = new();
-    readonly byte[] buffer = GC.AllocateArray<byte>(36, pinned: true);
-
+    readonly byte[] sendBuffer = GC.AllocateArray<byte>(Unsafe.SizeOf<Guid>(), pinned: true);
     readonly HashSet<Guid> knownClients = [];
     bool disposed;
 
@@ -27,45 +26,52 @@ public sealed class LobbyUdpClient : IDisposable
 
     public async Task HandShake(User user, CancellationToken ct = default)
     {
-        if (!user.Token.TryFormat(buffer, out var bytesWritten) || bytesWritten is 0) return;
-        await socket.SendToAsync(buffer.AsMemory()[..bytesWritten], serverEndpoint, ct);
+        if (!user.Token.TryWriteBytes(sendBuffer, true, out var bytesWritten) || bytesWritten is 0)
+            return;
+
+        await socket.SendToAsync(sendBuffer.AsMemory()[..bytesWritten], serverEndpoint, ct);
     }
 
     public async Task Ping(User user, Peer[] peers, CancellationToken ct = default)
     {
-        if (peers.Length is 0 || !user.PeerId.TryFormat(buffer, out var bytesWritten) ||
+        if (peers.Length is 0 || !user.PeerId.TryWriteBytes(sendBuffer, true, out var bytesWritten) ||
             bytesWritten is 0)
             return;
 
-        var msgBytes = buffer.AsMemory()[..bytesWritten];
+        var msgBytes = sendBuffer.AsMemory()[..bytesWritten];
         for (var i = 0; i < peers.Length; i++)
         {
             var peer = peers[i];
             if (peer.Connected && peer.PeerId != user.PeerId)
-                await socket.SendToAsync(msgBytes, GetFallbackEndpoint(user, peer), ct);
+                await socket.SendToAsync(msgBytes, peer.GetEndpointForUser(user), ct);
         }
     }
 
     [AsyncMethodBuilder(typeof(PoolingAsyncValueTaskMethodBuilder))]
     async ValueTask Receive(CancellationToken stoppingToken)
     {
-        var recBuffer = GC.AllocateArray<byte>(36, pinned: true);
+        var idSize = Unsafe.SizeOf<Guid>();
+        var recBuffer = GC.AllocateArray<byte>(idSize, pinned: true);
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                var receiveInfo = await socket.ReceiveAsync(recBuffer, stoppingToken)
+                var receiveInfo = await socket
+                    .ReceiveAsync(recBuffer, stoppingToken)
                     .ConfigureAwait(false);
 
                 if (receiveInfo.ReceivedBytes is 0) continue;
 
-                var msg = Encoding.UTF8.GetString(recBuffer);
-                Console.WriteLine($"recv: {msg} from {receiveInfo.RemoteEndPoint}");
-
-                if (!Guid.TryParse(msg, out var peerToken))
+                if (receiveInfo.ReceivedBytes != idSize)
+                {
+                    var msg = Encoding.UTF8.GetString(recBuffer.AsSpan(0, receiveInfo.ReceivedBytes));
+                    Console.WriteLine($"recv ({receiveInfo.RemoteEndPoint}): '{msg}'");
                     continue;
+                }
 
-                knownClients.Add(peerToken);
+                Guid peerToken = new(recBuffer.AsSpan(0, receiveInfo.ReceivedBytes), true);
+                Console.WriteLine($"recv ({receiveInfo.RemoteEndPoint}): Ping from '{peerToken}'");
+                if (peerToken != Guid.Empty) knownClients.Add(peerToken);
             }
             catch (OperationCanceledException)
             {
@@ -76,15 +82,6 @@ public sealed class LobbyUdpClient : IDisposable
                 // skip
             }
         }
-    }
-
-    // Use local IP when over same network
-    public static IPEndPoint GetFallbackEndpoint(User user, Peer peer)
-    {
-        if (Equals(peer.Endpoint.Address, user.IP) && peer.LocalEndpoint is not null)
-            return peer.LocalEndpoint;
-
-        return peer.Endpoint;
     }
 
     public bool IsKnown(Guid id) => knownClients.Contains(id);
