@@ -6,6 +6,7 @@ namespace SpaceWar;
 public class AppSettings
 {
     public string Username { get; set; } = string.Empty;
+    public int GameId { get; set; }
     public required string LobbyName { get; set; }
     public required Uri ServerUrl { get; set; }
     public int LocalPort { get; set; }
@@ -38,6 +39,10 @@ public class AppSettings
         if (argsDict.TryGetValue(nameof(Username), out var usernameArg) &&
             !string.IsNullOrWhiteSpace(usernameArg))
             Username = usernameArg;
+
+        if (argsDict.TryGetValue(nameof(GameId), out var gameIdArg) &&
+            int.TryParse(gameIdArg, out var gameId))
+            GameId = gameId;
     }
 
     public static AppSettings LoadFromJson(string file)

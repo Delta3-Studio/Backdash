@@ -25,19 +25,22 @@ public sealed class LobbyHttpClient(AppSettings appSettings)
         BaseAddress = appSettings.ServerUrl,
     };
 
+    readonly Guid recreationKey = Guid.NewGuid();
+
     public async Task<User> EnterLobby(string lobbyName, string username, PlayerMode mode)
     {
         var localEndpoint = await GetLocalEndpoint();
-        var response = await client.PostAsJsonAsync("/lobby", new
+        var response = await client.PostAsJsonAsync($"/{appSettings.GameId}/lobby", new
         {
             lobbyName,
             username,
             mode,
             localEndpoint,
+            recreationKey,
         }, jsonOptions);
 
         if (response.StatusCode is HttpStatusCode.UnprocessableEntity)
-            throw new InvalidOperationException("Already started");
+            throw new InvalidOperationException("Failed to enter lobby");
 
         response.EnsureSuccessStatusCode();
 
@@ -49,19 +52,19 @@ public sealed class LobbyHttpClient(AppSettings appSettings)
         return result;
     }
 
-    public async Task<Lobby> GetLobby(User user) =>
-        await client.GetFromJsonAsync<Lobby>($"/lobby/{user.LobbyName}", jsonOptions)
+    public async Task<Lobby> GetLobby() =>
+        await client.GetFromJsonAsync<Lobby>("/entry/lobby", jsonOptions)
         ?? throw new InvalidOperationException();
 
-    public async Task LeaveLobby(User user)
+    public async Task LeaveLobby()
     {
-        var response = await client.DeleteAsync($"/lobby/{user.LobbyName}");
+        var response = await client.DeleteAsync("/entry");
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task ToggleReady(User user)
+    public async Task ToggleReady()
     {
-        var response = await client.PutAsync($"/lobby/{user.LobbyName}", null);
+        var response = await client.PutAsync("/entry/ready", null);
         response.EnsureSuccessStatusCode();
     }
 

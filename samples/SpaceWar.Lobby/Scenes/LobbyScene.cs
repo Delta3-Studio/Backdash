@@ -59,7 +59,7 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
     {
         if (!AllReachable()) return;
 
-        await client.ToggleReady(user);
+        await client.ToggleReady();
         ready = true;
     }
 
@@ -306,7 +306,7 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
 
     async Task RefreshLobby()
     {
-        lobbyInfo = await client.GetLobby(user);
+        lobbyInfo = await client.GetLobby();
 
         await lobbyUdpClient.HandShake(user);
 
@@ -491,7 +491,7 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
             cts.Dispose();
             lobbyUdpClient.Dispose();
             if (user is not null && lobbyInfo is { Ready: false })
-                client.LeaveLobby(user).GetAwaiter().GetResult();
+                client.LeaveLobby().GetAwaiter().GetResult();
         }
         catch (Exception e)
         {
