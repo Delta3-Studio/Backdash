@@ -20,7 +20,7 @@ public class StructWriteSingleBenchmark
     public void Setup()
     {
         Random random = new(42);
-        data = StructData.Generate(random);
+        data = random.Next<StructData>();
     }
 
     [IterationSetup]
@@ -67,7 +67,7 @@ public class StructWriteSpanBenchmark
     public void Setup()
     {
         Random random = new(42);
-        dataArray = StructData.Generate(random, N);
+        dataArray = random.Next<StructData>(N);
         resultArray = new StructData[N];
     }
 
@@ -135,18 +135,4 @@ public record struct StructData
     public byte Field7;
     public sbyte Field8;
     public Int128 Field9;
-
-    public static StructData Generate(Random random)
-    {
-        StructData result = new();
-        random.NextBytes(Mem.AsBytes(ref result));
-        return result;
-    }
-
-    public static StructData[] Generate(Random random, int count)
-    {
-        StructData[] result = new StructData[count];
-        random.NextBytes(MemoryMarshal.AsBytes(result.AsSpan()));
-        return result;
-    }
 }

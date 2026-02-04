@@ -31,14 +31,14 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     }
 
     /// <inheritdoc />
-    public bool TryLoad(in Frame frame, [MaybeNullWhen(false)] out SavedFrame savedFrame)
+    public bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedFrame savedFrame)
     {
         var i = 0;
         var span = savedStates.AsSpan();
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var limit = ref Unsafe.Add(ref current, span.Length);
 
-        while (Unsafe.IsAddressLessThan(in current, in limit))
+        while (Unsafe.IsAddressLessThan(ref current, ref limit))
         {
             if (current.Frame.Number == frame.Number)
             {
@@ -68,13 +68,13 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     public void Advance() => head = (head + 1) % savedStates.Length;
 
     /// <inheritdoc />
-    public uint GetChecksum(in Frame frame)
+    public uint GetChecksum(Frame frame)
     {
         var span = savedStates.AsSpan();
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var limit = ref Unsafe.Add(ref current, span.Length);
 
-        while (Unsafe.IsAddressLessThan(in current, in limit))
+        while (Unsafe.IsAddressLessThan(ref current, ref limit))
         {
             if (current.Frame.Number == frame.Number)
                 return current.Checksum;

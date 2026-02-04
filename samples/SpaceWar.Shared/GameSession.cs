@@ -71,7 +71,7 @@ public sealed class GameSession(
         Console.WriteLine(message);
     }
 
-    public void SaveState(in Frame frame, ref readonly BinaryBufferWriter writer)
+    public void SaveState(Frame frame, ref readonly BinaryBufferWriter writer)
     {
         // UNCOMMENT TO FORCE DESYNC ON FRAME 200
 #pragma warning disable S125
@@ -82,7 +82,7 @@ public sealed class GameSession(
         gameState.SaveState(in writer);
     }
 
-    public void LoadState(in Frame frame, ref readonly BinaryBufferReader reader)
+    public void LoadState(Frame frame, ref readonly BinaryBufferReader reader)
     {
         Log($"=> LOADING STATE {frame}...");
         gameState.LoadState(in reader);
@@ -159,7 +159,7 @@ public sealed class GameSession(
     }
 
     // used by SyncTest, the return value is used on the state desync handler call
-    object INetcodeSessionHandler.CreateState(in Frame frame, ref readonly BinaryBufferReader reader)
+    object? INetcodeSessionHandler.CreateState(Frame frame, ref readonly BinaryBufferReader reader)
     {
         GameState state = new();
         state.LoadState(in reader);

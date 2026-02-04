@@ -49,7 +49,7 @@ struct InputMessage : IEquatable<InputMessage>, IUtf8SpanFormattable
 
         writer.Write(in InputSize);
         writer.Write(in NumBits);
-        writer.Write(Bits[..ByteSize.ByteCountOfBits(in NumBits)]);
+        writer.Write(Bits[..ByteSize.BytesToBits(NumBits)]);
     }
 
     public void Deserialize(in BinaryBufferReader reader)
@@ -70,7 +70,7 @@ struct InputMessage : IEquatable<InputMessage>, IUtf8SpanFormattable
 
         InputSize = reader.ReadByte();
         NumBits = reader.ReadUInt16();
-        reader.Read(Bits[..ByteSize.ByteCountOfBits(in NumBits)]);
+        reader.Read(Bits[..ByteSize.BytesToBits(NumBits)]);
     }
 
     public readonly bool TryFormat(

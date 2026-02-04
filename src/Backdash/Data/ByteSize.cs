@@ -76,27 +76,19 @@ public readonly record struct ByteSize(long ByteCount)
 
     ReadOnlySpan<char> GetMaxBinarySymbol()
     {
-        if (Math.Abs(TebiBytes) >= 1)
-            return TebiByteSymbol;
-        if (Math.Abs(GibiBytes) >= 1)
-            return GibiByteSymbol;
-        if (Math.Abs(MebiBytes) >= 1)
-            return MebiByteSymbol;
-        if (Math.Abs(KibiBytes) >= 1)
-            return KibiByteSymbol;
+        if (Math.Abs(TebiBytes) >= 1) return TebiByteSymbol;
+        if (Math.Abs(GibiBytes) >= 1) return GibiByteSymbol;
+        if (Math.Abs(MebiBytes) >= 1) return MebiByteSymbol;
+        if (Math.Abs(KibiBytes) >= 1) return KibiByteSymbol;
         return ByteSymbol;
     }
 
     ReadOnlySpan<char> GetMaxDecimalSymbol()
     {
-        if (Math.Abs(TeraBytes) >= 1)
-            return TeraByteSymbol;
-        if (Math.Abs(GigaBytes) >= 1)
-            return GigaByteSymbol;
-        if (Math.Abs(MegaBytes) >= 1)
-            return MegaByteSymbol;
-        if (Math.Abs(KiloBytes) >= 1)
-            return KiloByteSymbol;
+        if (Math.Abs(TeraBytes) >= 1) return TeraByteSymbol;
+        if (Math.Abs(GigaBytes) >= 1) return GigaByteSymbol;
+        if (Math.Abs(MegaBytes) >= 1) return MegaByteSymbol;
+        if (Math.Abs(KiloBytes) >= 1) return KiloByteSymbol;
         return ByteSymbol;
     }
 
@@ -116,26 +108,26 @@ public readonly record struct ByteSize(long ByteCount)
         };
 
     double GetValueForSymbol(ReadOnlySpan<char> symbol) => GetValue(SymbolToMeasure(symbol));
-    const string defaultFormat = "0.##";
-    const string binaryFormat = "binary";
-    const string decimalFormat = "decimal";
+    const string DefaultFormat = "0.##";
+    const string BinaryFormat = "binary";
+    const string DecimalFormat = "decimal";
 
     /// <inheritdoc />
     public string ToString(string? format, IFormatProvider? formatProvider)
     {
-        format ??= decimalFormat;
-        if (format.Equals(binaryFormat, StringComparison.OrdinalIgnoreCase))
+        format ??= DecimalFormat;
+        if (format.Equals(BinaryFormat, StringComparison.OrdinalIgnoreCase))
         {
             var maxBinarySymbol = GetMaxBinarySymbol();
             var binaryValue = GetValueForSymbol(maxBinarySymbol);
-            return binaryValue.ToString($"{defaultFormat} {maxBinarySymbol}", formatProvider);
+            return binaryValue.ToString($"{DefaultFormat} {maxBinarySymbol}", formatProvider);
         }
 
-        if (format.Equals(decimalFormat, StringComparison.OrdinalIgnoreCase))
+        if (format.Equals(DecimalFormat, StringComparison.OrdinalIgnoreCase))
         {
             var maxDecimalSymbol = GetMaxDecimalSymbol();
             var decimalValue = GetValueForSymbol(maxDecimalSymbol);
-            return decimalValue.ToString($"{defaultFormat} {maxDecimalSymbol}", formatProvider);
+            return decimalValue.ToString($"{DefaultFormat} {maxDecimalSymbol}", formatProvider);
         }
 
         var symbol = FindSymbol(format);
@@ -146,7 +138,7 @@ public readonly record struct ByteSize(long ByteCount)
             (!format.Contains('#') && !format.Contains('0'))
             || symbol.Equals(format, StringComparison.OrdinalIgnoreCase)
         )
-            return value.ToString($"{defaultFormat} {symbol}", formatProvider);
+            return value.ToString($"{DefaultFormat} {symbol}", formatProvider);
         string symbolString = new(symbol);
         return value.ToString(
             format.Replace(symbolString, symbolString, StringComparison.OrdinalIgnoreCase),
@@ -177,21 +169,21 @@ public readonly record struct ByteSize(long ByteCount)
     {
         bytesWritten = 0;
         Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
-        format = format.IsEmpty ? decimalFormat : format;
-        if (format.Equals(binaryFormat, StringComparison.OrdinalIgnoreCase))
+        format = format.IsEmpty ? DecimalFormat : format;
+        if (format.Equals(BinaryFormat, StringComparison.OrdinalIgnoreCase))
         {
             var maxBinarySymbol = GetMaxBinarySymbol();
             var binaryValue = GetValueForSymbol(maxBinarySymbol);
-            return writer.Write(binaryValue, defaultFormat, provider) &&
+            return writer.Write(binaryValue, DefaultFormat, provider) &&
                    writer.Write(" "u8) &&
                    writer.Write(maxBinarySymbol);
         }
 
-        if (format.Equals(decimalFormat, StringComparison.OrdinalIgnoreCase))
+        if (format.Equals(DecimalFormat, StringComparison.OrdinalIgnoreCase))
         {
             var maxDecimalSymbol = GetMaxDecimalSymbol();
             var decimalValue = GetValueForSymbol(maxDecimalSymbol);
-            return writer.Write(decimalValue, defaultFormat, provider) &&
+            return writer.Write(decimalValue, DefaultFormat, provider) &&
                    writer.Write(" "u8) &&
                    writer.Write(maxDecimalSymbol);
         }
@@ -203,7 +195,7 @@ public readonly record struct ByteSize(long ByteCount)
         var value = GetValueForSymbol(symbol);
         if ((!format.Contains('#') && !format.Contains('0'))
             || symbol.Equals(format, StringComparison.OrdinalIgnoreCase))
-            return writer.Write(value, defaultFormat, provider) &&
+            return writer.Write(value, DefaultFormat, provider) &&
                    writer.Write(" "u8) &&
                    writer.Write(symbol);
 
@@ -216,21 +208,21 @@ public readonly record struct ByteSize(long ByteCount)
     {
         charsWritten = 0;
         SpanStringBuilder writer = new(in destination, ref charsWritten);
-        format = format.IsEmpty ? decimalFormat : format;
-        if (format.Equals(binaryFormat, StringComparison.OrdinalIgnoreCase))
+        format = format.IsEmpty ? DecimalFormat : format;
+        if (format.Equals(BinaryFormat, StringComparison.OrdinalIgnoreCase))
         {
             var maxBinarySymbol = GetMaxBinarySymbol();
             var binaryValue = GetValueForSymbol(maxBinarySymbol);
-            return writer.Write(binaryValue, defaultFormat) &&
+            return writer.Write(binaryValue, DefaultFormat) &&
                    writer.Write(" ") &&
                    writer.Write(maxBinarySymbol);
         }
 
-        if (format.Equals(decimalFormat, StringComparison.OrdinalIgnoreCase))
+        if (format.Equals(DecimalFormat, StringComparison.OrdinalIgnoreCase))
         {
             var maxDecimalSymbol = GetMaxDecimalSymbol();
             var decimalValue = GetValueForSymbol(maxDecimalSymbol);
-            return writer.Write(decimalValue, defaultFormat) &&
+            return writer.Write(decimalValue, DefaultFormat) &&
                    writer.Write(" ") &&
                    writer.Write(maxDecimalSymbol);
         }
@@ -242,33 +234,12 @@ public readonly record struct ByteSize(long ByteCount)
         var value = GetValueForSymbol(symbol);
         if ((!format.Contains('#') && !format.Contains('0'))
             || symbol.Equals(format, StringComparison.OrdinalIgnoreCase))
-            return writer.Write(value, defaultFormat) &&
+            return writer.Write(value, DefaultFormat) &&
                    writer.Write(" ") &&
                    writer.Write(symbol);
 
         return writer.Write(value, format);
     }
-
-    static ReadOnlySpan<char> FindSymbol(ReadOnlySpan<char> str)
-    {
-        const StringComparison cmp = StringComparison.Ordinal;
-        if (str.Contains(KibiByteSymbol, cmp)) return KibiByteSymbol;
-        if (str.Contains(MebiByteSymbol, cmp)) return MebiByteSymbol;
-        if (str.Contains(GibiByteSymbol, cmp)) return GibiByteSymbol;
-        if (str.Contains(TebiByteSymbol, cmp)) return TebiByteSymbol;
-        if (str.Contains(KiloByteSymbol, cmp)) return KiloByteSymbol;
-        if (str.Contains(MegaByteSymbol, cmp)) return MegaByteSymbol;
-        if (str.Contains(GigaByteSymbol, cmp)) return GigaByteSymbol;
-        if (str.Contains(TeraByteSymbol, cmp)) return TeraByteSymbol;
-        if (str.Contains(ByteSymbol, cmp)) return ByteSymbol;
-        return [];
-    }
-
-    /// <summary>
-    ///     Returns number of bits for <paramref name="byteCount" /> bytes.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int ByteCountOfBits(in ushort byteCount) => MathI.CeilDiv(byteCount, ByteToBits);
 
     /// <inheritdoc />
     public static bool operator >(ByteSize left, ByteSize right) => left.ByteCount > right.ByteCount;
@@ -330,6 +301,21 @@ public readonly record struct ByteSize(long ByteCount)
     /// <inheritdoc cref="op_Explicit(long)" />
     public static explicit operator ByteSize(byte value) => new(value);
 
+    static ReadOnlySpan<char> FindSymbol(ReadOnlySpan<char> str)
+    {
+        const StringComparison cmp = StringComparison.Ordinal;
+        if (str.Contains(KibiByteSymbol, cmp)) return KibiByteSymbol;
+        if (str.Contains(MebiByteSymbol, cmp)) return MebiByteSymbol;
+        if (str.Contains(GibiByteSymbol, cmp)) return GibiByteSymbol;
+        if (str.Contains(TebiByteSymbol, cmp)) return TebiByteSymbol;
+        if (str.Contains(KiloByteSymbol, cmp)) return KiloByteSymbol;
+        if (str.Contains(MegaByteSymbol, cmp)) return MegaByteSymbol;
+        if (str.Contains(GigaByteSymbol, cmp)) return GigaByteSymbol;
+        if (str.Contains(TeraByteSymbol, cmp)) return TeraByteSymbol;
+        if (str.Contains(ByteSymbol, cmp)) return ByteSymbol;
+        return [];
+    }
+
     /// <summary>
     ///     Returns new <see cref="ByteSize" /> with <paramref name="value" /> bytes
     /// </summary>
@@ -339,50 +325,72 @@ public readonly record struct ByteSize(long ByteCount)
     /// <summary>
     ///     Returns new <see cref="ByteSize" /> with <paramref name="value" /> kilo-bytes
     /// </summary>
-    /// <param name="value">Number of kilo-bytes</param>
+    /// <param name="value">Number of kilobytes</param>
     public static ByteSize FromKiloByte(double value) => new((long)(value * BytesToKiloByte));
 
     /// <summary>
     ///     Returns new <see cref="ByteSize" /> with <paramref name="value" /> mega-bytes
     /// </summary>
-    /// <param name="value">Number of mega-bytes</param>
+    /// <param name="value">Number of megabytes</param>
     public static ByteSize FromMegaBytes(double value) => new((long)(value * BytesToMegaByte));
 
     /// <summary>
     ///     Returns new <see cref="ByteSize" /> with <paramref name="value" /> giga-bytes
     /// </summary>
-    /// <param name="value">Number of giga-bytes</param>
+    /// <param name="value">Number of gigabytes</param>
     public static ByteSize FromGigaBytes(double value) => new((long)(value * BytesToGigaByte));
 
     /// <summary>
     ///     Returns new <see cref="ByteSize" /> with <paramref name="value" /> tera-bytes
     /// </summary>
-    /// <param name="value">Number of tera-bytes</param>
+    /// <param name="value">Number of terabytes</param>
     public static ByteSize FromTeraBytes(double value) => new((long)(value * BytesToTeraByte));
 
     /// <summary>
     ///     Returns new <see cref="ByteSize" /> with <paramref name="value" /> kibi-bytes
     /// </summary>
-    /// <param name="value">Number of kibi-bytes</param>
+    /// <param name="value">Number of kibibytes</param>
     public static ByteSize FromKibiBytes(double value) => new((long)(value * BytesToKibiByte));
 
     /// <summary>
     ///     Returns new <see cref="ByteSize" /> with <paramref name="value" /> mebi-bytes
     /// </summary>
-    /// <param name="value">Number of mebi-bytes</param>
+    /// <param name="value">Number of mebibytes</param>
     public static ByteSize FromMebiBytes(double value) => new((long)(value * BytesToMebiByte));
 
     /// <summary>
     ///     Returns new <see cref="ByteSize" /> with <paramref name="value" /> gibi-bytes
     /// </summary>
-    /// <param name="value">Number of gibi-bytes</param>
+    /// <param name="value">Number of gibibytes</param>
     public static ByteSize FromGibiBytes(double value) => new((long)(value * BytesToGibiByte));
 
     /// <summary>
     ///     Returns new <see cref="ByteSize" /> with <paramref name="value" /> gibi-bytes
     /// </summary>
-    /// <param name="value">Number of tebi-bytes</param>
+    /// <param name="value">Number of tebibytes</param>
     public static ByteSize FromTebiBytes(double value) => new((long)(value * BytesToTebiByte));
+
+    /// <summary>
+    ///     Returns number of bits for <paramref name="byteCount" /> bytes.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int BytesToBits(ushort byteCount) => MathI.CeilDiv(byteCount, ByteToBits);
+
+    /// <summary>
+    ///     Returns the size of a value of the given type parameter.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ByteSize OfType<T>() where T : unmanaged => new(Unsafe.SizeOf<T>());
+
+    /// <summary>
+    ///     Returns the first power of two ByteSize greater than <paramref name="value" />
+    /// </summary>
+    public static ByteSize NextPowerOfTwo(ByteSize value) => new(MathI.NextPowerOfTwo(value.ByteCount));
+
+    /// <summary>
+    ///     Returns the first power of two ByteSize greater than <paramref name="size" /> (in bytes)
+    /// </summary>
+    public static ByteSize NextPowerOfTwo(int size) => size <= 0 ? Zero : new(MathI.NextPowerOfTwo((long)size));
 
     static Measure SymbolToMeasure(ReadOnlySpan<char> symbol) =>
         symbol switch

@@ -26,10 +26,10 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     public FrameRange(int start, int end) : this((Frame)start, (Frame)end) { }
 
     /// <inheritdoc />
-    public FrameRange(in Range range) : this(range.Start.Value, range.End.Value) { }
+    public FrameRange(Range range) : this(range.Start.Value, range.End.Value) { }
 
     /// <inheritdoc />
-    public FrameRange(in Frame start, in FrameSpan duration) : this(start, start + (duration.Frames - 1)) { }
+    public FrameRange(Frame start, FrameSpan duration) : this(start, start + (duration.Frames - 1)) { }
 
     /// <summary>
     /// Get or set the duration of the range
@@ -44,7 +44,7 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     /// <summary>
     /// Checks if a frame is contained in the range
     /// </summary>
-    public bool Contains(in Frame frame) => Contains(frame.Number);
+    public bool Contains(Frame frame) => Contains(frame.Number);
 
     /// <summary>
     /// Returns a new range with the duration changed
@@ -52,7 +52,7 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     public FrameRange WithDuration(int duration) => new(Start, Start + (duration - 1));
 
     ///  <inheritdoc cref="WithDuration(int)"/>
-    public FrameRange WithDuration(in FrameSpan duration) => WithDuration(duration.Frames);
+    public FrameRange WithDuration(FrameSpan duration) => WithDuration(duration.Frames);
 
     sealed class FrameRangeJsonConverter : JsonConverter<FrameRange>
     {
@@ -133,26 +133,25 @@ public readonly record struct FrameRange(Frame Start, Frame End)
                && writer.Write("]");
     }
 
-    static int Compare(in FrameRange left, in FrameRange right) =>
-        (left.Start, left.End).CompareTo((right.Start, right.End));
+    static int Compare(FrameRange left, FrameRange right) => (left.Start, left.End).CompareTo((right.Start, right.End));
 
     /// <inheritdoc />
-    public int CompareTo(FrameRange other) => Compare(in this, in other);
+    public int CompareTo(FrameRange other) => Compare(this, other);
 
     /// <inheritdoc />
-    int IComparable.CompareTo(object? obj) => obj is FrameRange other ? Compare(in this, in other) : -1;
+    int IComparable.CompareTo(object? obj) => obj is FrameRange other ? Compare(this, other) : -1;
 
     /// <inheritdoc />
-    public static bool operator >(FrameRange left, FrameRange right) => Compare(in left, in right) > 0;
+    public static bool operator >(FrameRange left, FrameRange right) => Compare(left, right) > 0;
 
     /// <inheritdoc />
-    public static bool operator >=(FrameRange left, FrameRange right) => Compare(in left, in right) >= 0;
+    public static bool operator >=(FrameRange left, FrameRange right) => Compare(left, right) >= 0;
 
     /// <inheritdoc />
-    public static bool operator <(FrameRange left, FrameRange right) => Compare(in left, in right) < 0;
+    public static bool operator <(FrameRange left, FrameRange right) => Compare(left, right) < 0;
 
     /// <inheritdoc />
-    public static bool operator <=(FrameRange left, FrameRange right) => Compare(in left, in right) <= 0;
+    public static bool operator <=(FrameRange left, FrameRange right) => Compare(left, right) <= 0;
 
     /// <inheritdoc />
     public static FrameRange operator +(FrameRange left, FrameSpan right) => new(left.Start, left.Duration + right);
@@ -163,7 +162,7 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     /// <summary>
     /// Converts a range to a frame range.
     /// </summary>
-    public static implicit operator FrameRange(in Range range) => new(range);
+    public static implicit operator FrameRange(Range range) => new(range);
 
     /// <summary>
     /// Converts a frame tuple to a frame range.
@@ -174,5 +173,5 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     /// Converts a tuple of frame and frame-span to a frame range.
     /// </summary>
     public static implicit operator FrameRange((Frame Start, FrameSpan Duration) range) =>
-        new(in range.Start, in range.Duration);
+        new(range.Start, range.Duration);
 }

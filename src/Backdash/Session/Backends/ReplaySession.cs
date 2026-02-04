@@ -209,7 +209,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         ref var nextState = ref stateStore.Next();
 
         BinaryBufferWriter writer = new(nextState.GameState, endianness);
-        callbacks.SaveState(in currentFrame, in writer);
+        callbacks.SaveState(currentFrame, ref writer);
         nextState.Frame = currentFrame;
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
 
@@ -227,7 +227,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
             return true;
         }
 
-        if (!stateStore.TryLoad(in frame, out var savedFrame))
+        if (!stateStore.TryLoad(frame, out var savedFrame))
         {
             ReplayController.IsBackward = false;
             ReplayController.Pause();
@@ -238,7 +238,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
             $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum:x8})");
         var offset = 0;
         BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
-        callbacks.LoadState(in frame, in reader);
+        callbacks.LoadState(frame, ref reader);
         CurrentFrame = savedFrame.Frame;
         return true;
     }
@@ -250,6 +250,6 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         var offset = 0;
         BinaryBufferReader reader = new(snapshot.State, ref offset, endianness);
-        callbacks.LoadState(CurrentFrame, in reader);
+        callbacks.LoadState(CurrentFrame, ref reader);
     }
 }

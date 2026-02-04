@@ -346,7 +346,7 @@ sealed class SpectatorSession<TInput> :
         ref var nextState = ref stateStore.Next();
 
         BinaryBufferWriter writer = new(nextState.GameState, endianness);
-        callbacks.SaveState(CurrentFrame, in writer);
+        callbacks.SaveState(CurrentFrame, ref writer);
         nextState.Frame = CurrentFrame;
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
 
@@ -364,7 +364,7 @@ sealed class SpectatorSession<TInput> :
             return true;
         }
 
-        if (!stateStore.TryLoad(in frame, out var savedFrame))
+        if (!stateStore.TryLoad(frame, out var savedFrame))
             return false;
 
         logger.Write(LogLevel.Trace,
@@ -372,7 +372,7 @@ sealed class SpectatorSession<TInput> :
 
         var offset = 0;
         BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
-        callbacks.LoadState(in frame, in reader);
+        callbacks.LoadState(frame, ref reader);
         CurrentFrame = savedFrame.Frame;
         return true;
     }

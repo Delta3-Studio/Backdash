@@ -217,14 +217,14 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
             return true;
         }
 
-        if (!stateStore.TryLoad(in frame, out var savedFrame))
+        if (!stateStore.TryLoad(frame, out var savedFrame))
             return false;
 
         var offset = 0;
         BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
-        callbacks.LoadState(in frame, in reader);
+        callbacks.LoadState(frame, ref reader);
         CurrentFrame = frame;
-        DiscardInputsAfter(in frame);
+        DiscardInputsAfter(frame);
 
         return true;
     }
@@ -239,10 +239,10 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
 
         var offset = 0;
         BinaryBufferReader reader = new(snapshot.State, ref offset, endianness);
-        callbacks.LoadState(CurrentFrame, in reader);
+        callbacks.LoadState(CurrentFrame, ref reader);
     }
 
-    void DiscardInputsAfter(in Frame frame)
+    void DiscardInputsAfter(Frame frame)
     {
         var prevFrame = frame.Previous();
         ref var current = ref MemoryMarshal.GetReference(inputQueues.AsSpan());
@@ -260,7 +260,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         ref var nextState = ref stateStore.Next();
 
         BinaryBufferWriter writer = new(nextState.GameState, endianness);
-        callbacks.SaveState(in currentFrame, in writer);
+        callbacks.SaveState(currentFrame, ref writer);
         nextState.Frame = currentFrame;
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
 

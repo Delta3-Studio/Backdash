@@ -26,7 +26,7 @@ public interface INetcodeSessionHandler
     /// </summary>
     /// <param name="frame">The frame which the save occurs.</param>
     /// <param name="writer">Binary state writer.</param>
-    void SaveState(in Frame frame, ref readonly BinaryBufferWriter writer);
+    void SaveState(Frame frame, ref readonly BinaryBufferWriter writer);
 
     /// <summary>
     ///     Backdash will call this function at the beginning  of a rollback.
@@ -34,7 +34,7 @@ public interface INetcodeSessionHandler
     /// </summary>
     /// <param name="frame">The loading frame</param>
     /// <param name="reader">Binary state reader</param>
-    void LoadState(in Frame frame, ref readonly BinaryBufferReader reader);
+    void LoadState(Frame frame, ref readonly BinaryBufferReader reader);
 
     /// <summary>
     ///     Called during a rollback after <see cref="LoadState" />. You should advance your game
@@ -66,7 +66,7 @@ public interface INetcodeSessionHandler
     /// <seealso cref="NetcodeSessionBuilder{TInput}.ForSyncTest" />
     /// <seealso cref="IStateStringParser" />
     /// <seealso cref="IStateStringParser.GetStateString" />
-    object? CreateState(in Frame frame, ref readonly BinaryBufferReader reader) => null;
+    object? CreateState(Frame frame, ref readonly BinaryBufferReader reader) => null;
 }
 
 sealed class EmptySessionHandler(Logger logger) : INetcodeSessionHandler
@@ -77,11 +77,11 @@ sealed class EmptySessionHandler(Logger logger) : INetcodeSessionHandler
     public void OnSessionClose() =>
         logger.Write(LogLevel.Information, $"{DateTime.UtcNow:o} [Session Handler] Closing.");
 
-    public void SaveState(in Frame frame, ref readonly BinaryBufferWriter writer) =>
+    public void SaveState(Frame frame, ref readonly BinaryBufferWriter writer) =>
         logger.Write(LogLevel.Information,
             $"{DateTime.UtcNow:o} [Session Handler] {nameof(SaveState)} called for frame {frame}");
 
-    public void LoadState(in Frame frame, ref readonly BinaryBufferReader reader) =>
+    public void LoadState(Frame frame, ref readonly BinaryBufferReader reader) =>
         logger.Write(LogLevel.Information, $"{DateTime.UtcNow:o} [Session Handler] {nameof(LoadState)} called");
 
     public void AdvanceFrame() =>

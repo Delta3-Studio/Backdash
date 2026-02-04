@@ -123,7 +123,7 @@ public sealed class Game : INetcodeSessionHandler
         nonGameState.RemotePlayerStatus = PlayerStatus.Disconnected;
     }
 
-    public void SaveState(in Frame frame, ref readonly BinaryBufferWriter writer)
+    public void SaveState(Frame frame, ref readonly BinaryBufferWriter writer)
     {
         writer.Write(currentState.Position1);
         writer.Write(currentState.Position2);
@@ -133,7 +133,7 @@ public sealed class Game : INetcodeSessionHandler
         writer.Write(currentState.Target);
     }
 
-    public void LoadState(in Frame frame, ref readonly BinaryBufferReader reader)
+    public void LoadState(Frame frame, ref readonly BinaryBufferReader reader)
     {
         currentState.Position1 = reader.ReadVector2();
         currentState.Position2 = reader.ReadVector2();

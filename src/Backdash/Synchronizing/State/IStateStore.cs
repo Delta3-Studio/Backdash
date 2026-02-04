@@ -17,7 +17,7 @@ public interface IStateStore
     ///     Try loads a <see cref="SavedFrame" /> for <paramref name="frame" />.
     /// </summary>
     /// <returns>true if the frame was found, false otherwise</returns>
-    bool TryLoad(in Frame frame, [MaybeNullWhen(false)] out SavedFrame savedFrame);
+    bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedFrame savedFrame);
 
     /// <summary>
     ///     Returns last <see cref="SavedFrame" />.
@@ -38,5 +38,5 @@ public interface IStateStore
     ///     Finds checksum for
     ///     <param name="frame"></param>
     /// </summary>
-    uint GetChecksum(in Frame frame);
+    uint GetChecksum(Frame frame);
 }

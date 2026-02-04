@@ -44,7 +44,7 @@ sealed class InputQueue<TInput> where TInput : unmanaged
         ArgumentOutOfRangeException.ThrowIfNegative(frame.Number);
 
         if (!lastFrameRequested.IsNull)
-            frame = Frame.Min(in frame, in lastFrameRequested);
+            frame = Frame.Min(frame, lastFrameRequested);
         logger.Write(LogLevel.Trace,
             $"Queue {QueueId} => discarding confirmed frames up to {frame} (last add:{lastAddedFrame.Number} len:{inputs.Size} front:{FirstInput.Frame.Number} back:{LastInput.Frame.Number})");
         if (frame.Number >= lastAddedFrame.Number)

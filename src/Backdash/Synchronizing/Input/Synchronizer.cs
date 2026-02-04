@@ -66,7 +66,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
             LocalFrameDelay = player.IsLocal() ? Math.Max(options.InputDelayFrames, 0) : 0,
         });
 
-    public void SetLastConfirmedFrame(in Frame frame)
+    public void SetLastConfirmedFrame(Frame frame)
     {
         lastConfirmedFrame = frame;
         if (lastConfirmedFrame.Number <= 0)
@@ -110,7 +110,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
     public void AddRemoteInput(NetcodePlayer player, GameInput<TInput> input) => AddInput(player, ref input);
 
-    public bool GetConfirmedInputGroup(in Frame frame, ref GameInput<ConfirmedInputs<TInput>> confirmed)
+    public bool GetConfirmedInputGroup(Frame frame, ref GameInput<ConfirmedInputs<TInput>> confirmed)
     {
         confirmed.Data.Count = (byte)NumberOfPlayers;
         confirmed.Frame = frame;
@@ -118,7 +118,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
         for (var playerNumber = 0; playerNumber < NumberOfPlayers; playerNumber++)
         {
-            if (!GetConfirmedInput(in frame, playerNumber, ref current))
+            if (!GetConfirmedInput(frame, playerNumber, ref current))
                 return false;
 
             confirmed.Data.Inputs[playerNumber] = current.Data;
@@ -127,7 +127,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         return true;
     }
 
-    public bool GetConfirmedInput(in Frame frame, int playerNumber, ref GameInput<TInput> confirmed)
+    public bool GetConfirmedInput(Frame frame, int playerNumber, ref GameInput<TInput> confirmed)
     {
         if (localConnections[playerNumber].Disconnected && frame > localConnections[playerNumber].LastFrame)
             return false;
@@ -162,7 +162,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     public void CheckSimulation()
     {
         if (!CheckSimulationConsistency(out var seekTo))
-            AdjustSimulation(in seekTo);
+            AdjustSimulation(seekTo);
     }
 
     public void IncrementFrame()
@@ -175,7 +175,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         rollbackFrameCounter = ((1f - options.RollbackFramesSmoothFactor) * rollbackFrameCounter) +
                                (options.RollbackFramesSmoothFactor * FramesBehind.Frames);
 
-    public void AdjustSimulation(in Frame seekTo)
+    public void AdjustSimulation(Frame seekTo)
     {
         var localCurrentFrame = currentFrame;
         var rollbackCount = currentFrame.Number - seekTo.Number;
@@ -183,11 +183,11 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         InRollback = true;
 
         // Flush our input queue and load the last frame.
-        LoadFrame(in seekTo);
+        LoadFrame(seekTo);
         ThrowIf.Assert(currentFrame.Number == seekTo.Number);
 
         // Advance frame by frame (stuffing notifications back to the master).
-        ResetPrediction(in currentFrame);
+        ResetPrediction(currentFrame);
         for (var i = 0; i < rollbackCount; i++)
         {
             logger.Write(LogLevel.Debug, $"[Begin Frame {currentFrame}](rollback)");
@@ -198,7 +198,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         InRollback = false;
     }
 
-    public bool TryLoadFrame(in Frame frame)
+    public bool TryLoadFrame(Frame frame)
     {
         // find the frame in question
         if (frame.Number == currentFrame.Number)
@@ -207,7 +207,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
             return true;
         }
 
-        if (!stateStore.TryLoad(in frame, out var savedFrame))
+        if (!stateStore.TryLoad(frame, out var savedFrame))
             return false;
 
         logger.Write(LogLevel.Information,
@@ -216,7 +216,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         var offset = 0;
         BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
 
-        Callbacks.LoadState(in frame, in reader);
+        Callbacks.LoadState(frame, ref reader);
 
         // Reset frame count and the head of the state ring-buffer to point in
         // advance of the current frame (as if we had just finished executing it).
@@ -224,9 +224,9 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         return true;
     }
 
-    public void LoadFrame(in Frame frame)
+    public void LoadFrame(Frame frame)
     {
-        if (!TryLoadFrame(in frame))
+        if (!TryLoadFrame(frame))
             throw new NetcodeException($"Save state not found for frame {frame.Number}");
     }
 
@@ -237,7 +237,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         ref var nextState = ref stateStore.Next();
 
         BinaryBufferWriter writer = new(nextState.GameState, endianness);
-        Callbacks.SaveState(in currentFrame, in writer);
+        Callbacks.SaveState(currentFrame, ref writer);
         nextState.Frame = currentFrame;
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
 
@@ -282,7 +282,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     public void SetFrameDelay(NetcodePlayer player, int delay) =>
         inputQueues[player.Index].LocalFrameDelay = Math.Max(delay, 0);
 
-    void ResetPrediction(in Frame frameNumber)
+    void ResetPrediction(Frame frameNumber)
     {
         var span = CollectionsMarshal.AsSpan(inputQueues);
         ref var current = ref MemoryMarshal.GetReference(span);

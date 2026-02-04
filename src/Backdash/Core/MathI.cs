@@ -95,4 +95,46 @@ public static class MathI
 
     /// <inheritdoc cref="Avg(ReadOnlySpan{int})"/>
     public static double Avg(int[] values) => Avg((ReadOnlySpan<int>)values);
+
+    /// <summary>
+    /// Return the next power of two number greater than <paramref name="number" />
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ulong NextPowerOfTwo(ulong number) =>
+        number switch
+        {
+            <= 1 => 1UL,
+            > 1UL << 63 => ulong.MaxValue,
+            _ => 1UL << (64 - BitOperations.LeadingZeroCount(number - 1)),
+        };
+
+    /// <inheritdoc cref="NextPowerOfTwo(ulong)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long NextPowerOfTwo(long number) =>
+        number switch
+        {
+            <= 1 => 1L,
+            > 1L << 62 => long.MaxValue,
+            _ => 1L << (64 - BitOperations.LeadingZeroCount((ulong)(number - 1))),
+        };
+
+    /// <inheritdoc cref="NextPowerOfTwo(ulong)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint NextPowerOfTwo(uint number) =>
+        number switch
+        {
+            <= 1 => 1u,
+            > 1u << 31 => uint.MaxValue,
+            _ => 1u << (32 - BitOperations.LeadingZeroCount(number - 1)),
+        };
+
+    /// <inheritdoc cref="NextPowerOfTwo(ulong)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int NextPowerOfTwo(int number) =>
+        number switch
+        {
+            <= 1 => 1,
+            > 1 << 30 => int.MaxValue,
+            _ => 1 << (32 - BitOperations.LeadingZeroCount((uint)(number - 1))),
+        };
 }

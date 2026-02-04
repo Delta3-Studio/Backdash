@@ -192,10 +192,32 @@ public readonly record struct FrameSpan :
     public static FrameSpan FromMilliseconds(double milliseconds) => FromSeconds(milliseconds / 1000.0);
 
     /// <summary>Returns the smaller of two <see cref="FrameSpan" />.</summary>
-    public static FrameSpan Min(in FrameSpan left, in FrameSpan right) => left <= right ? left : right;
+    public static FrameSpan Min(FrameSpan left, FrameSpan right) => left <= right ? left : right;
 
     /// <summary>Returns the larger of two <see cref="FrameSpan" />.</summary>
-    public static FrameSpan Max(in FrameSpan left, in FrameSpan right) => left >= right ? left : right;
+    public static FrameSpan Max(FrameSpan left, FrameSpan right) => left >= right ? left : right;
+
+    /// <summary>
+    ///     Returns the absolute value of a Frame.
+    /// </summary>
+    public static FrameSpan Abs(FrameSpan frame) => new(Math.Abs(frame.Frames));
+
+    /// <summary>
+    ///     Clamps frame value to a range
+    /// </summary>
+    public static FrameSpan Clamp(FrameSpan frame, int min, int max) => new(Math.Clamp(frame.Frames, min, max));
+
+    /// <summary>
+    ///     Clamps frame value to a range
+    /// </summary>
+    public static FrameSpan Clamp(FrameSpan frame, FrameSpan min, FrameSpan max) =>
+        Clamp(frame, min.Frames, max.Frames);
+
+    /// <summary>
+    ///     Clamps frame value to a range
+    /// </summary>
+    public static FrameSpan Clamp(FrameSpan frame, Frame min, Frame max) =>
+        Clamp(frame, min.Number, max.Number);
 
     /// <inheritdoc />
     public static bool operator >(FrameSpan left, FrameSpan right) => left.Frames > right.Frames;
@@ -241,26 +263,4 @@ public readonly record struct FrameSpan :
 
     /// <inheritdoc />
     public static FrameRange operator -(FrameSpan left, FrameRange right) => right + left;
-
-    /// <summary>
-    ///     Returns the absolute value of a Frame.
-    /// </summary>
-    public static FrameSpan Abs(in FrameSpan frame) => new(Math.Abs(frame.Frames));
-
-    /// <summary>
-    ///     Clamps frame value to a range
-    /// </summary>
-    public static FrameSpan Clamp(in FrameSpan frame, int min, int max) => new(Math.Clamp(frame.Frames, min, max));
-
-    /// <summary>
-    ///     Clamps frame value to a range
-    /// </summary>
-    public static FrameSpan Clamp(in FrameSpan frame, in FrameSpan min, in FrameSpan max) =>
-        Clamp(in frame, min.Frames, max.Frames);
-
-    /// <summary>
-    ///     Clamps frame value to a range
-    /// </summary>
-    public static FrameSpan Clamp(in FrameSpan frame, in Frame min, in Frame max) =>
-        Clamp(in frame, min.Number, max.Number);
 }

@@ -461,7 +461,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     public bool LoadFrame(Frame frame)
     {
         if (frame.Number < 0) return false;
-        return synchronizer.TryLoadFrame(in frame);
+        return synchronizer.TryLoadFrame(frame);
     }
 
     public void LoadSnapshot(StateSnapshot snapshot) =>
@@ -658,7 +658,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         GameInput<ConfirmedInputs<TInput>> confirmed = new(nextListenerFrame);
         while (nextListenerFrame <= minConfirmedFrame)
         {
-            if (!synchronizer.GetConfirmedInputGroup(in nextListenerFrame, ref confirmed))
+            if (!synchronizer.GetConfirmedInputGroup(nextListenerFrame, ref confirmed))
                 break;
 
             logger.Write(LogLevel.Trace, $"pushing frame {nextListenerFrame} to listener");
@@ -675,7 +675,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         GameInput<ConfirmedInputs<TInput>> confirmed = new(nextSpectatorFrame);
         while (nextSpectatorFrame <= minConfirmedFrame)
         {
-            if (!synchronizer.GetConfirmedInputGroup(in nextSpectatorFrame, ref confirmed))
+            if (!synchronizer.GetConfirmedInputGroup(nextSpectatorFrame, ref confirmed))
                 break;
 
             logger.Write(LogLevel.Trace, $"pushing frame {nextSpectatorFrame} to spectators");
@@ -797,7 +797,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             ref var localConn = ref localConnections[i];
 
             if (!localConn.Disconnected)
-                totalMinConfirmed = Frame.Min(in localConnections[i].LastFrame, in totalMinConfirmed);
+                totalMinConfirmed = Frame.Min(localConnections[i].LastFrame, totalMinConfirmed);
 
             logger.Write(LogLevel.Trace,
                 $"Queue {i} => connected: {!localConn.Disconnected}; last received: {localConn.LastFrame}; min confirmed: {totalMinConfirmed}");
@@ -833,7 +833,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
                 {
                     var connected = endpoint.GetPeerConnectStatus(queue, out var lastReceived);
                     queueConnected = queueConnected && connected;
-                    queueMinConfirmed = Frame.Min(in lastReceived, in queueMinConfirmed);
+                    queueMinConfirmed = Frame.Min(lastReceived, queueMinConfirmed);
                     logger.Write(LogLevel.Trace,
                         $"Queue {i} => connected: {connected}; last received: {lastReceived}; min confirmed: {queueMinConfirmed}");
                 }
@@ -844,11 +844,11 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             ref var localStatus = ref localConnections[queue];
             // merge in our local status only if we're still connected!
             if (!localStatus.Disconnected)
-                queueMinConfirmed = Frame.Min(in localStatus.LastFrame, in queueMinConfirmed);
+                queueMinConfirmed = Frame.Min(localStatus.LastFrame, queueMinConfirmed);
             logger.Write(LogLevel.Trace,
                 $"[Endpoint {queue}]: connected = {!localStatus.Disconnected}; last received = {localStatus.LastFrame}, queue min confirmed = {queueMinConfirmed}");
             if (queueConnected)
-                totalMinConfirmed = Frame.Min(in queueMinConfirmed, in totalMinConfirmed);
+                totalMinConfirmed = Frame.Min(queueMinConfirmed, totalMinConfirmed);
             else
             {
                 // check to see if this disconnect notification is further back than we've been before.  If
@@ -881,7 +881,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         {
             logger.Write(LogLevel.Information,
                 $"adjusting simulation to account for the fact that {player} disconnected on frame {syncTo}");
-            synchronizer.AdjustSimulation(in syncTo);
+            synchronizer.AdjustSimulation(syncTo);
             logger.Write(LogLevel.Information, "finished adjusting simulation.");
         }
 

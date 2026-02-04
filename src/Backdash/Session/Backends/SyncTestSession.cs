@@ -270,7 +270,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public bool LoadFrame(Frame frame)
     {
         if (frame.Number < 0) return false;
-        return synchronizer.TryLoadFrame(in frame);
+        return synchronizer.TryLoadFrame(frame);
     }
 
     public void LoadSnapshot(StateSnapshot snapshot) { }
@@ -312,7 +312,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 
         // We've gone far enough ahead and should now start replaying frames.
         // Load the last verified frame and set the rollback flag to true.
-        synchronizer.LoadFrame(in lastVerified);
+        synchronizer.LoadFrame(lastVerified);
 
         inRollback = true;
         while (savedFrames.Count > 0)
@@ -360,13 +360,13 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         var currentOffset = 0;
         var currentBytes = current.State.AsSpan(0, current.StateSize);
         BinaryBufferReader currentReader = new(currentBytes, ref currentOffset, endianness);
-        var currentObject = callbacks.CreateState(current.Frame, in currentReader);
+        var currentObject = callbacks.CreateState(current.Frame, ref currentReader);
         var currentBody = stateParser.GetStateString(current.Frame, in currentReader, currentObject);
         LogSaveState(level, "CURRENT", currentBody, current.Checksum, current.Frame, current.Inputs.Frame.Number);
 
         var lastOffset = 0;
         BinaryBufferReader previousReader = new(previous.GameState.WrittenSpan, ref lastOffset, endianness);
-        var previousObject = callbacks.CreateState(current.Frame, in previousReader);
+        var previousObject = callbacks.CreateState(current.Frame, ref previousReader);
         var previousBody = stateParser.GetStateString(current.Frame, in previousReader, previousObject);
         LogSaveState(level, "LAST", previousBody, previous.Checksum, previous.Frame);
 

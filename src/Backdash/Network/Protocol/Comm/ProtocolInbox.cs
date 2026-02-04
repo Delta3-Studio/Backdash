@@ -146,11 +146,7 @@ sealed class ProtocolInbox<TInput>(
             {
                 ThrowIf.Assert(currentRemoteStatus.LastFrame >= currentLocalStatus.LastFrame);
                 currentLocalStatus.Disconnected = currentLocalStatus.Disconnected || currentRemoteStatus.Disconnected;
-                currentLocalStatus.LastFrame = Frame.Max(
-                    in currentLocalStatus.LastFrame,
-                    in currentRemoteStatus.LastFrame
-                );
-
+                currentLocalStatus.LastFrame = Frame.Max(currentLocalStatus.LastFrame, currentRemoteStatus.LastFrame);
                 currentRemoteStatus = ref Unsafe.Add(ref currentRemoteStatus, 1)!;
                 currentLocalStatus = ref Unsafe.Add(ref currentLocalStatus, 1)!;
             }

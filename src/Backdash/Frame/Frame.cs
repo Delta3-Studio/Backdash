@@ -114,17 +114,26 @@ public readonly record struct Frame :
         return Number.TryFormat(destination, out charsWritten, format, provider);
     }
 
-    /// <inheritdoc cref="Number" />
-    public static implicit operator int(Frame frame) => frame.Number;
-
-    /// <inheritdoc cref="Frame(int)" />
-    public static explicit operator Frame(int frame) => new(frame);
-
     /// <summary>Returns the smaller of two <see cref="Frame" />.</summary>
-    public static Frame Min(in Frame left, in Frame right) => left.Number <= right.Number ? left : right;
+    public static Frame Min(Frame left, Frame right) => left.Number <= right.Number ? left : right;
 
     /// <summary>Returns the larger of two <see cref="Frame" />.</summary>
-    public static Frame Max(in Frame left, in Frame right) => left.Number >= right.Number ? left : right;
+    public static Frame Max(Frame left, Frame right) => left.Number >= right.Number ? left : right;
+
+    /// <summary>
+    ///     Returns the absolute value of a Frame.
+    /// </summary>
+    public static Frame Abs(Frame frame) => new(Math.Abs(frame.Number));
+
+    /// <summary>
+    ///     Clamps frame value to a range
+    /// </summary>
+    public static Frame Clamp(in Frame frame, int min, int max) => new(Math.Clamp(frame.Number, min, max));
+
+    /// <summary>
+    ///     Clamps frame value to a range
+    /// </summary>
+    public static Frame Clamp(Frame frame, Frame min, Frame max) => Clamp(in frame, min.Number, max.Number);
 
     /// <inheritdoc />
     public static bool operator >(Frame left, Frame right) => left.Number > right.Number;
@@ -180,18 +189,9 @@ public readonly record struct Frame :
     /// <inheritdoc />
     public static FrameSpan operator +(Frame left, FrameSpan right) => right + left.Number;
 
-    /// <summary>
-    ///     Returns the absolute value of a Frame.
-    /// </summary>
-    public static Frame Abs(in Frame frame) => new(Math.Abs(frame.Number));
+    /// <inheritdoc cref="Number" />
+    public static implicit operator int(Frame frame) => frame.Number;
 
-    /// <summary>
-    ///     Clamps frame value to a range
-    /// </summary>
-    public static Frame Clamp(in Frame frame, int min, int max) => new(Math.Clamp(frame.Number, min, max));
-
-    /// <summary>
-    ///     Clamps frame value to a range
-    /// </summary>
-    public static Frame Clamp(in Frame frame, in Frame min, in Frame max) => Clamp(in frame, min.Number, max.Number);
+    /// <inheritdoc cref="Frame(int)" />
+    public static explicit operator Frame(int frame) => new(frame);
 }
