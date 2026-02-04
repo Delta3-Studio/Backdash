@@ -111,7 +111,7 @@ public readonly ref struct BinaryBufferReader
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void ReadSpan<T>(in Span<T> data) where T : struct => Read(MemoryMarshal.AsBytes(data));
+    void ReadSpan<T>(in Span<T> data) where T : unmanaged => Read(MemoryMarshal.AsBytes(data));
 
     /// <summary>Reads single <see cref="byte" /> from the buffer.</summary>
     public byte ReadByte() => buffer[offset++];
@@ -732,7 +732,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<short> values)
     {
         ReadSpan(values);
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(values, values);
     }
 
@@ -743,7 +743,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<ushort> values)
     {
         ReadSpan(values);
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(values, values);
     }
 
@@ -754,7 +754,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<char> values)
     {
         ReadSpan(values);
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
         {
             var ushortSpan = MemoryMarshal.Cast<char, ushort>(values);
             BinaryPrimitives.ReverseEndianness(ushortSpan, ushortSpan);
@@ -768,7 +768,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<int> values)
     {
         ReadSpan(values);
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(values, values);
     }
 
@@ -779,7 +779,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<uint> values)
     {
         ReadSpan(values);
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(values, values);
     }
 
@@ -790,7 +790,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<long> values)
     {
         ReadSpan(values);
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(values, values);
     }
 
@@ -801,7 +801,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<ulong> values)
     {
         ReadSpan(values);
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(values, values);
     }
 
@@ -812,7 +812,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<Int128> values)
     {
         ReadSpan(values);
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(values, values);
     }
 
@@ -823,7 +823,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<UInt128> values)
     {
         ReadSpan(values);
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(values, values);
     }
 

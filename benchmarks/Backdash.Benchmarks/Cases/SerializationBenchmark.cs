@@ -24,13 +24,16 @@ public class SerializationBenchmark
     public Endianness SerializationEndianness;
 
     [Params(true, false)]
+    public bool WithValues;
+
+    [Params(true, false)]
     public bool WithRef;
 
     [Params(true, false)]
     public bool WithIn;
 
     const int TestItemCount = 1_000_000;
-    const int TestDataSize = 100;
+    const int TestDataSize = 250;
 
     [GlobalSetup]
     public void Setup()
@@ -39,7 +42,7 @@ public class SerializationBenchmark
         Console.WriteLine($"===> Current-Endianness: {Platform.Endianness}, Buffer-Size: {bufferSize})");
 
         Random random = new(42);
-        data = new(TestItemCount, random, WithIn, WithRef);
+        data = new(random, TestItemCount, WithIn, WithRef, WithValues);
         buffer = new((int)bufferSize.ByteCount);
     }
 
@@ -69,19 +72,21 @@ public class SerializationBenchmark
         Debug.Assert(data == result);
     }
 
-    public sealed class TestData(int itemsSize, bool useIn, bool useRef) : IBinarySerializable, IEquatable<TestData>
+    public sealed class TestData(int itemsSize, bool useIn, bool useRef)
+        : IBinarySerializable, IEquatable<TestData>
     {
         public bool Field1;
         public ulong Field2;
         public readonly TestEntryData[] Field3 = new TestEntryData[itemsSize];
 
-        public TestData(int itemsSize, Random random, bool useIn, bool useRef) : this(itemsSize, useIn, useRef)
+        public TestData(Random random, int itemsSize, bool useIn, bool useRef, bool withValues) :
+            this(itemsSize, useIn, useRef)
         {
             Field1 = random.NextBool();
             Field2 = random.Next<ulong>();
 
             for (int i = 0; i < Field3.Length; i++)
-                Field3[i] = new(random, useIn, useRef);
+                Field3[i] = new(random, useIn, useRef, withValues);
         }
 
         public void Serialize(ref readonly BinaryBufferWriter writer)
@@ -137,7 +142,8 @@ public class SerializationBenchmark
         public static bool operator !=(TestData? left, TestData? right) => !Equals(left, right);
     }
 
-    public struct TestEntryData(bool useIn, bool useRef) : IBinarySerializable, IEquatable<TestEntryData>
+    public struct TestEntryData(bool useIn, bool useRef, bool withValues)
+        : IBinarySerializable, IEquatable<TestEntryData>
     {
         public int Field1;
         public uint Field2;
@@ -150,7 +156,7 @@ public class SerializationBenchmark
         public Int128 Field9;
         public TestDataValues Field10;
 
-        public TestEntryData(Random random, bool useIn, bool useRef) : this(useIn, useRef)
+        public TestEntryData(Random random, bool useIn, bool useRef, bool withValues) : this(useIn, useRef, withValues)
         {
             Field1 = random.Next();
             Field2 = random.Next<uint>();
@@ -161,7 +167,7 @@ public class SerializationBenchmark
             Field7 = random.Next<byte>();
             Field8 = random.Next<sbyte>();
             Field9 = random.Next<Int128>();
-            Field10 = new(random);
+            Field10 = withValues ? new(random) : new();
         }
 
         public readonly void Serialize(ref readonly BinaryBufferWriter writer)
@@ -177,7 +183,6 @@ public class SerializationBenchmark
                 writer.Write(in Field7);
                 writer.Write(in Field8);
                 writer.Write(in Field9);
-                writer.Write(Field10);
             }
             else
             {
@@ -190,8 +195,10 @@ public class SerializationBenchmark
                 writer.Write(Field7);
                 writer.Write(Field8);
                 writer.Write(Field9);
-                writer.Write(Field10);
             }
+
+            if (withValues)
+                writer.Write(Field10);
         }
 
         public void Deserialize(ref readonly BinaryBufferReader reader)
@@ -221,7 +228,8 @@ public class SerializationBenchmark
                 Field9 = reader.ReadInt128();
             }
 
-            reader.Read(Field10);
+            if (withValues)
+                reader.Read(Field10);
         }
 
         public override readonly int GetHashCode() => throw new InvalidOperationException();

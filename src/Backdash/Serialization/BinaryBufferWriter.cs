@@ -323,7 +323,7 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes a span of <see cref="short" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<short> value)
     {
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
         else
             WriteSpan(in value);
@@ -332,7 +332,7 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes a span of <see cref="ushort" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<ushort> value)
     {
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
         else
             WriteSpan(in value);
@@ -344,7 +344,7 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes a span of <see cref="int" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<int> value)
     {
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
         else
             WriteSpan(in value);
@@ -353,7 +353,7 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes a span of <see cref="uint" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<uint> value)
     {
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
         else
             WriteSpan(in value);
@@ -362,7 +362,7 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes a span of <see cref="long" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<long> value)
     {
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
         else
             WriteSpan(in value);
@@ -371,7 +371,7 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes a span of <see cref="ulong" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<ulong> value)
     {
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
         else
             WriteSpan(in value);
@@ -380,7 +380,7 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes a span of <see cref="Int128" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<Int128> value)
     {
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
         else
             WriteSpan(in value);
@@ -389,7 +389,7 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes a span of <see cref="UInt128" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<UInt128> values)
     {
-        if (Endianness != Platform.Endianness)
+        if (numberSerializer.NeedsReverse)
             BinaryPrimitives.ReverseEndianness(values, AllocSpan(in values));
         else
             WriteSpan(in values);
