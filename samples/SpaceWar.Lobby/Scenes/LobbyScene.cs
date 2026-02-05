@@ -22,7 +22,7 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
     PlayerMode mode = mode;
 
     readonly TimeSpan refreshInterval = TimeSpan.FromSeconds(2);
-    readonly TimeSpan pingInterval = TimeSpan.FromMilliseconds(300);
+    readonly TimeSpan handShakeInterval = TimeSpan.FromMilliseconds(300);
     readonly KeyboardController keyboard = new();
     readonly CancellationTokenSource cts = new();
 
@@ -33,8 +33,7 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
         lobbyUdpClient = new(Config.LocalPort, Config.ServerUrl, Config.ServerUdpPort);
         keyboard.Update();
 
-        StartPingTimer();
-        StartLobbyRefreshTimer();
+        _ = StartTimers();
     }
 
     public override void Update(GameTime gameTime)
@@ -59,7 +58,7 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
     {
         if (!AllReachable()) return;
 
-        await client.ToggleReady();
+        await client.ToggleReady(cts.Token);
         ready = true;
     }
 
@@ -295,7 +294,7 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
 
     async Task RequestLobby()
     {
-        user = await client.EnterLobby(Config.LobbyName, Config.Username, mode);
+        user = await client.EnterLobby(Config.LobbyName, Config.Username, mode, cts.Token);
         await RefreshLobby();
 
         if (Array.Exists(lobbyInfo.Spectators, s => s.PeerId == user.PeerId))
@@ -306,13 +305,20 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
 
     async Task RefreshLobby()
     {
-        lobbyInfo = await client.GetLobby();
+        if (await client.GetLobby(cts.Token) is not { } lobby)
+        {
+            SetError("Can't find Lobby...");
+            await Task.Delay(TimeSpan.FromSeconds(1.5));
+            lobbyInfo = null;
+            LoadScene(new ChooseLobbyScene());
+            return;
+        }
 
+        lobbyInfo = lobby;
         await lobbyUdpClient.HandShake(user);
 
         if (connected) return;
-        connected = lobbyInfo.Players.SingleOrDefault(x => x.PeerId == user.PeerId) is
-            { Connected: true };
+        connected = lobbyInfo.Players.SingleOrDefault(x => x.PeerId == user.PeerId) is { Connected: true };
     }
 
     void CheckPlayersReady()
@@ -416,82 +422,55 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
 
     bool PendingNetworkCall()
     {
-        if (networkCall is null)
-            return false;
-
-        if (!networkCall.IsCompleted)
-            return true;
-
-        if (networkCall.IsFaulted)
-            SetError(networkCall.Exception);
+        if (networkCall is null) return false;
+        if (!networkCall.IsCompleted) return true;
+        if (networkCall is { IsFaulted: true, Exception.InnerException: not TaskCanceledException })
+            SetError(networkCall.Exception.InnerException);
 
         networkCall = null;
         return true;
     }
 
-    void SetError(Exception ex)
+    void SetError(Exception ex) => SetError(ex.ToString());
+
+    void SetError(string message)
     {
         currentState = LobbyState.Error;
-        errorMessage =
-            ex?.InnerException?.Message
-            ?? networkCall.Exception?.Message;
+        errorMessage = message;
     }
 
-    public void StartPingTimer() => Task.Run(async () =>
+    async Task StartTimers()
     {
-        using PeriodicTimer timer = new(pingInterval);
-
-        try
-        {
-            while (await timer.WaitForNextTickAsync(cts.Token))
+        var handShakeTimer = AsyncTimer.Create(handShakeInterval, async () =>
             {
-                if (lobbyInfo is null || lobbyInfo.Ready) continue;
-                await Task.WhenAll(
-                    lobbyUdpClient.Ping(user, lobbyInfo.Players, cts.Token),
-                    lobbyUdpClient.Ping(user, lobbyInfo.Spectators, cts.Token)
-                );
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            // skip
-        }
-        catch (Exception ex)
-        {
-            SetError(ex);
-        }
-    });
+                if (lobbyInfo is not null && !lobbyInfo.Ready)
+                    await Task.WhenAll(
+                        lobbyUdpClient.HandShake(user, lobbyInfo.Players, cts.Token),
+                        lobbyUdpClient.HandShake(user, lobbyInfo.Spectators, cts.Token)
+                    );
+            },
+            SetError, cts.Token);
 
-    public void StartLobbyRefreshTimer() => Task.Run(async () =>
-    {
-        using PeriodicTimer timer = new(refreshInterval);
-
-        try
-        {
-            while (await timer.WaitForNextTickAsync(cts.Token))
+        var refreshTimer = AsyncTimer.Create(refreshInterval, async () =>
             {
-                if (currentState is not LobbyState.Waiting) continue;
-                await RefreshLobby();
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            // skip
-        }
-        catch (Exception ex)
-        {
-            SetError(ex);
-        }
-    });
+                if (currentState is LobbyState.Waiting)
+                    await RefreshLobby();
+            },
+            SetError, cts.Token);
+
+
+        await Task.Run(() => Task.WhenAll(handShakeTimer, refreshTimer), cts.Token);
+    }
 
     protected override void Dispose(bool disposing)
     {
         try
         {
+            if (user is not null && lobbyInfo is { Ready: false })
+                client.LeaveLobby(cts.Token).GetAwaiter().GetResult();
+
             cts.Dispose();
             lobbyUdpClient.Dispose();
-            if (user is not null && lobbyInfo is { Ready: false })
-                client.LeaveLobby().GetAwaiter().GetResult();
         }
         catch (Exception e)
         {
@@ -499,7 +478,7 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
         }
     }
 
-    public enum LobbyState
+    enum LobbyState
     {
         Loading,
         Waiting,
