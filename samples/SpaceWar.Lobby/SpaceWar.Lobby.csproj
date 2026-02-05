@@ -26,7 +26,6 @@
         <EmbeddedResource Include="Icon.bmp"/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Backdash.Utils\Backdash.Utils.csproj"/>
         <ProjectReference Include="..\SpaceWar.Shared\SpaceWar.Shared.csproj"/>
     </ItemGroup>
 </Project>

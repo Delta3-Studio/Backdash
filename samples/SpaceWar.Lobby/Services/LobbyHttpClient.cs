@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Backdash.JsonConverters;
+using Backdash.Json;
+using Backdash.Network;
 using SpaceWar.Models;
 
 namespace SpaceWar.Services;
@@ -75,22 +75,8 @@ public sealed class LobbyHttpClient(AppSettings appSettings)
         response.EnsureSuccessStatusCode();
     }
 
-    async Task<IPEndPoint?> GetLocalEndpoint(CancellationToken ct = default)
-    {
-        try
-        {
-            using Socket socket = new(AddressFamily.InterNetwork, SocketType.Dgram, 0);
-            await socket.ConnectAsync("8.8.8.8", 65530, ct);
-            if (socket.LocalEndPoint is not IPEndPoint { Address: { } ipAddress })
-                return null;
-
-            return new(ipAddress, appSettings.LocalPort);
-        }
-        catch (Exception)
-        {
-            // skip
-        }
-
-        return null;
-    }
+    async ValueTask<IPEndPoint?> GetLocalEndpoint(CancellationToken ct = default) =>
+        await NetUtils.FindNetworkIPAddress(ct: ct) is { } ipAddress
+            ? new(ipAddress, appSettings.LocalPort)
+            : null;
 }
