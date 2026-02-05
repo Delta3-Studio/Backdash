@@ -69,7 +69,6 @@ jobs:
                     }
 
                     publish "Backdash"
-                    publish "Backdash.Utils"
                 # publish "Backdash.Analyzers"
 
             -   name: Upload lib NuGet package artifact to GitHub

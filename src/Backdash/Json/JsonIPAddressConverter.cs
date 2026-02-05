@@ -5,15 +5,15 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Backdash.JsonConverters;
+namespace Backdash.Json;
 
 /// <summary>
-/// Json converter for IPAddress
+/// JSON converter for <see cref="IPAddress"/>
 /// </summary>
 public sealed class JsonIPAddressConverter : JsonConverter<IPAddress>
 {
-    public const int MaxIPv4StringLength = 15;
-    public const int MaxIPv6StringLength = 65;
+    internal const int MaxIPv4StringLength = 15;
+    internal const int MaxIPv6StringLength = 65;
 
     /// <inheritdoc />
     public override IPAddress Read(ref Utf8JsonReader reader,

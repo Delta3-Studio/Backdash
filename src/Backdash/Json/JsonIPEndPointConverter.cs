@@ -5,10 +5,10 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Backdash.JsonConverters;
+namespace Backdash.Json;
 
 /// <summary>
-/// Json converter for IPEndpoint
+/// JSON converter for <see cref="IPEndPoint"/>
 /// </summary>
 public sealed class JsonIPEndPointConverter : JsonConverter<IPEndPoint>
 {

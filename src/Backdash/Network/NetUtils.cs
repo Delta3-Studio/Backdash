@@ -27,7 +27,25 @@ public static class NetUtils
     }
 
     /// <summary>
-    /// Returns a temporary file name
+    ///     Finds the current network IPAddress
     /// </summary>
-    public static string GetTempFile() => Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+    public static async ValueTask<IPAddress?> FindNetworkIPAddress(
+        string host = "8.8.8.8",
+        int port = 65530,
+        CancellationToken ct = default
+    )
+    {
+        try
+        {
+            using Socket socket = new(AddressFamily.InterNetwork, SocketType.Dgram, 0);
+            await socket.ConnectAsync(host, port, ct);
+            return socket.LocalEndPoint is not IPEndPoint { Address: { } ipAddress } ? null : ipAddress;
+        }
+        catch (Exception)
+        {
+            // skip
+        }
+
+        return null;
+    }
 }

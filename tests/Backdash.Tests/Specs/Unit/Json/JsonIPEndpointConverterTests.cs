@@ -1,44 +1,45 @@
 using System.Net;
 using System.Text.Json;
-using Backdash.JsonConverters;
-using Backdash.Tests.TestUtils;
+using Backdash.Json;
 
 namespace Backdash.Tests.Specs.Unit.Utils;
 
 using static JsonSerializer;
 
-public class JsonIPAddressConverterTests
+public class JsonIPEndpointConverterTests
 {
+    static readonly Faker faker = new();
+
     static readonly JsonSerializerOptions options = new()
     {
         Converters =
         {
-            new JsonIPAddressConverter(),
+            new JsonIPEndPointConverter(),
         },
     };
 
-    record TestType(IPAddress Data);
+    record TestType(IPEndPoint Data);
 
     [Fact]
     public void ShouldParseIPv4()
     {
-        var expected = Gen.Faker.Internet.IpAddress();
-        var value = Deserialize<TestType>($$"""{"Data": "{{expected.ToString()}}"}""", options);
+        var expected = faker.Internet.IpEndPoint();
+        var value = Deserialize<TestType>($$"""{"Data": "{{expected}}"}""", options);
         value!.Data.Should().Be(expected);
     }
 
     [Fact]
     public void ShouldParseIPv6()
     {
-        var expected = Gen.Faker.Internet.Ipv6Address();
-        var value = Deserialize<TestType>($$"""{"Data": "{{expected.ToString()}}"}""", options);
+        var expected = faker.Internet.Ipv6EndPoint();
+        var value = Deserialize<TestType>($$"""{"Data": "{{expected}}"}""", options);
         value!.Data.Should().Be(expected);
     }
 
     [Fact]
     public void ShouldSerializeIPv4()
     {
-        var value = Gen.Faker.Internet.IpAddress();
+        var value = faker.Internet.IpEndPoint();
         var result = Serialize(new TestType(value), options);
         var expected = $$"""{"Data":"{{value}}"}""";
         result.Should().Be(expected);
@@ -47,7 +48,7 @@ public class JsonIPAddressConverterTests
     [Fact]
     public void ShouldSerializeIPv6()
     {
-        var value = Gen.Faker.Internet.Ipv6Address();
+        var value = faker.Internet.Ipv6EndPoint();
         var result = Serialize(new TestType(value), options);
         var expected = $$"""{"Data":"{{value}}"}""";
         result.Should().Be(expected);
