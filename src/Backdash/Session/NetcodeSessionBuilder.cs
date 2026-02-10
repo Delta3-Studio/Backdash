@@ -159,7 +159,6 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
         options.NumberOfPlayers = count;
-
         return this;
     }
 
@@ -169,7 +168,6 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
     public NetcodeSessionBuilder<TInput> WithPlayers(params NetcodePlayer[] players)
     {
         ArgumentNullException.ThrowIfNull(players);
-        ArgumentOutOfRangeException.ThrowIfZero(players.Length);
         playerList.AddRange(players);
         return this;
     }
@@ -181,7 +179,6 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
     {
         ArgumentNullException.ThrowIfNull(players);
         playerList.AddRange(players);
-        ArgumentOutOfRangeException.ThrowIfZero(playerList.Count);
         return this;
     }
 
