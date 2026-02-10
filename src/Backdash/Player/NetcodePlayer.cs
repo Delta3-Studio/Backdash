@@ -128,10 +128,10 @@ public class NetcodePlayer :
             builder.Append("Player");
         }
 
-        builder.Append(Index);
+        builder.Append(Number);
 
-        if (CustomId != 0)
-            builder.Append($"(Id: ${CustomId})");
+        if (CustomId is not 0)
+            builder.Append($"(Id: {CustomId})");
 
         builder.Append('}');
         return builder.ToString();
