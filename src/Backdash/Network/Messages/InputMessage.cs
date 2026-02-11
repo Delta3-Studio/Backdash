@@ -91,11 +91,11 @@ struct InputMessage : IEquatable<InputMessage>, IUtf8SpanFormattable
         PeerConnectStatus.Equals(other.PeerConnectStatus) &&
         Bits.Equals(other.Bits);
 
-    public override readonly bool Equals(object? obj) => obj is InputMessage other && Equals(in other);
+    public readonly override bool Equals(object? obj) => obj is InputMessage other && Equals(in other);
 
     readonly bool IEquatable<InputMessage>.Equals(InputMessage other) => Equals(in other);
 
-    public override readonly int GetHashCode() => HashCode.Combine(
+    public readonly override int GetHashCode() => HashCode.Combine(
         PeerCount, PeerConnectStatus, StartFrame,
         DisconnectRequested, AckFrame, NumBits, InputSize,
         Bits
@@ -113,7 +113,7 @@ struct PeerStatusBuffer : IEquatable<PeerStatusBuffer>
     ConnectStatus element0;
     public PeerStatusBuffer(ReadOnlySpan<ConnectStatus> buffer) => buffer.CopyTo(this);
 
-    public override readonly string ToString()
+    public readonly override string ToString()
     {
         ReadOnlySpan<ConnectStatus> values = this;
         StringBuilder builder = new();
@@ -138,9 +138,9 @@ struct PeerStatusBuffer : IEquatable<PeerStatusBuffer>
         return builder.ToString();
     }
 
-    public override readonly int GetHashCode() => Mem.GetHashCode<ConnectStatus>(this);
+    public readonly override int GetHashCode() => Mem.GetHashCode<ConnectStatus>(this);
     public readonly bool Equals(PeerStatusBuffer other) => this[..].SequenceEqual(other);
-    public override readonly bool Equals(object? obj) => obj is PeerStatusBuffer other && Equals(other);
+    public readonly override bool Equals(object? obj) => obj is PeerStatusBuffer other && Equals(other);
 }
 
 [Serializable, InlineArray(Max.CompressedBytes)]
@@ -149,12 +149,12 @@ struct InputMessageBuffer : IEquatable<InputMessageBuffer>
     byte element0;
     public InputMessageBuffer(ReadOnlySpan<byte> bits) => bits.CopyTo(this);
 
-    public override readonly string ToString() => Mem.GetBitString(this);
-    public override readonly int GetHashCode() => Mem.GetHashCode<byte>(this);
+    public readonly override string ToString() => Mem.GetBitString(this);
+    public readonly override int GetHashCode() => Mem.GetHashCode<byte>(this);
 
-    public readonly bool Equals(in InputMessageBuffer other) => Mem.ByteEqual(this, other, truncate: true);
+    public readonly bool Equals(in InputMessageBuffer other) => Mem.EqualBytes(this, other, truncate: true);
 
-    public override readonly bool Equals(object? obj) => obj is InputMessageBuffer other && Equals(other);
+    public readonly override bool Equals(object? obj) => obj is InputMessageBuffer other && Equals(other);
 
     readonly bool IEquatable<InputMessageBuffer>.Equals(InputMessageBuffer other) => Equals(in other);
 }

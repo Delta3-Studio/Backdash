@@ -127,21 +127,21 @@ public sealed partial class TestData : IBinarySerializable, IEquatable<TestData>
         TestData testData = new()
         {
             Field1 = random.NextBool(),
-            Field2 = random.Next<ulong>(),
+            Field2 = random.Generate<ulong>(),
         };
 
         for (int i = 0; i < testData.Field3.Length; i++)
         {
             ref var entry = ref testData.Field3[i];
             entry.Field1 = random.Next();
-            entry.Field2 = random.Next<uint>();
-            entry.Field3 = random.Next<ulong>();
-            entry.Field4 = random.Next<long>();
-            entry.Field5 = random.Next<short>();
-            entry.Field6 = random.Next<ushort>();
-            entry.Field7 = random.Next<byte>();
-            entry.Field8 = random.Next<sbyte>();
-            random.Next(entry.Field9.AsSpan());
+            entry.Field2 = random.Generate<uint>();
+            entry.Field3 = random.Generate<ulong>();
+            entry.Field4 = random.Generate<long>();
+            entry.Field5 = random.Generate<short>();
+            entry.Field6 = random.Generate<ushort>();
+            entry.Field7 = random.Generate<byte>();
+            entry.Field8 = random.Generate<sbyte>();
+            random.Generate(entry.Field9.AsSpan());
         }
 
         return testData;

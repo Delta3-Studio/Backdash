@@ -11,8 +11,8 @@ namespace Backdash.Benchmarks.Cases;
 [InProcess, MemoryDiagnoser]
 public class StructWriteSingleBenchmark
 {
-    static readonly int tSize = Unsafe.SizeOf<StructData>();
-    readonly byte[] arrayBuffer = new byte[tSize];
+    static readonly int typeSize = Unsafe.SizeOf<StructData>();
+    readonly byte[] arrayBuffer = new byte[typeSize];
 
     StructData data;
 
@@ -20,7 +20,7 @@ public class StructWriteSingleBenchmark
     public void Setup()
     {
         Random random = new(42);
-        data = random.Next<StructData>();
+        data = random.Generate<StructData>();
     }
 
     [IterationSetup]
@@ -67,7 +67,7 @@ public class StructWriteSpanBenchmark
     public void Setup()
     {
         Random random = new(42);
-        dataArray = random.Next<StructData>(N);
+        dataArray = random.Generate<StructData>(N);
         resultArray = new StructData[N];
     }
 

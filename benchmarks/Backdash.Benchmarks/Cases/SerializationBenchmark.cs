@@ -83,7 +83,7 @@ public class SerializationBenchmark
             this(itemsSize, useIn, useRef)
         {
             Field1 = random.NextBool();
-            Field2 = random.Next<ulong>();
+            Field2 = random.Generate<ulong>();
 
             for (int i = 0; i < Field3.Length; i++)
                 Field3[i] = new(random, useIn, useRef, withValues);
@@ -159,14 +159,14 @@ public class SerializationBenchmark
         public TestEntryData(Random random, bool useIn, bool useRef, bool withValues) : this(useIn, useRef, withValues)
         {
             Field1 = random.Next();
-            Field2 = random.Next<uint>();
-            Field3 = random.Next<ulong>();
-            Field4 = random.Next<long>();
-            Field5 = random.Next<short>();
-            Field6 = random.Next<ushort>();
-            Field7 = random.Next<byte>();
-            Field8 = random.Next<sbyte>();
-            Field9 = random.Next<Int128>();
+            Field2 = random.Generate<uint>();
+            Field3 = random.Generate<ulong>();
+            Field4 = random.Generate<long>();
+            Field5 = random.Generate<short>();
+            Field6 = random.Generate<ushort>();
+            Field7 = random.Generate<byte>();
+            Field8 = random.Generate<sbyte>();
+            Field9 = random.Generate<Int128>();
             Field10 = withValues ? new(random) : new();
         }
 
@@ -257,6 +257,6 @@ public class SerializationBenchmark
     public struct TestDataValues
     {
         int element0;
-        public TestDataValues(Random random) => random.Next((Span<int>)this);
+        public TestDataValues(Random random) => random.Generate((Span<int>)this);
     }
 }

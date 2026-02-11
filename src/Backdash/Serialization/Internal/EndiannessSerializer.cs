@@ -106,13 +106,13 @@ public static class EndiannessSerializer
 
         /// <inheritdoc cref="Read{T}(System.ReadOnlySpan{byte},bool,out int)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Read<T>(in ReadOnlySpan<byte> buffer, out int bytesRead)
+        T Read<T>(in ReadOnlySpan<byte> buffer, out int bytesRead)
             where T : unmanaged, ISignedNumber<T>, IBinaryInteger<T> =>
             Read<T>(buffer, false, out bytesRead);
 
         /// <inheritdoc cref="Read{T}(System.ReadOnlySpan{byte},bool,out int)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Read<T>(ReadOnlySpan<byte> buffer, out int bytesToRead)
+        T Read<T>(ReadOnlySpan<byte> buffer, out int bytesToRead)
             where T : unmanaged, IUnsignedNumber<T>, IBinaryInteger<T> =>
             Read<T>(buffer, true, out bytesToRead);
     }

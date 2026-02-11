@@ -18,7 +18,7 @@ static class Mem
     public static Span<byte> AsBytes<T>(scoped ref readonly T data) where T : unmanaged =>
         MemoryMarshal.AsBytes(new Span<T>(ref Unsafe.AsRef(in data)));
 
-    public static bool ByteEqual(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right, bool truncate = false)
+    public static bool EqualBytes(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right, bool truncate = false)
     {
         if (!truncate) return right.SequenceEqual(left);
         var minLength = Math.Min(left.Length, right.Length);

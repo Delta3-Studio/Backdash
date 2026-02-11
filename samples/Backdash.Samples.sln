@@ -37,6 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_files", "_files", "{0F1370
 		..\GitVersion.yml = ..\GitVersion.yml
 		..\global.json = ..\global.json
 		..\.config\dotnet-tools.json = ..\.config\dotnet-tools.json
+		..\Directory.Build.props = ..\Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{79955002-3B66-49BE-82D3-6EA518A87F5E}"

@@ -39,6 +39,7 @@ Ensure the server submodule is updated in the [server directory](https://github.
 
 ```bash
 git submodule update --init --recursive
+git submodule update --recursive --remote
 ```
 
 > [!TIP]

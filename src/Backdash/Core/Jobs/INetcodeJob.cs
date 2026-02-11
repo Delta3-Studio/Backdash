@@ -1,4 +1,4 @@
-﻿namespace Backdash.Core;
+namespace Backdash.Core;
 
 /// <summary>
 /// Defines an asynchronous background job

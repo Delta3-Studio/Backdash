@@ -7,10 +7,11 @@
     <Nullable>enable</Nullable>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1"/>
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Backdash\Backdash.csproj"/>

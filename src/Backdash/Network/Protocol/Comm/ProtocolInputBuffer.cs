@@ -134,7 +134,7 @@ sealed class ProtocolInputBuffer<TInput> where TInput : unmanaged
                 {
                     logger.Write(LogLevel.Warning,
                         $"Max input size reached. Sending inputs until frame {current.Frame.Previous()}");
-                    pendingOutput.EnqueueNext(in current);
+                    pendingOutput.PushFirst(in current);
                     messageBodyOverflow = true;
                     break;
                 }

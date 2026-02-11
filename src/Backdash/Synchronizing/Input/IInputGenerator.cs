@@ -1,8 +1,6 @@
-using Backdash.Core;
-
 namespace Backdash.Synchronizing.Input;
 
-using Random = System.Random;
+using System;
 
 /// <summary>
 ///     Input value provider
@@ -29,11 +27,5 @@ public sealed class RandomInputGenerator<TInput>(Random? random = null)
     Random Random { get; } = random ?? Random.Shared;
 
     /// <inheritdoc />
-    public TInput Next()
-    {
-        TInput newInput = new();
-        var buffer = Mem.AsBytes(ref newInput);
-        Random.NextBytes(buffer);
-        return newInput;
-    }
+    public TInput Next() => Random.Generate<TInput>();
 }
