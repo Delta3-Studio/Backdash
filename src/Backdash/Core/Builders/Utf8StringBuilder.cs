@@ -17,7 +17,7 @@ readonly ref struct Utf8StringBuilder
 
     public bool Write(ReadOnlySpan<char> value)
     {
-        Span<byte> dest = CurrentBuffer;
+        var dest = CurrentBuffer;
         if (dest.IsEmpty) return false;
         var size = System.Text.Encoding.UTF8.GetByteCount(value);
         var chars = size <= dest.Length
@@ -29,7 +29,7 @@ readonly ref struct Utf8StringBuilder
 
     public bool Write(ReadOnlySpan<byte> value)
     {
-        Span<byte> dest = CurrentBuffer;
+        var dest = CurrentBuffer;
         if (dest.IsEmpty) return false;
         var bytes = value.Length <= dest.Length
             ? value
@@ -42,9 +42,9 @@ readonly ref struct Utf8StringBuilder
     public bool Write<T>(in T value, ReadOnlySpan<char> format, IFormatProvider? provider = null)
         where T : IUtf8SpanFormattable
     {
-        Span<byte> dest = CurrentBuffer;
+        var dest = CurrentBuffer;
         if (dest.IsEmpty) return false;
-        if (!value.TryFormat(dest, out int written, format, provider))
+        if (!value.TryFormat(dest, out var written, format, provider))
             return false;
         offset += written;
         return true;
@@ -56,18 +56,18 @@ readonly ref struct Utf8StringBuilder
 
     public bool WriteFormat<T>(in T value, ReadOnlySpan<char> format = default) where T : ISpanFormattable
     {
-        Span<byte> dest = CurrentBuffer;
+        var dest = CurrentBuffer;
         if (dest.IsEmpty) return false;
         Span<char> charBuffer = stackalloc char[MaxLocalStringSize];
-        return value.TryFormat(charBuffer, out int written, format, null) && Write(charBuffer[..written]);
+        return value.TryFormat(charBuffer, out var written, format, null) && Write(charBuffer[..written]);
     }
 
     public bool WriteEnum<T>(in T value, ReadOnlySpan<char> format = default) where T : struct, Enum
     {
-        Span<byte> dest = CurrentBuffer;
+        var dest = CurrentBuffer;
         if (dest.IsEmpty) return false;
         Span<char> charBuffer = stackalloc char[MaxLocalStringSize];
-        return Enum.TryFormat(value, charBuffer, out int written, format) && Write(charBuffer[..written]);
+        return Enum.TryFormat(value, charBuffer, out var written, format) && Write(charBuffer[..written]);
     }
 }
 
