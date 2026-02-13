@@ -55,13 +55,9 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         this.options = options;
     }
 
-    public void Dispose() => tsc.SetResult();
+    public void Dispose() => tsc.SetCanceled();
 
-    public async ValueTask DisposeAsync()
-    {
-        Dispose();
-        await WaitUntilFinish();
-    }
+    public async ValueTask DisposeAsync() => await WaitUntilFinish();
 
     public int NumberOfPlayers => Math.Max(addedPlayers.Count, 1);
     public int NumberOfSpectators => 0;
@@ -97,7 +93,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public async Task WaitUntilFinish(CancellationToken stoppingToken = default)
     {
         // ReSharper disable once MethodSupportsCancellation
-        tsc.SetCanceled(stoppingToken);
+        tsc.TrySetCanceled(stoppingToken);
         await backGroundJobTask.WaitAsync(stoppingToken).ConfigureAwait(false);
     }
 
