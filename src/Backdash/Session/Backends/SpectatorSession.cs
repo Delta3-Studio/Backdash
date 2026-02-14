@@ -388,4 +388,10 @@ sealed class SpectatorSession<TInput> :
         host.SetLocalFrameNumber(input.Frame, FixedFrameRate);
         return host.SendInputAck();
     }
+
+    bool INetcodeSession.TryGetRemotePlayer([NotNullWhen(true)] out NetcodePlayer? player)
+    {
+        player = host.Player;
+        return true;
+    }
 }

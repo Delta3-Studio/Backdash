@@ -55,7 +55,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         this.options = options;
     }
 
-    public void Dispose() => tsc.SetCanceled();
+    public void Dispose() => tsc.TrySetCanceled();
 
     public async ValueTask DisposeAsync() => await WaitUntilFinish();
 
