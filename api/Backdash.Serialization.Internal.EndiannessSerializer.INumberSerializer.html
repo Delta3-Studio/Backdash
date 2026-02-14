@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Interface EndiannessSerializer.INumberSerializer | Backdash Netcode </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface EndiannessSerializer.INumberSerializer | Backdash Netcode ">
+      
+      <meta name="description" content="Endianness specific number serializer">
+      <link rel="icon" href="../docs/images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../docs/images/logo.png" alt="Backdash">
+            Backdash
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer">
+
+
+
+  <h1 id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer" class="text-break">
+Interface EndiannessSerializer.INumberSerializer  <a class="header-action link-secondary" title="View source" href="https://github.com/Delta3-Studio/Backdash/blob/master/src/Backdash/Serialization/Internal/EndiannessSerializer.cs"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Backdash.html">Backdash</a>.<a class="xref" href="Backdash.Serialization.html">Serialization</a>.<a class="xref" href="Backdash.Serialization.Internal.html">Internal</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Backdash.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Endianness specific number serializer</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface EndiannessSerializer.INumberSerializer</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Endianness_" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Endianness*"></a>
+
+  <h3 id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Endianness" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Endianness">
+  Endianness
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Delta3-Studio/Backdash/blob/master/src/Backdash/Serialization/Internal/EndiannessSerializer.cs"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Serializer endianness</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Endianness Endianness { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Backdash.Network.Endianness.html">Endianness</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_NeedsReverse_" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.NeedsReverse*"></a>
+
+  <h3 id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_NeedsReverse" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.NeedsReverse">
+  NeedsReverse
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Delta3-Studio/Backdash/blob/master/src/Backdash/Serialization/Internal/EndiannessSerializer.cs"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>True if it will be necessary to reverse the endianness</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool NeedsReverse { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Read_" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Read*"></a>
+
+  <h3 id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Read__1_System_ReadOnlySpan_System_Byte__System_Boolean_System_Int32__" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Read``1(System.ReadOnlySpan{System.Byte},System.Boolean,System.Int32@)">
+  Read&lt;T&gt;(ReadOnlySpan&lt;byte&gt;, bool, out int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Delta3-Studio/Backdash/blob/master/src/Backdash/Serialization/Internal/EndiannessSerializer.cs"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads number from the buffer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">T Read&lt;T&gt;(ReadOnlySpan&lt;byte&gt; buffer, bool isUnsigned, out int bytesRead) where T : unmanaged, IBinaryInteger&lt;T&gt;</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>isUnsigned</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>bytesRead</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Read_" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Read*"></a>
+
+  <h3 id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Read__1_System_ReadOnlySpan_System_Byte__System_Int32__" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Read``1(System.ReadOnlySpan{System.Byte},System.Int32@)">
+  Read&lt;T&gt;(ReadOnlySpan&lt;byte&gt;, out int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Delta3-Studio/Backdash/blob/master/src/Backdash/Serialization/Internal/EndiannessSerializer.cs"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads number from the buffer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">T Read&lt;T&gt;(ReadOnlySpan&lt;byte&gt; buffer, out int bytesToRead) where T : unmanaged, IUnsignedNumber&lt;T&gt;, IBinaryInteger&lt;T&gt;</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>bytesToRead</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Read_" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Read*"></a>
+
+  <h3 id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Read__1_System_ReadOnlySpan_System_Byte___System_Int32__" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Read``1(System.ReadOnlySpan{System.Byte}@,System.Int32@)">
+  Read&lt;T&gt;(in ReadOnlySpan&lt;byte&gt;, out int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Delta3-Studio/Backdash/blob/master/src/Backdash/Serialization/Internal/EndiannessSerializer.cs"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads number from the buffer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">T Read&lt;T&gt;(in ReadOnlySpan&lt;byte&gt; buffer, out int bytesRead) where T : unmanaged, ISignedNumber&lt;T&gt;, IBinaryInteger&lt;T&gt;</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>bytesRead</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Write_" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Write*"></a>
+
+  <h3 id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Write__1_System_Buffers_ArrayBufferWriter_System_Byte____0__System_Int32__" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Write``1(System.Buffers.ArrayBufferWriter{System.Byte},``0@,System.Int32@)">
+  Write&lt;T&gt;(ArrayBufferWriter&lt;byte&gt;, in T, out int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Delta3-Studio/Backdash/blob/master/src/Backdash/Serialization/Internal/EndiannessSerializer.cs"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Write a number into an array buffer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool Write&lt;T&gt;(ArrayBufferWriter&lt;byte&gt; buffer, in T value, out int size) where T : unmanaged, IBinaryInteger&lt;T&gt;</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.arraybufferwriter-1">ArrayBufferWriter</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Write_" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Write*"></a>
+
+  <h3 id="Backdash_Serialization_Internal_EndiannessSerializer_INumberSerializer_Write__1_System_Span_System_Byte____0__System_Int32__" data-uid="Backdash.Serialization.Internal.EndiannessSerializer.INumberSerializer.Write``1(System.Span{System.Byte},``0@,System.Int32@)">
+  Write&lt;T&gt;(Span&lt;byte&gt;, in T, out int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Delta3-Studio/Backdash/blob/master/src/Backdash/Serialization/Internal/EndiannessSerializer.cs"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Write a number into a buffer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool Write&lt;T&gt;(Span&lt;byte&gt; buffer, in T value, out int size) where T : unmanaged, IBinaryInteger&lt;T&gt;</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Delta3-Studio/Backdash/blob/master/src/Backdash/Serialization/Internal/EndiannessSerializer.cs" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Developed by <a href="http://delta3.studio/">Delta3</a> and <a href="https://lucasteles.dev/">Lucas Teles</a>.</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
