@@ -51,4 +51,7 @@ public enum ResultCode : short
 
     /// <summary>The current session type not support the requested operation.</summary>
     NotSupported,
+
+    /// <summary>The value is not ready to be ready.</summary>
+    NotReady,
 }

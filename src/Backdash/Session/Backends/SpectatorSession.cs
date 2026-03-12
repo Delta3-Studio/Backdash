@@ -309,7 +309,7 @@ sealed class SpectatorSession<TInput> :
         if (input.Frame.Number < CurrentFrame.Number)
         {
             // Haven't received the input from the host yet.  Wait
-            return ResultCode.PredictionThreshold;
+            return ResultCode.NotReady;
         }
 
         if (input.Frame.Number > CurrentFrame.Number)

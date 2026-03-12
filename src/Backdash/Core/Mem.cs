@@ -15,8 +15,7 @@ static class Mem
     public static ReadOnlySpan<T> AsSpan<T>(ref readonly T data) where T : unmanaged => new(in data);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Span<byte> AsBytes<T>(scoped ref readonly T data) where T : unmanaged =>
-        MemoryMarshal.AsBytes(new Span<T>(ref Unsafe.AsRef(in data)));
+    public static Span<byte> AsBytes<T>(ref T data) where T : unmanaged => MemoryMarshal.AsBytes(new Span<T>(ref data));
 
     public static bool EqualBytes(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right, bool truncate = false)
     {

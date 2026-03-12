@@ -43,10 +43,10 @@ public class StructWriteSingleBenchmark
     public void AsBytes()
     {
         var buffer = GetBuffer();
-        Mem.AsBytes(in data).CopyTo(buffer);
+        Mem.AsBytes(ref data).CopyTo(buffer);
 
         StructData copy = default;
-        buffer.CopyTo(Mem.AsBytes(in copy));
+        buffer.CopyTo(Mem.AsBytes(ref copy));
 
         Debug.Assert(data == copy);
     }

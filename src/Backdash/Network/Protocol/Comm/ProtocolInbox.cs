@@ -50,7 +50,7 @@ sealed class ProtocolInbox<TInput>(
         }
 
         var seqNum = message.Header.SequenceNumber;
-        if (message.Header.Type is not MessageType.SyncRequest and not MessageType.SyncReply)
+        if (message.Header.Type is not (MessageType.SyncRequest or MessageType.SyncReply))
         {
             if (state.CurrentStatus is not ProtocolStatus.Running)
             {
@@ -245,7 +245,7 @@ sealed class ProtocolInbox<TInput>(
         if (options.NumberOfSyncRoundTrips >= state.Sync.RemainingRoundTrips)
             state.Sync.TotalRoundTripsPing = TimeSpan.Zero;
         state.Sync.TotalRoundTripsPing += elapsed;
-        if (--state.Sync.RemainingRoundTrips == 0)
+        if (--state.Sync.RemainingRoundTrips is 0)
         {
             var ping = state.Sync.TotalRoundTripsPing / options.NumberOfSyncRoundTrips;
             logger.Write(LogLevel.Information,
