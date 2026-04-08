@@ -48,10 +48,4 @@ public static class NetcodeSessionExtensions
         var stateObject = @this.GetHandler().CreateState(frame, ref reader);
         return parser.GetStateString(frame, in reader, stateObject);
     }
-
-    /// <summary>
-    ///     Returns the last saved state snapshot.
-    /// </summary>
-    public static StateSnapshot CurrentStateSnapshot<T>(this INetcodeSession<T> @this) where T : unmanaged =>
-        @this.GetCurrentSavedFrame().ToSnapshot();
 }

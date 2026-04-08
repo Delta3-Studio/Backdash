@@ -88,6 +88,11 @@ public interface INetcodeSessionInfo
     ///     Returns the size of the current saved state.
     /// </summary>
     ByteSize CurrentStateSize => GetCurrentSavedFrame().Size;
+
+    /// <summary>
+    ///     Returns the last saved state snapshot.
+    /// </summary>
+    StateSnapshot CurrentStateSnapshot() => GetCurrentSavedFrame().ToSnapshot();
 }
 
 /// <summary>
