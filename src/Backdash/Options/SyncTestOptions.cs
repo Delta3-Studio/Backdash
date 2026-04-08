@@ -78,7 +78,7 @@ public sealed record SyncTestOptions<TInput> where TInput : unmanaged
     /// </summary>
     public SyncTestOptions<TInput> UseJsonStateParser(JsonSerializerOptions? options = null)
     {
-        StateStringParser = new JsonStateStringParser(options);
+        StateStringParser = options is null ? JsonStateStringParser.Singleton : new JsonStateStringParser(options);
         return this;
     }
 

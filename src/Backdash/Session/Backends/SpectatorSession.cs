@@ -159,6 +159,7 @@ sealed class SpectatorSession<TInput> :
     public bool IsInRollback => false;
     public SavedFrame GetCurrentSavedFrame() => stateStore.Last();
     public INetcodeRandom Random => random;
+    public INetcodeSessionHandler GetHandler() => callbacks;
     public int NumberOfPlayers { get; private set; }
     public int NumberOfSpectators => 0;
     public int LocalPort => udp.BindPort;

@@ -48,6 +48,11 @@ public sealed class JsonStateStringParser(
     IStateStringParser? stateStringFallback = null
 ) : IStateStringParser
 {
+    static readonly Lazy<IStateStringParser> singleton = new(new JsonStateStringParser());
+
+    /// <summary>Singleton instance</summary>
+    public static IStateStringParser Singleton => singleton.Value;
+
     internal Logger? Logger = null;
     readonly JsonSerializerOptions jsonOptions = options ?? CreateDefaultJsonOptions();
     readonly IStateStringParser fallback = stateStringFallback ?? new DefaultStateStringParser();

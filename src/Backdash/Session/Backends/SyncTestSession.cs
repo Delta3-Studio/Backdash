@@ -116,6 +116,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public int NumberOfSpectators => addedSpectators.Count;
     public int LocalPort => 0;
     public INetcodeRandom Random => random;
+    public INetcodeSessionHandler GetHandler() => callbacks;
     public Frame CurrentFrame => synchronizer.CurrentFrame;
     public SessionMode Mode => SessionMode.SyncTest;
     public FrameSpan FramesBehind => synchronizer.FramesBehind;

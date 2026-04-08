@@ -66,7 +66,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public Endianness StateSerializationEndianness => endianness.Endianness;
     public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public INetcodeRandom Random => random;
-
+    public INetcodeSessionHandler GetHandler() => callbacks;
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;
 

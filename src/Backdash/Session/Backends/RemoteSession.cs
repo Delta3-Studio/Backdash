@@ -203,6 +203,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     public int LocalPort => udp.BindPort;
     public Endianness StateSerializationEndianness => synchronizer.SerializationEndianness;
     public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
+    public INetcodeSessionHandler GetHandler() => callbacks;
     public SessionMode Mode => SessionMode.Remote;
 
     public IReadOnlySet<NetcodePlayer> GetPlayers() => addedPlayers;

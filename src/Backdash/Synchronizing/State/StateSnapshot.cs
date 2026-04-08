@@ -16,10 +16,10 @@ public sealed class StateSnapshot(Frame frame, byte[] state)
     public StateSnapshot() : this(Frame.Null, []) { }
 
     /// <summary>Saved frame number</summary>
-    public Frame Frame = frame;
+    public readonly Frame Frame = frame;
 
     /// <summary>Saved game state</summary>
-    public byte[] State = state;
+    public readonly byte[] State = state;
 
     /// <summary>Saved state size</summary>
     public ByteSize Size => ByteSize.FromBytes(State.Length);

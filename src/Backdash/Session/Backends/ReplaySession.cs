@@ -108,7 +108,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     public int NumberOfPlayers { get; private set; }
 
     public INetcodeRandom Random => random;
-
+    public INetcodeSessionHandler GetHandler() => callbacks;
     public SessionMode Mode => SessionMode.Replay;
     public void DisconnectPlayer(NetcodePlayer player) { }
     public ResultCode AddLocalInput(NetcodePlayer player, in TInput localInput) => ResultCode.Ok;

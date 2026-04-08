@@ -80,11 +80,6 @@ public interface INetcodeSessionInfo
     SavedFrame GetCurrentSavedFrame();
 
     /// <summary>
-    ///     Returns the last saved state snapshot.
-    /// </summary>
-    StateSnapshot CurrentStateSnapshot() => GetCurrentSavedFrame().ToSnapshot();
-
-    /// <summary>
     ///     Returns the checksum of the current saved state.
     /// </summary>
     uint CurrentChecksum => GetCurrentSavedFrame().Checksum;
@@ -104,6 +99,11 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     ///     Returns session info
     /// </summary>
     INetcodeSessionInfo GetInfo() => this;
+
+    /// <summary>
+    ///     Returns session info
+    /// </summary>
+    INetcodeSessionHandler GetHandler();
 
     /// <summary>
     ///     Disconnects a remote player from a game.
@@ -233,18 +233,6 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     /// <param name="player"></param>
     /// <returns><see cref="ResultCode.Ok" /> if success.</returns>
     ResultCode AddPlayer(NetcodePlayer player);
-
-    /// <summary>
-    ///     Add a list of <see name="Player" /> into current session.
-    /// </summary>
-    /// <returns>An equivalent <see cref="ResultCode" /> list.</returns>
-    IReadOnlyList<ResultCode> AddPlayers(IReadOnlyList<NetcodePlayer> players)
-    {
-        var result = new ResultCode[players.Count];
-        for (var index = 0; index < players.Count; index++)
-            result[index] = AddPlayer(players[index]);
-        return result;
-    }
 
     /// <summary>
     ///     Find player by unique ID
