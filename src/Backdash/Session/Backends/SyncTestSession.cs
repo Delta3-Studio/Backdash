@@ -57,12 +57,12 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     Task backGroundJobTask = Task.CompletedTask;
     Frame lastVerified = Frame.Zero;
 
-    public int FixedFrameRate { get; }
-
     readonly IReadOnlySet<NetcodePlayer> localPlayerFallback = new HashSet<NetcodePlayer>
     {
         new(0, PlayerType.Local),
     }.ToFrozenSet();
+
+    readonly NetcodeOptions options;
 
     public SyncTestSession(
         SyncTestOptions<TInput> syncTestOptions,
@@ -75,7 +75,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         ArgumentNullException.ThrowIfNull(syncTestOptions);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(syncTestOptions.CheckDistanceFrames);
 
-        FixedFrameRate = options.FrameRate;
+        this.options = options;
         checkDistance = new(syncTestOptions.CheckDistanceFrames);
         logStateOnDesync = syncTestOptions.LogStateOnDesync;
         throwError = syncTestOptions.ThrowOnDesync;
@@ -101,7 +101,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
             Callbacks = callbacks,
         };
 
-        endianness = options.GetEndiannessNumberStateSerializer();
+        endianness = synchronizer.NumberSerializer;
     }
 
     public void Dispose() => tsc.SetResult();
@@ -120,7 +120,9 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public SessionMode Mode => SessionMode.SyncTest;
     public FrameSpan FramesBehind => synchronizer.FramesBehind;
     public FrameSpan RollbackFrames => synchronizer.RollbackFrames;
-
+    public int FixedFrameRate => options.FrameRate;
+    public Endianness StateSerializationEndianness => endianness.Endianness;
+    public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;
 
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;

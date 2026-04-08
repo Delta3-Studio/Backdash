@@ -63,6 +63,18 @@ public interface INetcodeSessionInfo
     bool IsInRollback { get; }
 
     /// <summary>
+    ///     Returns the state serialization <see cref="Endianness"/>
+    ///     <seealso cref="NetcodeOptions.StateSerializationEndianness"/>
+    /// </summary>
+    Endianness StateSerializationEndianness { get; }
+
+    /// <summary>
+    ///     Returns the input serialization <see cref="Endianness"/>
+    ///     <seealso cref="ProtocolOptions.SerializationEndianness"/>
+    /// </summary>
+    Endianness InputSerializationEndianness { get; }
+
+    /// <summary>
     ///     Returns the last saved state.
     /// </summary>
     SavedFrame GetCurrentSavedFrame();

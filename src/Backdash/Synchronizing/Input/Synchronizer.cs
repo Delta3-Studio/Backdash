@@ -57,6 +57,8 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     float rollbackFrameCounter;
 
     public Frame CurrentFrame => currentFrame;
+    public EndiannessSerializer.INumberSerializer NumberSerializer => endianness;
+    public Endianness SerializationEndianness => endianness.Endianness;
     public FrameSpan FramesBehind => new(currentFrame.Number - lastConfirmedFrame.Number);
     public FrameSpan RollbackFrames => new((int)Math.Round(rollbackFrameCounter));
 

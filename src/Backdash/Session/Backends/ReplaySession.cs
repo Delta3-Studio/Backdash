@@ -51,6 +51,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         random = services.DeterministicRandom;
         NumberOfPlayers = options.NumberOfPlayers;
         FixedFrameRate = options.FrameRate;
+        InputSerializationEndianness = options.Protocol.SerializationEndianness;
         endianness = options.GetEndiannessNumberStateSerializer();
         callbacks = services.SessionHandler;
 
@@ -94,10 +95,11 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         callbacks.OnSessionClose();
     }
 
+    public Endianness InputSerializationEndianness { get; }
+    public Endianness StateSerializationEndianness => endianness.Endianness;
     public Frame CurrentFrame { get; private set; } = Frame.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
-
     public bool IsInRollback => false;
     public SavedFrame GetCurrentSavedFrame() => stateStore.Last();
 

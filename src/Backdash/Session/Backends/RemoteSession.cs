@@ -200,9 +200,9 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     public SavedFrame GetCurrentSavedFrame() => synchronizer.GetLastSavedFrame();
     public int NumberOfPlayers => addedPlayers.Count;
     public int NumberOfSpectators => addedSpectators.Count;
-
     public int LocalPort => udp.BindPort;
-
+    public Endianness StateSerializationEndianness => synchronizer.SerializationEndianness;
+    public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public SessionMode Mode => SessionMode.Remote;
 
     public IReadOnlySet<NetcodePlayer> GetPlayers() => addedPlayers;

@@ -48,8 +48,6 @@ sealed class SpectatorSession<TInput> :
     readonly IChecksumProvider checksumProvider;
     readonly EndiannessSerializer.INumberSerializer endianness;
 
-    public int FixedFrameRate { get; }
-
     public SpectatorSession(
         SpectatorOptions spectatorOptions,
         NetcodeOptions options,
@@ -64,7 +62,6 @@ sealed class SpectatorSession<TInput> :
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(options.FrameRate);
 
         this.options = options;
-        FixedFrameRate = this.options.FrameRate;
         hostEndpoint = spectatorOptions.GetHostEndPoint();
         jobManager = services.JobManager;
         random = services.DeterministicRandom;
@@ -155,6 +152,7 @@ sealed class SpectatorSession<TInput> :
         callbacks.OnSessionClose();
     }
 
+    public int FixedFrameRate => options.FrameRate;
     public Frame CurrentFrame { get; private set; } = Frame.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
@@ -164,7 +162,8 @@ sealed class SpectatorSession<TInput> :
     public int NumberOfPlayers { get; private set; }
     public int NumberOfSpectators => 0;
     public int LocalPort => udp.BindPort;
-
+    public Endianness StateSerializationEndianness => endianness.Endianness;
+    public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;
 
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;
