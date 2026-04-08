@@ -241,6 +241,12 @@ public readonly record struct ByteSize(long ByteCount)
         return writer.Write(value, format);
     }
 
+    /// <summary>Cast <see cref="ByteSize"/> to <see cref="long"/> byte-count value.</summary>
+    public static explicit operator long(ByteSize size) => size.ByteCount;
+
+    /// <summary>Cast <see cref="ByteSize"/> to <see cref="int"/> byte-count value.</summary>
+    public static explicit operator int(ByteSize size) => (int)size.ByteCount;
+
     /// <inheritdoc />
     public static bool operator >(ByteSize left, ByteSize right) => left.ByteCount > right.ByteCount;
 
