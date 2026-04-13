@@ -540,6 +540,10 @@ public class BinaryBufferReadWriteListTests
             return new();
         }
 
-        public void Return(T value) => returned.Add(value);
+        public bool Return(T value)
+        {
+            returned.Add(value);
+            return true;
+        }
     }
 }

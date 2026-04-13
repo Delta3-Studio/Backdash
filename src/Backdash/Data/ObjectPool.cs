@@ -16,7 +16,7 @@ public interface IObjectPool<T>
     /// <summary>
     ///     Return <paramref name="value" /> to the pool
     /// </summary>
-    void Return(T value);
+    bool Return(T value);
 }
 
 /// <summary>
@@ -73,23 +73,24 @@ public sealed class DefaultObjectPool<T> : IObjectPool<T>, IEnumerable<T> where 
     }
 
     /// <inheritdoc />
-    public void Return(T value)
+    public bool Return(T value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        if (Contains(value)) return;
+        if (Contains(value)) return true;
 
         if (fastItem is null)
         {
             fastItem = value;
-            return;
+            return true;
         }
 
         if (numItems >= MaxCapacity)
-            return;
+            return false;
 
-        if (!set.Add(value)) return;
+        if (!set.Add(value)) return true;
         numItems++;
         items.Push(value);
+        return true;
     }
 
     /// <summary>
