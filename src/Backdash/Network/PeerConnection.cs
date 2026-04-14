@@ -371,8 +371,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     void OnConsistencyCheck(object? sender, ElapsedEventArgs e)
     {
         if (state.CurrentStatus is not ProtocolStatus.Running) return;
-
-        var lastReceivedFrame = inbox.LastAckedFrame;
+        var lastReceivedFrame = inbox.LastReceivedInput.Frame;
         var checkFrame = lastReceivedFrame.Number - options.ConsistencyCheckDistance;
         if (checkFrame <= 1) return;
 

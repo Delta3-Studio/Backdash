@@ -40,7 +40,6 @@ sealed class SessionServices<TInput> where TInput : unmanaged
         ArgumentNullException.ThrowIfNull(inputSerializer);
         ArgumentNullException.ThrowIfNull(options);
 
-        ChecksumStore = new(Math.Max(options.TotalSavedFramesAllowed, options.Protocol.ConsistencyCheckStoreSize));
         ChecksumProvider = services?.ChecksumProvider ?? new Fletcher32ChecksumProvider();
         StateStore = services?.StateStore ?? new DefaultStateStore(options.StateSizeHint);
         InputListener = services?.InputListener;
@@ -48,10 +47,12 @@ sealed class SessionServices<TInput> where TInput : unmanaged
         LatencyStrategy = DelayStrategyFactory.Create(Random, options.Protocol.LatencyStrategy);
         InputComparer = services?.InputComparer ?? EqualityComparer<TInput>.Default;
         InputSerializer = inputSerializer;
-
         DeterministicRandom = services?.DeterministicRandom ?? new XorShiftRandom<TInput>();
         if (DeterministicRandom.InitialSeed is 0)
             DeterministicRandom.SetInitialSeed(options.DeterministicRandomInitialSeed);
+
+        ChecksumStore = new(Math.Max(options.TotalSavedFramesAllowed, options.Protocol.ConsistencyCheckStoreSize)
+                            + options.Protocol.ConsistencyCheckDistance);
 
         var logWriter = services?.LogWriter ?? new ConsoleTextLogWriter();
         Logger = new(options.Logger, logWriter);
