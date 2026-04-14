@@ -755,6 +755,14 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
                 }
 
                 break;
+
+            case PeerEvent.ChecksumMismatch:
+                if (player.Type is PlayerType.Spectator)
+                    RemoveSpectator(player);
+                else
+                    Close();
+
+                break;
         }
     }
 

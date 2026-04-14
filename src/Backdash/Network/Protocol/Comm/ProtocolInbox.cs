@@ -307,7 +307,17 @@ sealed class ProtocolInbox<TInput>(
         {
             logger.Write(LogLevel.Error,
                 $"Invalid remote checksum on frame {checkFrame}, {localChecksum:x8} != {checksum:x8}");
-            state.StoppingTokenSource.Cancel();
+
+            networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.ChecksumMismatch)
+            {
+                ChecksumMismatch = new(
+                        MismatchFrame: checkFrame,
+                        LocalChecksum: localChecksum,
+                        RemoteChecksum: checksum
+                    ),
+            }
+            );
+
             return false;
         }
 

@@ -264,7 +264,7 @@ sealed class SpectatorSession<TInput> :
                 isSynchronizing = false;
                 host.Start();
                 break;
-            case PeerEvent.SynchronizationFailure:
+            case PeerEvent.SynchronizationFailure or PeerEvent.ChecksumMismatch:
                 Close();
                 break;
         }

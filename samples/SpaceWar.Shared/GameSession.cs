@@ -155,6 +155,9 @@ public sealed class GameSession(
             case PeerEvent.Disconnected:
                 nonGameState.SetConnectState(player, PlayerConnectState.Disconnected);
                 break;
+            case PeerEvent.ChecksumMismatch:
+                Log($"=>  CHECKSUM MISMATCH: {evt.ChecksumMismatch}");
+                break;
         }
     }
 

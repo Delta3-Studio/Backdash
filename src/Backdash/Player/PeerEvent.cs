@@ -50,6 +50,12 @@ public enum PeerEvent : sbyte
     ///     <see cref="ProtocolOptions.DisconnectNotifyStart" />.
     /// </summary>
     ConnectionResumed,
+
+    /// <summary>
+    ///     When consistency-check has failure.
+    ///     <see cref="ProtocolOptions.ConsistencyCheckInterval" />.
+    /// </summary>
+    ChecksumMismatch,
 }
 
 /// <summary>
@@ -86,6 +92,12 @@ public readonly struct PeerEventInfo(PeerEvent type) : IUtf8SpanFormattable
     [field: FieldOffset(HeaderSize)]
     public ConnectionInterruptedEventInfo ConnectionInterrupted { get; init; }
 
+    /// <summary>
+    ///     Data for <see cref="PeerEvent.ChecksumMismatch" /> event.
+    /// </summary>
+    [field: FieldOffset(HeaderSize)]
+    public ChecksumMismatchEventInfo ChecksumMismatch { get; init; }
+
     /// <inheritdoc />
     public override string ToString()
     {
@@ -94,6 +106,7 @@ public readonly struct PeerEventInfo(PeerEvent type) : IUtf8SpanFormattable
             PeerEvent.Synchronizing => Synchronizing.ToString(),
             PeerEvent.Synchronized => Synchronized.ToString(),
             PeerEvent.ConnectionInterrupted => ConnectionInterrupted.ToString(),
+            PeerEvent.ChecksumMismatch => ChecksumMismatch.ToString(),
             _ => "{}",
         };
         return $"Event {Type}: {details}";
@@ -121,11 +134,15 @@ public readonly struct PeerEventInfo(PeerEvent type) : IUtf8SpanFormattable
                 if (!writer.Write(Synchronizing.TotalSteps)) return false;
                 return true;
             case PeerEvent.Synchronized:
-                if (!writer.Write(" with ping "u8)) return false;
+                if (!writer.Write(" ping: "u8)) return false;
                 return writer.Write(Synchronized.Ping.TotalMilliseconds, "f2");
             case PeerEvent.ConnectionInterrupted:
-                if (!writer.Write(" with timeout "u8)) return false;
+                if (!writer.Write(" timeout: "u8)) return false;
                 if (!writer.Write(ConnectionInterrupted.DisconnectTimeout)) return false;
+                return true;
+            case PeerEvent.ChecksumMismatch:
+                if (!writer.Write(" frame: "u8)) return false;
+                if (!writer.Write(ChecksumMismatch.MismatchFrame)) return false;
                 return true;
             default:
                 return writer.Write(' ');
@@ -151,3 +168,8 @@ public readonly record struct ConnectionInterruptedEventInfo(TimeSpan Disconnect
 /// </summary>
 /// <param name="Ping">Current ping</param>
 public readonly record struct SynchronizedEventInfo(TimeSpan Ping);
+
+/// <summary>
+///     Data for <see cref="PeerEvent.ChecksumMismatch" /> event.
+/// </summary>
+public readonly record struct ChecksumMismatchEventInfo(Frame MismatchFrame, uint LocalChecksum, uint RemoteChecksum);
