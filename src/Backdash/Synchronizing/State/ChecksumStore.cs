@@ -1,23 +1,31 @@
-using Backdash.Data;
-using Backdash.Options;
-
 namespace Backdash.Synchronizing.State;
 
 sealed class ChecksumStore
 {
-    readonly CircularBuffer<uint> data;
+    readonly Entry[] data;
 
     public ChecksumStore(int size)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(size);
-        data = new(size);
+        data = new Entry[size];
     }
 
-    public ChecksumStore(NetcodeOptions options) : this(Math.Max(options.TotalSavedFramesAllowed,
-        options.Protocol.ConsistencyCheckStoreSize)) { }
+    public void Add(Frame frame, uint checksum)
+    {
+        ref var entry = ref data[frame.Number % data.Length];
+        entry.Frame = frame;
+        entry.Checksum = checksum;
+    }
 
-    public void Add(Frame frame, uint checksum) { }
+    public uint Get(Frame frame)
+    {
+        var entry = data[frame.Number % data.Length];
+        return entry.Frame == frame ? entry.Checksum : 0;
+    }
 
-
-    public uint Get(Frame frame) => 0;
+    struct Entry
+    {
+        public Frame Frame;
+        public uint Checksum;
+    }
 }

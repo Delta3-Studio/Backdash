@@ -18,6 +18,7 @@ sealed class SessionServices<TInput> where TInput : unmanaged
     public NetcodeJobManager JobManager { get; }
     public ProtocolClientFactory ProtocolClientFactory { get; }
     public IStateStore StateStore { get; }
+    public ChecksumStore ChecksumStore { get; }
     public IRandomNumberGenerator Random { get; }
     public IDeterministicRandom<TInput> DeterministicRandom { get; }
     public ILatencyStrategy LatencyStrategy { get; }
@@ -39,6 +40,7 @@ sealed class SessionServices<TInput> where TInput : unmanaged
         ArgumentNullException.ThrowIfNull(inputSerializer);
         ArgumentNullException.ThrowIfNull(options);
 
+        ChecksumStore = new(Math.Max(options.TotalSavedFramesAllowed, options.Protocol.ConsistencyCheckStoreSize));
         ChecksumProvider = services?.ChecksumProvider ?? new Fletcher32ChecksumProvider();
         StateStore = services?.StateStore ?? new DefaultStateStore(options.StateSizeHint);
         InputListener = services?.InputListener;

@@ -22,7 +22,6 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     readonly Logger logger;
     readonly PeerClient<ProtocolMessage> udp;
     readonly Synchronizer<TInput> synchronizer;
-    readonly ChecksumStore checksumStore;
     readonly NetcodeJobManager jobManager;
     readonly PeerConnectionFactory peerConnectionFactory;
     readonly IDeterministicRandom<TInput> random;
@@ -95,25 +94,11 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         endpoints = new(Max.NumberOfPlayers);
         spectators = [];
         peerObservers = new();
-        checksumStore = new(options);
         callbacks = services.SessionHandler;
 
         if (this.options.SaveConfirmedInputHistory)
             inputListener = new MemoryInputListener<TInput>(inputListener);
 
-        synchronizer = new(
-            this.options,
-            logger,
-            addedPlayers,
-            services.StateStore,
-            services.ChecksumProvider,
-            checksumStore,
-            localConnections,
-            inputComparer
-        )
-        {
-            Callbacks = callbacks,
-        };
 
         udp = services.ProtocolClientFactory.CreateClient(options.LocalPort, peerObservers);
 
@@ -124,8 +109,22 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             udp,
             this.options.Protocol,
             this.options.TimeSync,
-            checksumStore
+            services.ChecksumStore
         );
+
+        synchronizer = new(
+            this.options,
+            logger,
+            addedPlayers,
+            services.StateStore,
+            services.ChecksumProvider,
+            services.ChecksumStore,
+            localConnections,
+            inputComparer
+        )
+        {
+            Callbacks = callbacks,
+        };
 
         ConfigureJobs(services);
     }

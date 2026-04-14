@@ -80,11 +80,11 @@ sealed class SpectatorSession<TInput> :
         ConfigureJobs(services);
 
         var magicNumber = services.Random.SyncNumber();
-        var checksumStore = new ChecksumStore(options);
+
         networkEventQueue = new();
         PeerConnectionFactory peerConnectionFactory = new(
             networkEventQueue, services.Random, logger, udp,
-            options.Protocol, options.TimeSync, checksumStore
+            options.Protocol, options.TimeSync, services.ChecksumStore
         );
 
         ProtocolState protocolState =
