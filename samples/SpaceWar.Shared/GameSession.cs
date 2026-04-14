@@ -122,7 +122,7 @@ public sealed class GameSession(
         nonGameState.StateSize = saved.Size;
     }
 
-    public void OnPeerEvent(NetcodePlayer player, PeerEventInfo evt)
+    public void OnPeerEvent(NetcodePlayer player, in PeerEventInfo evt)
     {
         Log($"=> PEER EVENT: {evt} from {player}");
         if (player.IsSpectator()) return;

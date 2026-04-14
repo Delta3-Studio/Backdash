@@ -57,7 +57,7 @@ public interface INetcodeSessionHandler
     /// </summary>
     /// <param name="player">The player owner of the event</param>
     /// <param name="evt">Event data</param>
-    void OnPeerEvent(NetcodePlayer player, PeerEventInfo evt);
+    void OnPeerEvent(NetcodePlayer player, in PeerEventInfo evt);
 
     /// <summary>
     ///     Reads a state object of a snapshot.
@@ -91,7 +91,7 @@ sealed class EmptySessionHandler(Logger logger) : INetcodeSessionHandler
         logger.Write(LogLevel.Information,
             $"{DateTime.UtcNow:o} [Session Handler] Need to sync: {framesAhead} frames ahead");
 
-    public void OnPeerEvent(NetcodePlayer player, PeerEventInfo evt) =>
+    public void OnPeerEvent(NetcodePlayer player, in PeerEventInfo evt) =>
         logger.Write(LogLevel.Information,
             $"{DateTime.UtcNow:o} [Session Handler] {nameof(OnPeerEvent)} called with {evt} for {player}");
 }

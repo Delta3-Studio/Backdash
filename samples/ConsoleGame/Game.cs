@@ -150,11 +150,11 @@ public sealed class Game : INetcodeSessionHandler
         Thread.Sleep(framesAhead.Duration());
     }
 
-    public void OnPeerEvent(NetcodePlayer player, PeerEventInfo evt)
+    public void OnPeerEvent(NetcodePlayer player, in PeerEventInfo evt)
     {
         Log($"PEER EVENT: {evt} from {player}");
-        if (player.IsSpectator())
-            return;
+        if (player.IsSpectator()) return;
+
         switch (evt.Type)
         {
             case PeerEvent.Connected:
