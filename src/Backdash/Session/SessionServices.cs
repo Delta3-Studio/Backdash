@@ -20,7 +20,7 @@ sealed class SessionServices<TInput> where TInput : unmanaged
     public IStateStore StateStore { get; }
     public IRandomNumberGenerator Random { get; }
     public IDeterministicRandom<TInput> DeterministicRandom { get; }
-    public IDelayStrategy DelayStrategy { get; }
+    public ILatencyStrategy LatencyStrategy { get; }
     public IInputListener<TInput>? InputListener { get; }
 
     public EqualityComparer<TInput> InputComparer { get; }
@@ -43,7 +43,7 @@ sealed class SessionServices<TInput> where TInput : unmanaged
         StateStore = services?.StateStore ?? new DefaultStateStore(options.StateSizeHint);
         InputListener = services?.InputListener;
         Random = new DefaultRandomNumberGenerator(services?.Random ?? System.Random.Shared);
-        DelayStrategy = DelayStrategyFactory.Create(Random, options.Protocol.DelayStrategy);
+        LatencyStrategy = DelayStrategyFactory.Create(Random, options.Protocol.LatencyStrategy);
         InputComparer = services?.InputComparer ?? EqualityComparer<TInput>.Default;
         InputSerializer = inputSerializer;
 
@@ -57,7 +57,7 @@ sealed class SessionServices<TInput> where TInput : unmanaged
         SessionHandler = services?.SessionHandler ?? new EmptySessionHandler(Logger);
 
         var socketFactory = services?.PeerSocketFactory ?? new PeerSocketFactory();
-        ProtocolClientFactory = new(options, socketFactory, Logger, DelayStrategy);
+        ProtocolClientFactory = new(options, socketFactory, Logger, LatencyStrategy);
         Jobs = services?.Jobs.ToArray() ?? [];
         PluginManager = new(Logger, services?.Plugin);
     }

@@ -32,7 +32,7 @@ public sealed record NetcodeOptions
     /// <seealso cref="TimeSync" />
     /// <seealso cref="TimeSyncOptions" />
     /// <value>Defaults to <c>240</c> milliseconds</value>
-    public int RecommendationInterval { get; set; } = 240;
+    public int SynchronizationInterval { get; set; } = 240;
 
     /// <summary>
     ///     Sets the <see cref="Endianness" /> used for state serialization.

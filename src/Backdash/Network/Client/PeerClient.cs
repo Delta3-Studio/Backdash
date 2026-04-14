@@ -29,7 +29,7 @@ sealed class PeerClient<T> : INetcodeJob, IDisposable, IAsyncDisposable where T 
     readonly IPeerObserver<T> observer;
     readonly IBinarySerializer<T> serializer;
     readonly Logger logger;
-    readonly IDelayStrategy? delayStrategy;
+    readonly ILatencyStrategy? delayStrategy;
     readonly int maxPacketSize;
     readonly int receiveSocketAddressSize;
     readonly Channel<QueueEntry> sendQueue;
@@ -52,7 +52,7 @@ sealed class PeerClient<T> : INetcodeJob, IDisposable, IAsyncDisposable where T 
         IBinarySerializer<T> serializer,
         IPeerObserver<T> observer,
         Logger logger,
-        IDelayStrategy? delayStrategy = null,
+        ILatencyStrategy? delayStrategy = null,
         int maxPacketSize = Max.UdpPacketSize,
         int maxPackageQueue = Max.PackageQueue,
         int receiveSocketAddressSize = 0

@@ -47,7 +47,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     readonly PluginManager plugins;
 
     bool isSynchronizing = true;
-    int nextRecommendedInterval;
+    int nextSyncInterval;
     Frame nextSpectatorFrame = Frame.Zero;
     Frame nextListenerFrame = Frame.Zero;
     INetcodeSessionHandler callbacks;
@@ -639,7 +639,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         }
 
         // send time sync notifications if now is the proper time
-        if (currentFrame.Number <= nextRecommendedInterval)
+        if (currentFrame.Number <= nextSyncInterval)
             return;
 
         var interval = 0;
@@ -649,7 +649,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         if (interval <= 0) return;
         callbacks.TimeSync(new(interval));
-        nextRecommendedInterval = currentFrame.Number + options.RecommendationInterval;
+        nextSyncInterval = currentFrame.Number + options.SynchronizationInterval;
     }
 
     void SyncListeners(Frame minConfirmedFrame)

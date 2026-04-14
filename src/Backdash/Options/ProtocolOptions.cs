@@ -57,20 +57,20 @@ public sealed record ProtocolOptions
 
     /// <summary>
     ///     Forced network packet sending latency for the current peer.
-    ///     This value is processed using <see cref="DelayStrategy" />.
+    ///     This value is processed using <see cref="LatencyStrategy" />.
     /// </summary>
     /// <value>Defaults to <see cref="TimeSpan.Zero" /></value>
-    /// <seealso cref="Backdash.Network.DelayStrategy" />
+    /// <seealso cref="LatencyStrategy" />
     public TimeSpan NetworkLatency { get; set; }
 
     /// <summary>
     ///     Strategy for applying delay to sending packages, forcing latency.
     ///     When <see cref="NetworkLatency" /> is <see cref="TimeSpan.Zero" /> this is ignored.
     /// </summary>
-    /// <value>Defaults to <see cref="DelayStrategy.Gaussian" /></value>
+    /// <value>Defaults to <see cref="LatencyStrategy.Gaussian" /></value>
     /// <seealso cref="NetworkLatency" />
-    /// <seealso cref="Backdash.Network.DelayStrategy" />
-    public DelayStrategy DelayStrategy { get; set; } = DelayStrategy.Gaussian;
+    /// <seealso cref="LatencyStrategy" />
+    public LatencyStrategy LatencyStrategy { get; set; } = LatencyStrategy.Gaussian;
 
     /// <summary>
     ///     The time to wait before the first <see cref="PeerEvent.ConnectionInterrupted" /> timeout will be sent.

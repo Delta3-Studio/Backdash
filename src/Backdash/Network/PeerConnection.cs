@@ -374,9 +374,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
 
         var lastReceivedFrame = inbox.LastReceivedInput.Frame;
         var checkFrame = lastReceivedFrame.Number - options.ConsistencyCheckDistance;
-
-        if (checkFrame <= 1)
-            return;
+        if (checkFrame <= 1) return;
 
         state.Consistency.AskedFrame = new(checkFrame);
         state.Consistency.AskedChecksum = stateStore.GetChecksum(state.Consistency.AskedFrame);

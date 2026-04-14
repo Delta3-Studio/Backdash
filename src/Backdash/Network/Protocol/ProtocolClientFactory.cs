@@ -10,7 +10,7 @@ sealed class ProtocolClientFactory(
     NetcodeOptions options,
     IPeerSocketFactory socketFactory,
     Logger logger,
-    IDelayStrategy delayStrategy
+    ILatencyStrategy latencyStrategy
 )
 {
     public PeerClient<ProtocolMessage> CreateClient(int port, IPeerObserver<ProtocolMessage> observer) =>
@@ -19,7 +19,7 @@ sealed class ProtocolClientFactory(
             new ProtocolMessageSerializer(options.Protocol.SerializationEndianness),
             observer,
             logger,
-            delayStrategy,
+            latencyStrategy,
             options.Protocol.UdpPacketBufferSize,
             options.Protocol.MaxPackageQueue,
             options.Protocol.ReceiveSocketAddressSize

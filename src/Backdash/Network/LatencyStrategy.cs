@@ -5,7 +5,7 @@ namespace Backdash.Network;
 /// <summary>
 ///     Jitter delay strategy
 /// </summary>
-public enum DelayStrategy
+public enum LatencyStrategy
 {
     /// <summary>Constant delay</summary>
     Constant,
@@ -17,28 +17,28 @@ public enum DelayStrategy
     ContinuousUniform,
 }
 
-interface IDelayStrategy
+interface ILatencyStrategy
 {
     TimeSpan Jitter(TimeSpan sendLatency);
 }
 
 static class DelayStrategyFactory
 {
-    public static IDelayStrategy Create(IRandomNumberGenerator random, DelayStrategy strategy) => strategy switch
+    public static ILatencyStrategy Create(IRandomNumberGenerator random, LatencyStrategy strategy) => strategy switch
     {
-        DelayStrategy.Constant => new ConstantDelayStrategy(),
-        DelayStrategy.Gaussian => new GaussianDelayStrategy(random),
-        DelayStrategy.ContinuousUniform => new UniformDelayStrategy(random),
+        LatencyStrategy.Constant => new ConstantLatencyStrategy(),
+        LatencyStrategy.Gaussian => new GaussianLatencyStrategy(random),
+        LatencyStrategy.ContinuousUniform => new UniformLatencyStrategy(random),
         _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null),
     };
 }
 
-sealed class ConstantDelayStrategy : IDelayStrategy
+sealed class ConstantLatencyStrategy : ILatencyStrategy
 {
     public TimeSpan Jitter(TimeSpan sendLatency) => sendLatency;
 }
 
-sealed class UniformDelayStrategy(IRandomNumberGenerator random) : IDelayStrategy
+sealed class UniformLatencyStrategy(IRandomNumberGenerator random) : ILatencyStrategy
 {
     public TimeSpan Jitter(TimeSpan sendLatency)
     {
@@ -49,7 +49,7 @@ sealed class UniformDelayStrategy(IRandomNumberGenerator random) : IDelayStrateg
     }
 }
 
-sealed class GaussianDelayStrategy(IRandomNumberGenerator random) : IDelayStrategy
+sealed class GaussianLatencyStrategy(IRandomNumberGenerator random) : ILatencyStrategy
 {
     public TimeSpan Jitter(TimeSpan sendLatency)
     {
