@@ -16,7 +16,7 @@ enum ProtocolEvent : byte
 struct ProtocolEventInfo(ProtocolEvent type, NetcodePlayer player) : IUtf8SpanFormattable
 {
     public readonly ProtocolEvent Type = type;
-    public NetcodePlayer Player = player;
+    public readonly NetcodePlayer Player = player;
     public SynchronizingEventInfo Synchronizing = default;
     public SynchronizedEventInfo Synchronized = default;
     public ConnectionInterruptedEventInfo NetworkInterrupted = default;
