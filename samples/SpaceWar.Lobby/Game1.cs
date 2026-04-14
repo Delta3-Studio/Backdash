@@ -33,13 +33,14 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         SpriteBatch = new(GraphicsDevice);
-        SceneManager = new(this, startScene: new ChooseLobbyScene());
 
         Services.AddService(SpriteBatch);
-        Services.AddService(SceneManager);
         Services.AddService(settings);
         Services.AddService(new GameAssets(Content, GraphicsDevice));
         Services.AddService(new LobbyHttpClient(settings));
+
+        SceneManager = new(this, startScene: new ChooseLobbyScene());
+        Services.AddService(SceneManager);
     }
 
     protected override void Update(GameTime gameTime)
