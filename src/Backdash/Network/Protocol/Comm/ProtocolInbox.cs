@@ -54,7 +54,7 @@ sealed class ProtocolInbox<TInput>(
         {
             if (state.CurrentStatus is not ProtocolStatus.Running)
             {
-                logger.Write(LogLevel.Debug, $"recv skip (not ready): {message} on {state.Player}");
+                logger.Write(LogLevel.Trace, $"recv skip (not ready): {message} on {state.Player}");
                 return;
             }
 
@@ -186,7 +186,7 @@ sealed class ProtocolInbox<TInput>(
                 lastReceivedInput.Frame = currentFrame;
                 state.Stats.LastReceivedInputTime = Stopwatch.GetTimestamp();
                 currentFrame++;
-                logger.Write(LogLevel.Debug,
+                logger.Write(LogLevel.Trace,
                     $"Received input: frame {lastReceivedInput.Frame}, sending to emulator queue {state.Player} (ack: {LastAckedFrame})");
                 inputEvents.Publish(new(state.Player, lastReceivedInput));
             }
@@ -296,7 +296,7 @@ sealed class ProtocolInbox<TInput>(
         var checksum = message.ConsistencyCheckReply.Checksum;
         var localChecksum = state.Consistency.AskedChecksum;
 
-        logger.Write(LogLevel.Debug, $"Received consistency request reply for: {checkFrame} #{checksum:x8}");
+        logger.Write(LogLevel.Debug, $"Reply consistency-check for {checkFrame} #{checksum:x8}");
 
         if (state.Consistency.AskedFrame != checkFrame || localChecksum is 0 || checksum is 0)
         {
@@ -312,7 +312,7 @@ sealed class ProtocolInbox<TInput>(
             return false;
         }
 
-        logger.Write(LogLevel.Debug, $"Consistency request check for: {checkFrame} OK({checksum:x8})");
+        logger.Write(LogLevel.Debug, $"Finish consistency-check request check for {checkFrame} #{checksum:x8}");
         state.Consistency.LastCheck = Stopwatch.GetTimestamp();
         state.Consistency.AskedFrame = Frame.Null;
         state.Consistency.AskedChecksum = 0;

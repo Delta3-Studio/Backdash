@@ -372,7 +372,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     {
         if (state.CurrentStatus is not ProtocolStatus.Running) return;
 
-        var lastReceivedFrame = inbox.LastReceivedInput.Frame;
+        var lastReceivedFrame = inbox.LastAckedFrame;
         var checkFrame = lastReceivedFrame.Number - options.ConsistencyCheckDistance;
         if (checkFrame <= 1) return;
 
@@ -385,9 +385,6 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         if (state.Consistency.LastCheck is 0)
             state.Consistency.LastCheck = Stopwatch.GetTimestamp();
 
-        logger.Write(LogLevel.Trace,
-            $"Start consistency check for frame {state.Consistency.AskedFrame} #{state.Consistency.AskedChecksum:x8}");
-
         var elapsed = Stopwatch.GetElapsedTime(state.Consistency.LastCheck);
         if (options.ConsistencyCheckTimeout > TimeSpan.Zero && elapsed > options.ConsistencyCheckTimeout)
         {
@@ -398,7 +395,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         }
 
         logger.Write(LogLevel.Debug,
-            $"Send consistency request for frame {state.Consistency.AskedFrame.Number} #{state.Consistency.AskedChecksum:x8}");
+            $"Begin consistency-check request for frame {state.Consistency.AskedFrame.Number} #{state.Consistency.AskedChecksum:x8}");
 
         outbox
             .SendMessage(new(MessageType.ConsistencyCheckRequest)
