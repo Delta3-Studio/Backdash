@@ -33,10 +33,4 @@ public interface IStateStore
     ///     Advance the store pointer
     /// </summary>
     void Advance();
-
-    /// <summary>
-    ///     Finds checksum for
-    ///     <param name="frame"></param>
-    /// </summary>
-    uint GetChecksum(Frame frame);
 }

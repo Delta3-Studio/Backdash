@@ -124,7 +124,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             udp,
             this.options.Protocol,
             this.options.TimeSync,
-            services.StateStore
+            checksumStore
         );
 
         ConfigureJobs(services);

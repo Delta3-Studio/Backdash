@@ -27,7 +27,7 @@ sealed class ProtocolInbox<TInput>(
     IMessageSender messageSender,
     IProtocolNetworkEventHandler networkEvents,
     IProtocolInputEventPublisher<TInput> inputEvents,
-    IStateStore stateStore,
+    ChecksumStore checksumStore,
     Logger logger
 ) : IProtocolInbox<TInput> where TInput : unmanaged
 {
@@ -323,7 +323,7 @@ sealed class ProtocolInbox<TInput>(
     bool OnConsistencyCheckRequest(ref readonly ProtocolMessage message, ref ProtocolMessage replyMsg)
     {
         var checkFrame = message.ConsistencyCheckRequest.Frame;
-        var checksum = stateStore.GetChecksum(checkFrame);
+        var checksum = checksumStore.Get(checkFrame);
 
         logger.Write(LogLevel.Debug, $"Received consistency request check for: {checkFrame} (reply {checksum:x8})");
 

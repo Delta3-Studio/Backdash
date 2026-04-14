@@ -25,7 +25,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     readonly ProtocolInbox<TInput> inbox;
     readonly ProtocolOutbox outbox;
     readonly ProtocolInputBuffer<TInput> inputBuffer;
-    readonly IStateStore stateStore;
+    readonly ChecksumStore checksumStore;
 
     readonly Timer qualityReportTimer;
     readonly Timer networkStatsTimer;
@@ -45,7 +45,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         ProtocolInbox<TInput> inbox,
         ProtocolOutbox outbox,
         ProtocolInputBuffer<TInput> inputBuffer,
-        IStateStore stateStore
+        ChecksumStore checksumStore
     )
     {
         this.options = options;
@@ -57,7 +57,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         this.inbox = inbox;
         this.outbox = outbox;
         this.inputBuffer = inputBuffer;
-        this.stateStore = stateStore;
+        this.checksumStore = checksumStore;
         disconnectCheckEnabled = options.IsDisconnectTimeoutEnabled();
 
         keepAliveTimer = new(options.KeepAliveInterval);
@@ -377,7 +377,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         if (checkFrame <= 1) return;
 
         state.Consistency.AskedFrame = new(checkFrame);
-        state.Consistency.AskedChecksum = stateStore.GetChecksum(state.Consistency.AskedFrame);
+        state.Consistency.AskedChecksum = checksumStore.Get(state.Consistency.AskedFrame);
 
         if (state.Consistency.AskedFrame.IsNull || state.Consistency.AskedChecksum is 0)
             return;

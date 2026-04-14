@@ -17,7 +17,7 @@ sealed class PeerConnectionFactory(
     PeerClient<ProtocolMessage> peer,
     ProtocolOptions options,
     TimeSyncOptions timeSyncOptions,
-    IStateStore stateStore
+    ChecksumStore checksumStore
 )
 {
     public PeerConnection<TInput> Create<TInput>(
@@ -31,13 +31,13 @@ sealed class PeerConnectionFactory(
         var outbox = new ProtocolOutbox(state, peer, logger);
         var syncManager = new ProtocolSynchronizer(logger, random, state, options, outbox, networkEventHandler);
         var inbox = new ProtocolInbox<TInput>(options, inputSerializer, state, syncManager, outbox,
-            networkEventHandler, inputEventQueue, stateStore, logger);
+            networkEventHandler, inputEventQueue, checksumStore, logger);
         var inputBuffer =
             new ProtocolInputBuffer<TInput>(options, inputSerializer, state, logger, timeSync, outbox, inbox);
 
         PeerConnection<TInput> connection = new(
             options, state, logger, timeSync, networkEventHandler,
-            syncManager, inbox, outbox, inputBuffer, stateStore
+            syncManager, inbox, outbox, inputBuffer, checksumStore
         );
 
         state.StoppingToken.Register(() => connection.Disconnect());
