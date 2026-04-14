@@ -80,10 +80,11 @@ sealed class SpectatorSession<TInput> :
         ConfigureJobs(services);
 
         var magicNumber = services.Random.SyncNumber();
+
         networkEventQueue = new();
         PeerConnectionFactory peerConnectionFactory = new(
             networkEventQueue, services.Random, logger, udp,
-            options.Protocol, options.TimeSync, stateStore
+            options.Protocol, options.TimeSync, services.ChecksumStore
         );
 
         ProtocolState protocolState =
@@ -254,45 +255,17 @@ sealed class SpectatorSession<TInput> :
 
     void OnNetworkEvent(in ProtocolEventInfo evt)
     {
-        ref readonly var player = ref evt.Player;
+        callbacks.OnPeerEvent(evt.Player, in evt.EventInfo);
+
         switch (evt.Type)
         {
-            case ProtocolEvent.Connected:
-                callbacks.OnPeerEvent(player, new(PeerEvent.Connected));
-                break;
-            case ProtocolEvent.Synchronizing:
-                callbacks.OnPeerEvent(player, new(PeerEvent.Synchronizing)
-                {
-                    Synchronizing = new(evt.Synchronizing.CurrentStep, evt.Synchronizing.TotalSteps),
-                });
-                break;
-            case ProtocolEvent.Synchronized:
-                callbacks.OnPeerEvent(player, new(PeerEvent.Synchronized)
-                {
-                    Synchronized = new(evt.Synchronized.Ping),
-                });
+            case PeerEvent.Synchronized:
                 callbacks.OnSessionStart();
                 isSynchronizing = false;
                 host.Start();
                 break;
-            case ProtocolEvent.SyncFailure:
-                callbacks.OnPeerEvent(player, new(PeerEvent.SynchronizationFailure));
+            case PeerEvent.SynchronizationFailure or PeerEvent.ChecksumMismatch:
                 Close();
-                break;
-            case ProtocolEvent.NetworkInterrupted:
-                callbacks.OnPeerEvent(player, new(PeerEvent.ConnectionInterrupted)
-                {
-                    ConnectionInterrupted = new(evt.NetworkInterrupted.DisconnectTimeout),
-                });
-                break;
-            case ProtocolEvent.NetworkResumed:
-                callbacks.OnPeerEvent(player, new(PeerEvent.ConnectionResumed));
-                break;
-            case ProtocolEvent.Disconnected:
-                callbacks.OnPeerEvent(player, new(PeerEvent.Disconnected));
-                break;
-            default:
-                logger.Write(LogLevel.Warning, $"Unknown protocol event {evt} from {player}");
                 break;
         }
     }

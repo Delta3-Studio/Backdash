@@ -66,22 +66,4 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
 
     /// <inheritdoc />
     public void Advance() => head = (head + 1) % savedStates.Length;
-
-    /// <inheritdoc />
-    public uint GetChecksum(Frame frame)
-    {
-        var span = savedStates.AsSpan();
-        ref var current = ref MemoryMarshal.GetReference(span);
-        ref var limit = ref Unsafe.Add(ref current, span.Length);
-
-        while (Unsafe.IsAddressLessThan(ref current, ref limit))
-        {
-            if (current.Frame.Number == frame.Number)
-                return current.Checksum;
-
-            current = ref Unsafe.Add(ref current, 1)!;
-        }
-
-        return 0;
-    }
 }

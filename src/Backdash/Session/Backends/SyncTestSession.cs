@@ -94,6 +94,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
             addedPlayers.Keys,
             services.StateStore,
             services.ChecksumProvider,
+            services.ChecksumStore,
             new(options.NumberOfPlayers),
             services.InputComparer
         )

@@ -68,7 +68,7 @@ sealed class ProtocolSynchronizer(
             active = false;
             logger.Write(LogLevel.Warning,
                 $"Fail to sync {state.Player} after {retryCounter} retries");
-            eventHandler.OnNetworkEvent(ProtocolEvent.SyncFailure, state.Player);
+            eventHandler.OnNetworkEvent(PeerEvent.SynchronizationFailure, state.Player);
             return;
         }
 

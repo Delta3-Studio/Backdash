@@ -122,7 +122,7 @@ public sealed class GameSession(
         nonGameState.StateSize = saved.Size;
     }
 
-    public void OnPeerEvent(NetcodePlayer player, PeerEventInfo evt)
+    public void OnPeerEvent(NetcodePlayer player, in PeerEventInfo evt)
     {
         Log($"=> PEER EVENT: {evt} from {player}");
         if (player.IsSpectator()) return;
@@ -154,6 +154,9 @@ public sealed class GameSession(
                 break;
             case PeerEvent.Disconnected:
                 nonGameState.SetConnectState(player, PlayerConnectState.Disconnected);
+                break;
+            case PeerEvent.ChecksumMismatch:
+                Log($"=>  CHECKSUM MISMATCH: {evt.ChecksumMismatch}");
                 break;
         }
     }

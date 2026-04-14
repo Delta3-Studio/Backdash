@@ -25,7 +25,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     readonly ProtocolInbox<TInput> inbox;
     readonly ProtocolOutbox outbox;
     readonly ProtocolInputBuffer<TInput> inputBuffer;
-    readonly IStateStore stateStore;
+    readonly ChecksumStore checksumStore;
 
     readonly Timer qualityReportTimer;
     readonly Timer networkStatsTimer;
@@ -45,7 +45,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         ProtocolInbox<TInput> inbox,
         ProtocolOutbox outbox,
         ProtocolInputBuffer<TInput> inputBuffer,
-        IStateStore stateStore
+        ChecksumStore checksumStore
     )
     {
         this.options = options;
@@ -57,7 +57,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         this.inbox = inbox;
         this.outbox = outbox;
         this.inputBuffer = inputBuffer;
-        this.stateStore = stateStore;
+        this.checksumStore = checksumStore;
         disconnectCheckEnabled = options.IsDisconnectTimeoutEnabled();
 
         keepAliveTimer = new(options.KeepAliveInterval);
@@ -269,9 +269,9 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
             if (state.Connection is not { DisconnectNotifySent: false, DisconnectEventSent: false })
                 return false;
 
-            networkEventHandler.OnNetworkEvent(new(ProtocolEvent.NetworkInterrupted, state.Player)
+            networkEventHandler.OnNetworkEvent(state.Player, new(PeerEvent.ConnectionInterrupted)
             {
-                NetworkInterrupted = new()
+                ConnectionInterrupted = new()
                 {
                     DisconnectTimeout = timeout,
                 },
@@ -291,7 +291,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
                 return false;
 
             state.Connection.DisconnectEventSent = true;
-            networkEventHandler.OnNetworkEvent(ProtocolEvent.Disconnected, state.Player);
+            networkEventHandler.OnNetworkEvent(PeerEvent.Disconnected, state.Player);
 
             return true;
         }
@@ -371,22 +371,18 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     void OnConsistencyCheck(object? sender, ElapsedEventArgs e)
     {
         if (state.CurrentStatus is not ProtocolStatus.Running) return;
-
         var lastReceivedFrame = inbox.LastReceivedInput.Frame;
         var checkFrame = lastReceivedFrame.Number - options.ConsistencyCheckDistance;
         if (checkFrame <= 1) return;
 
         state.Consistency.AskedFrame = new(checkFrame);
-        state.Consistency.AskedChecksum = stateStore.GetChecksum(state.Consistency.AskedFrame);
+        state.Consistency.AskedChecksum = checksumStore.Get(state.Consistency.AskedFrame);
 
         if (state.Consistency.AskedFrame.IsNull || state.Consistency.AskedChecksum is 0)
             return;
 
         if (state.Consistency.LastCheck is 0)
             state.Consistency.LastCheck = Stopwatch.GetTimestamp();
-
-        logger.Write(LogLevel.Trace,
-            $"Start consistency check for frame {state.Consistency.AskedFrame} #{state.Consistency.AskedChecksum:x8}");
 
         var elapsed = Stopwatch.GetElapsedTime(state.Consistency.LastCheck);
         if (options.ConsistencyCheckTimeout > TimeSpan.Zero && elapsed > options.ConsistencyCheckTimeout)
@@ -398,7 +394,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         }
 
         logger.Write(LogLevel.Debug,
-            $"Send consistency request for frame {state.Consistency.AskedFrame.Number} #{state.Consistency.AskedChecksum:x8}");
+            $"Begin consistency-check request for frame {state.Consistency.AskedFrame.Number} #{state.Consistency.AskedChecksum:x8}");
 
         outbox
             .SendMessage(new(MessageType.ConsistencyCheckRequest)

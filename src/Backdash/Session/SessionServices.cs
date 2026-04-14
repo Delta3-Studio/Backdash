@@ -18,6 +18,7 @@ sealed class SessionServices<TInput> where TInput : unmanaged
     public NetcodeJobManager JobManager { get; }
     public ProtocolClientFactory ProtocolClientFactory { get; }
     public IStateStore StateStore { get; }
+    public ChecksumStore ChecksumStore { get; }
     public IRandomNumberGenerator Random { get; }
     public IDeterministicRandom<TInput> DeterministicRandom { get; }
     public ILatencyStrategy LatencyStrategy { get; }
@@ -46,10 +47,12 @@ sealed class SessionServices<TInput> where TInput : unmanaged
         LatencyStrategy = DelayStrategyFactory.Create(Random, options.Protocol.LatencyStrategy);
         InputComparer = services?.InputComparer ?? EqualityComparer<TInput>.Default;
         InputSerializer = inputSerializer;
-
         DeterministicRandom = services?.DeterministicRandom ?? new XorShiftRandom<TInput>();
         if (DeterministicRandom.InitialSeed is 0)
             DeterministicRandom.SetInitialSeed(options.DeterministicRandomInitialSeed);
+
+        ChecksumStore = new(Math.Max(options.TotalSavedFramesAllowed, options.Protocol.ConsistencyCheckStoreSize)
+                            + options.Protocol.ConsistencyCheckDistance);
 
         var logWriter = services?.LogWriter ?? new ConsoleTextLogWriter();
         Logger = new(options.Logger, logWriter);

@@ -143,7 +143,7 @@ public sealed record ProtocolOptions
     /// <seealso cref="PeerNetworkStats.Send"/>
     /// <seealso cref="PeerNetworkStats.Received"/>
     /// <value>Defaults to <see lanword="true" /></value>
-    public bool NetworkPackageStatsEnabled { get; set; } = false;
+    public bool NetworkPackageStatsEnabled { get; set; }
 
     internal bool IsNetworkPackageStatsEnabled() =>
         NetworkPackageStatsEnabled && NetworkPackageStatsInterval > TimeSpan.Zero;
@@ -165,7 +165,7 @@ public sealed record ProtocolOptions
 
     /// <summary>
     ///     Offset to be applied to frame on checksum consistency check.
-    ///     The frame sent is (<c>LastReceivedFrame - ConsistencyCheckOffset</c>).
+    ///     The frame sent is (<c>LastAckedFrame - ConsistencyCheckOffset</c>).
     /// </summary>
     /// <value>Defaults to <c>8</c></value>
     /// <seealso cref="ConsistencyCheckTimeout" />
@@ -180,8 +180,15 @@ public sealed record ProtocolOptions
     /// <value>Defaults to <c>3_000</c> milliseconds</value>
     /// <seealso cref="ConsistencyCheckDistance" />
     /// <seealso cref="ConsistencyCheckTimeout" />
-    public TimeSpan ConsistencyCheckInterval { get; set; } =
-        TimeSpan.FromMilliseconds(3_000);
+    public TimeSpan ConsistencyCheckInterval { get; set; } = TimeSpan.FromSeconds(3);
+
+    /// <summary>
+    ///     The number of checksum frames that will be keep for consistency checks.
+    /// </summary>
+    /// <value>Defaults to <c>180</c></value>
+    /// <seealso cref="ConsistencyCheckTimeout" />
+    /// <seealso cref="ConsistencyCheckInterval" />
+    public int ConsistencyCheckStoreSize { get; set; } = 250;
 
     /// <summary>
     ///     Enable/Disable consistency check.

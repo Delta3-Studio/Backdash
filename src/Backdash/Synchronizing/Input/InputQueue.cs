@@ -213,7 +213,7 @@ sealed class InputQueue<TInput> where TInput : unmanaged
         // we can dump out of prediction mode entirely. Otherwise, advance the prediction frame count up.
         if (prediction.Frame.Number == lastFrameRequested.Number && firstIncorrectFrame.IsNull)
         {
-            logger.Write(LogLevel.Debug,
+            logger.Write(LogLevel.Trace,
                 $"Queue {QueueId} => prediction is correct!  dumping out of prediction mode.");
             prediction.ResetFrame();
         }
