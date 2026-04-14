@@ -32,20 +32,14 @@ struct ProtocolEventInfo(ProtocolEvent type, NetcodePlayer player) : IUtf8SpanFo
         if (!writer.Write(" ProtoEvt "u8)) return false;
         if (!writer.WriteEnum(Type)) return false;
         if (!writer.Write(":"u8)) return false;
-        switch (Type)
+        return Type switch
         {
-            case ProtocolEvent.NetworkInterrupted:
-                return writer.Write("Timeout: "u8)
-                       && writer.Write(NetworkInterrupted.DisconnectTimeout);
-            case ProtocolEvent.Synchronizing when !writer.Write(' '):
-                return false;
-            case ProtocolEvent.Synchronizing:
-                return writer.Write(Synchronizing.CurrentStep)
-                       && writer.Write('/')
-                       &&
-                       writer.Write(Synchronizing.TotalSteps);
-            default:
-                return writer.Write("{}"u8);
-        }
+            ProtocolEvent.NetworkInterrupted => writer.Write("Timeout: "u8) &&
+                                                writer.Write(NetworkInterrupted.DisconnectTimeout),
+            ProtocolEvent.Synchronizing when !writer.Write(' ') => false,
+            ProtocolEvent.Synchronizing => writer.Write(Synchronizing.CurrentStep) && writer.Write('/') &&
+                                           writer.Write(Synchronizing.TotalSteps),
+            _ => writer.Write("{}"u8),
+        };
     }
 }
