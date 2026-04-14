@@ -18,6 +18,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     readonly IReadOnlyCollection<NetcodePlayer> players;
     readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
+    readonly ChecksumStore checksumStore;
     readonly ConnectionsState localConnections;
     readonly EqualityComparer<TInput> inputComparer;
     readonly List<InputQueue<TInput>> inputQueues;
@@ -35,6 +36,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         IReadOnlyCollection<NetcodePlayer> players,
         IStateStore stateStore,
         IChecksumProvider checksumProvider,
+        ChecksumStore checksumStore,
         ConnectionsState localConnections,
         EqualityComparer<TInput>? inputComparer = null
     )
@@ -46,10 +48,12 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         this.checksumProvider = checksumProvider;
         this.localConnections = localConnections;
         this.inputComparer = inputComparer ?? EqualityComparer<TInput>.Default;
+        this.checksumStore = checksumStore;
 
         inputQueues = new(2);
         endianness = options.GetEndiannessNumberStateSerializer();
-        stateStore.Initialize(options.TotalSavedFramesAllowed);
+        var saveBufferSize = options.TotalSavedFramesAllowed;
+        stateStore.Initialize(saveBufferSize);
     }
 
     public bool InRollback { get; private set; }
@@ -242,6 +246,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         Callbacks.SaveState(currentFrame, ref writer);
         nextState.Frame = currentFrame;
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
+        checksumStore.Add(nextState.Frame, nextState.Checksum);
 
         stateStore.Advance();
         logger.Write(LogLevel.Trace, $"sync: saved frame {nextState.Frame} (checksum: {nextState.Checksum:x8})");

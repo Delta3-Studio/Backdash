@@ -184,6 +184,14 @@ public sealed record ProtocolOptions
         TimeSpan.FromMilliseconds(3_000);
 
     /// <summary>
+    ///     The number of checksum frames that will be keep for consistency checks.
+    /// </summary>
+    /// <value>Defaults to <c>1</c></value>
+    /// <seealso cref="ConsistencyCheckTimeout" />
+    /// <seealso cref="ConsistencyCheckInterval" />
+    public int ConsistencyCheckStoreSize { get; set; } = 180;
+
+    /// <summary>
     ///     Enable/Disable consistency check.
     /// </summary>
     /// <seealso cref="ConsistencyCheckDistance" />

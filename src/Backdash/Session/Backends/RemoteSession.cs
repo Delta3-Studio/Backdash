@@ -22,6 +22,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     readonly Logger logger;
     readonly PeerClient<ProtocolMessage> udp;
     readonly Synchronizer<TInput> synchronizer;
+    readonly ChecksumStore checksumStore;
     readonly NetcodeJobManager jobManager;
     readonly PeerConnectionFactory peerConnectionFactory;
     readonly IDeterministicRandom<TInput> random;
@@ -94,6 +95,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         endpoints = new(Max.NumberOfPlayers);
         spectators = [];
         peerObservers = new();
+        checksumStore = new(options);
         callbacks = services.SessionHandler;
 
         if (this.options.SaveConfirmedInputHistory)
@@ -105,6 +107,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             addedPlayers,
             services.StateStore,
             services.ChecksumProvider,
+            checksumStore,
             localConnections,
             inputComparer
         )
