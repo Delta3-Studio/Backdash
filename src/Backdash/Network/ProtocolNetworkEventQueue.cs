@@ -6,7 +6,8 @@ namespace Backdash.Network;
 interface IProtocolNetworkEventHandler : IDisposable
 {
     void OnNetworkEvent(in ProtocolEventInfo evt);
-    void OnNetworkEvent(in ProtocolEvent evt, NetcodePlayer player) => OnNetworkEvent(new(evt, player));
+    void OnNetworkEvent(NetcodePlayer player, PeerEventInfo evt) => OnNetworkEvent(new(player, evt));
+    void OnNetworkEvent(PeerEvent evt, NetcodePlayer player) => OnNetworkEvent(player, new(evt));
 }
 
 sealed class ProtocolNetworkEventQueue : IProtocolNetworkEventHandler

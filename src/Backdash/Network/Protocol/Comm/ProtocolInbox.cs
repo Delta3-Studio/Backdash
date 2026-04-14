@@ -85,7 +85,7 @@ sealed class ProtocolInbox<TInput>(
             state.Stats.Received.TotalBytes += (ByteSize)bytesReceived;
             if (state.Connection.DisconnectNotifySent && state.CurrentStatus is ProtocolStatus.Running)
             {
-                networkEvents.OnNetworkEvent(ProtocolEvent.NetworkResumed, state.Player);
+                networkEvents.OnNetworkEvent(PeerEvent.ConnectionResumed, state.Player);
                 state.Connection.DisconnectNotifySent = false;
             }
         }
@@ -124,7 +124,7 @@ sealed class ProtocolInbox<TInput>(
             if (state.CurrentStatus is not ProtocolStatus.Disconnected && !state.Connection.DisconnectEventSent)
             {
                 logger.Write(LogLevel.Information, "Disconnecting endpoint on remote request");
-                networkEvents.OnNetworkEvent(ProtocolEvent.Disconnected, state.Player);
+                networkEvents.OnNetworkEvent(PeerEvent.Disconnected, state.Player);
                 state.Connection.DisconnectEventSent = true;
             }
         }
@@ -236,7 +236,7 @@ sealed class ProtocolInbox<TInput>(
 
         if (!state.Connection.IsConnected)
         {
-            networkEvents.OnNetworkEvent(ProtocolEvent.Connected, state.Player);
+            networkEvents.OnNetworkEvent(PeerEvent.Connected, state.Player);
             state.Connection.IsConnected = true;
         }
 
@@ -254,21 +254,20 @@ sealed class ProtocolInbox<TInput>(
             state.Stats.RoundTripTime = ping;
             lastReceivedInput.ResetFrame();
             state.RemoteSyncNumber = msg.Header.SyncNumber;
-            networkEvents.OnNetworkEvent(new(ProtocolEvent.Synchronized, state.Player)
+            networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.Synchronized)
             {
                 Synchronized = new(ping),
             });
         }
         else
         {
-            networkEvents.OnNetworkEvent(
-                new(ProtocolEvent.Synchronizing, state.Player)
-                {
-                    Synchronizing = new(
+            networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.Synchronizing)
+            {
+                Synchronizing = new(
                         TotalSteps: options.NumberOfSyncRoundTrips,
                         CurrentStep: options.NumberOfSyncRoundTrips - state.Sync.RemainingRoundTrips
                     ),
-                }
+            }
             );
             sync.CreateRequestMessage(ref replyMsg);
         }

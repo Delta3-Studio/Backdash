@@ -732,42 +732,18 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
     void OnNetworkEvent(in ProtocolEventInfo evt)
     {
-        ref readonly var player = ref evt.Player;
+        var player = evt.Player;
         logger.Write(LogLevel.Trace, $"Session event: {evt} from {player}");
+        callbacks.OnPeerEvent(player, in evt.EventInfo);
         switch (evt.Type)
         {
-            case ProtocolEvent.Connected:
-                callbacks.OnPeerEvent(player, new(PeerEvent.Connected));
-                break;
-            case ProtocolEvent.Synchronizing:
-                callbacks.OnPeerEvent(player, new(PeerEvent.Synchronizing)
-                {
-                    Synchronizing = new(evt.Synchronizing.CurrentStep, evt.Synchronizing.TotalSteps),
-                });
-                break;
-            case ProtocolEvent.Synchronized:
-                callbacks.OnPeerEvent(player, new(PeerEvent.Synchronized)
-                {
-                    Synchronized = new(evt.Synchronized.Ping),
-                });
-                break;
-            case ProtocolEvent.SyncFailure:
+            case PeerEvent.SynchronizationFailure:
                 if (player.IsSpectator())
                     RemoveSpectator(player);
-                else
-                    callbacks.OnPeerEvent(player, new(PeerEvent.SynchronizationFailure));
 
                 break;
-            case ProtocolEvent.NetworkInterrupted:
-                callbacks.OnPeerEvent(player, new(PeerEvent.ConnectionInterrupted)
-                {
-                    ConnectionInterrupted = new(evt.NetworkInterrupted.DisconnectTimeout),
-                });
-                break;
-            case ProtocolEvent.NetworkResumed:
-                callbacks.OnPeerEvent(player, new(PeerEvent.ConnectionResumed));
-                break;
-            case ProtocolEvent.Disconnected:
+
+            case PeerEvent.Disconnected:
                 switch (player.Type)
                 {
                     case PlayerType.Spectator:
@@ -778,10 +754,6 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
                         break;
                 }
 
-                callbacks.OnPeerEvent(player, new(PeerEvent.Disconnected));
-                break;
-            default:
-                logger.Write(LogLevel.Warning, $"Unknown protocol event {evt} from {player}");
                 break;
         }
     }

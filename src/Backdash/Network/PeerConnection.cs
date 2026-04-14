@@ -269,9 +269,9 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
             if (state.Connection is not { DisconnectNotifySent: false, DisconnectEventSent: false })
                 return false;
 
-            networkEventHandler.OnNetworkEvent(new(ProtocolEvent.NetworkInterrupted, state.Player)
+            networkEventHandler.OnNetworkEvent(state.Player, new(PeerEvent.ConnectionInterrupted)
             {
-                NetworkInterrupted = new()
+                ConnectionInterrupted = new()
                 {
                     DisconnectTimeout = timeout,
                 },
@@ -291,7 +291,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
                 return false;
 
             state.Connection.DisconnectEventSent = true;
-            networkEventHandler.OnNetworkEvent(ProtocolEvent.Disconnected, state.Player);
+            networkEventHandler.OnNetworkEvent(PeerEvent.Disconnected, state.Player);
 
             return true;
         }
