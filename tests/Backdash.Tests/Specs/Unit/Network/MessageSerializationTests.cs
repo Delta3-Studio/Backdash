@@ -75,4 +75,11 @@ public class MessageSerializationTests
             (ref ConsistencyCheckReply v, BinarySpanWriter w) => v.Serialize(w),
             (ref ConsistencyCheckReply v, BinaryBufferReader r) => v.Deserialize(r)
         );
+
+    [PropertyTest]
+    internal bool ConsistencyCheckFailSerialize(ConsistencyCheckFail value) =>
+        AssertThat.Serialization.IsValid(ref value,
+            (ref ConsistencyCheckFail v, BinarySpanWriter w) => v.Serialize(w),
+            (ref ConsistencyCheckFail v, BinaryBufferReader r) => v.Deserialize(r)
+        );
 }

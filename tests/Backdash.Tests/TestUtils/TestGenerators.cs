@@ -255,6 +255,18 @@ abstract class DataGenerator
         }
     );
 
+    public static Arbitrary<ConsistencyCheckFail> ConsistencyCheckFailGenerator() => Arb.From(
+        from frame in Generate<Frame>()
+        from localChecksum in Generate<Checksum>()
+        from remoteChecksum in Generate<Checksum>()
+        select new ConsistencyCheckFail
+        {
+            Frame = frame,
+            LocalChecksum = localChecksum,
+            RemoteChecksum = remoteChecksum,
+        }
+    );
+
     public static Arbitrary<InputMessage> InputMsgGenerator(
         Arbitrary<ConnectStatus> connectStatusGenerator
     ) =>
@@ -290,7 +302,8 @@ abstract class DataGenerator
         Arbitrary<KeepAlive> keepAliveArb,
         Arbitrary<InputAck> inputAckArb,
         Arbitrary<ConsistencyCheckRequest> consistencyCheckReqArb,
-        Arbitrary<ConsistencyCheckReply> consistencyCheckReplyArb
+        Arbitrary<ConsistencyCheckReply> consistencyCheckReplyArb,
+        Arbitrary<ConsistencyCheckFail> consistencyCheckFailArb
     ) =>
         headerArb.Generator
             .Where(h => h.Type is not MessageType.Unknown)
@@ -343,6 +356,12 @@ abstract class DataGenerator
                     {
                         Header = header,
                         ConsistencyCheckReply = x,
+                    }),
+                MessageType.ConsistencyCheckFail =>
+                    consistencyCheckFailArb.Generator.Select(x => new ProtocolMessage
+                    {
+                        Header = header,
+                        ConsistencyCheckFail = x,
                     }),
                 MessageType.InputAck =>
                     inputAckArb.Generator.Select(x => new ProtocolMessage

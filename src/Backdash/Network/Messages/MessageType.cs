@@ -13,4 +13,5 @@ enum MessageType : ushort
     InputAck,
     ConsistencyCheckRequest,
     ConsistencyCheckReply,
+    ConsistencyCheckFail,
 }

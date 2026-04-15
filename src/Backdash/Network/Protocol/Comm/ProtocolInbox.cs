@@ -103,7 +103,8 @@ sealed class ProtocolInbox<TInput>(
             MessageType.QualityReply => OnQualityReply(in message),
             MessageType.InputAck => OnInputAck(in message),
             MessageType.ConsistencyCheckRequest => OnConsistencyCheckRequest(in message, ref replyMsg),
-            MessageType.ConsistencyCheckReply => OnConsistencyCheckReply(in message),
+            MessageType.ConsistencyCheckReply => OnConsistencyCheckReply(in message, ref replyMsg),
+            MessageType.ConsistencyCheckFail => OnConsistencyCheckFail(in message),
             MessageType.KeepAlive => true,
             MessageType.Unknown =>
                 throw new NetcodeException($"Unknown UDP protocol message received: {message.Header.Type}"),
@@ -289,7 +290,26 @@ sealed class ProtocolInbox<TInput>(
         return true;
     }
 
-    bool OnConsistencyCheckReply(ref readonly ProtocolMessage message)
+    bool OnConsistencyCheckRequest(ref readonly ProtocolMessage message, ref ProtocolMessage replyMsg)
+    {
+        var checkFrame = message.ConsistencyCheckRequest.Frame;
+        var checksum = checksumStore.Get(checkFrame);
+
+        logger.Write(LogLevel.Debug, $"Received consistency request check for: {checkFrame} (reply {checksum})");
+
+        if (checksum.IsEmpty)
+        {
+            logger.Write(LogLevel.Warning, $"Unable to find requested local checksum for {checkFrame}");
+            return false;
+        }
+
+        replyMsg.Header.Type = MessageType.ConsistencyCheckReply;
+        replyMsg.ConsistencyCheckReply.Frame = checkFrame;
+        replyMsg.ConsistencyCheckReply.Checksum = checksum;
+        return true;
+    }
+
+    bool OnConsistencyCheckReply(ref readonly ProtocolMessage message, ref ProtocolMessage replyMsg)
     {
         var checkFrame = message.ConsistencyCheckReply.Frame;
         var checksum = message.ConsistencyCheckReply.Checksum;
@@ -308,6 +328,11 @@ sealed class ProtocolInbox<TInput>(
             logger.Write(LogLevel.Error,
                 $"Invalid remote checksum on frame {checkFrame}, {localChecksum} != {checksum}");
 
+            replyMsg.Header.Type = MessageType.ConsistencyCheckFail;
+            replyMsg.ConsistencyCheckFail.Frame = checkFrame;
+            replyMsg.ConsistencyCheckFail.RemoteChecksum = checksum;
+            replyMsg.ConsistencyCheckFail.LocalChecksum = localChecksum;
+
             networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.ChecksumMismatch)
                 {
                     ChecksumMismatch = new(
@@ -318,33 +343,31 @@ sealed class ProtocolInbox<TInput>(
                 }
             );
 
-            return false;
+            return true;
         }
 
         logger.Write(LogLevel.Debug, $"Finish consistency-check request check for {checkFrame} #{checksum}");
         state.Consistency.LastCheck = Stopwatch.GetTimestamp();
         state.Consistency.AskedFrame = Frame.Null;
         state.Consistency.AskedChecksum = Checksum.Empty;
-
         return true;
     }
 
-    bool OnConsistencyCheckRequest(ref readonly ProtocolMessage message, ref ProtocolMessage replyMsg)
+    bool OnConsistencyCheckFail(ref readonly ProtocolMessage message)
     {
-        var checkFrame = message.ConsistencyCheckRequest.Frame;
-        var checksum = checksumStore.Get(checkFrame);
+        var body = message.ConsistencyCheckFail;
+        logger.Write(LogLevel.Warning, $"Failure in consistency-check for {body}");
 
-        logger.Write(LogLevel.Debug, $"Received consistency request check for: {checkFrame} (reply {checksum})");
+        networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.ChecksumMismatch)
+            {
+                ChecksumMismatch = new(
+                    MismatchFrame: body.Frame,
+                    LocalChecksum: body.LocalChecksum,
+                    RemoteChecksum: body.RemoteChecksum
+                ),
+            }
+        );
 
-        if (checksum.IsEmpty)
-        {
-            logger.Write(LogLevel.Warning, $"Unable to find requested local checksum for {checkFrame}");
-            return false;
-        }
-
-        replyMsg.Header.Type = MessageType.ConsistencyCheckReply;
-        replyMsg.ConsistencyCheckReply.Frame = checkFrame;
-        replyMsg.ConsistencyCheckReply.Checksum = checksum;
         return true;
     }
 }
