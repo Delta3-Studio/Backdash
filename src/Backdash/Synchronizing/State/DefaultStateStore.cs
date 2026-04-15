@@ -31,7 +31,7 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     }
 
     /// <inheritdoc />
-    public bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedState savedState)
+    public bool TryGet(Frame frame, [MaybeNullWhen(false)] out SavedState savedState)
     {
         var i = 0;
         var span = savedStates.AsSpan();

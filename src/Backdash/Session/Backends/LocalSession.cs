@@ -76,6 +76,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public bool IsInRollback => false;
     public SavedState GetSavedState() => stateStore.Last();
+    public SavedState? GetSavedState(Frame frame) => stateStore.Get(frame);
 
     public IReadOnlySet<NetcodePlayer> GetPlayers() => addedPlayers;
 
@@ -215,7 +216,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
             return true;
         }
 
-        if (!stateStore.TryLoad(frame, out var savedFrame))
+        if (!stateStore.TryGet(frame, out var savedFrame))
             return false;
 
         var offset = 0;

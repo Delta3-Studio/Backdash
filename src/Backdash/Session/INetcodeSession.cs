@@ -75,11 +75,6 @@ public interface INetcodeSessionInfo
     Endianness InputSerializationEndianness { get; }
 
     /// <summary>
-    ///     Returns the current saved state.
-    /// </summary>
-    SavedState GetSavedState();
-
-    /// <summary>
     ///     Returns the checksum of the current saved state.
     /// </summary>
     uint CurrentChecksum => GetSavedState().Checksum;
@@ -88,6 +83,21 @@ public interface INetcodeSessionInfo
     ///     Returns the size of the current saved state.
     /// </summary>
     ByteSize CurrentStateSize => GetSavedState().Size;
+
+    /// <summary>
+    ///     Returns the current saved state for <paramref name="frame"/> if exists, <c>null</c> otherwise.
+    /// </summary>
+    SavedState? GetSavedState(Frame frame);
+
+    /// <summary>
+    ///     Returns the current saved state.
+    /// </summary>
+    SavedState GetSavedState();
+
+    /// <summary>
+    ///     Returns the current state snapshot for <paramref name="frame"/> if exists, <c>null</c> otherwise.
+    /// </summary>
+    StateSnapshot? GetStateSnapshot(Frame frame) => GetSavedState(frame)?.ToSnapshot();
 
     /// <summary>
     ///     Returns the current saved state snapshot.

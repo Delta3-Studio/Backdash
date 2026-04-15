@@ -130,7 +130,8 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;
 
     public bool IsInRollback => synchronizer.InRollback;
-    public SavedState GetSavedState() => synchronizer.GetLastSavedFrame();
+    public SavedState GetSavedState() => synchronizer.Store.Last();
+    public SavedState? GetSavedState(Frame frame) => synchronizer.Store.Get(frame);
 
     public IReadOnlySet<NetcodePlayer> GetPlayers() =>
         addedPlayers.Count is 0 ? localPlayerFallback : addedPlayers.Keys.ToHashSet();
@@ -298,7 +299,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 
         // Hold onto the current frame in our queue of saved states.
         // We'll need the checksum later to verify that our replay of the same frame got the same results.
-        var lastSaved = synchronizer.GetLastSavedFrame();
+        var lastSaved = synchronizer.Store.Last();
         var stateBytes = ArrayPool<byte>.Shared.Rent(lastSaved.GameState.WrittenCount);
         lastSaved.GameState.WrittenSpan.CopyTo(stateBytes);
 
@@ -336,7 +337,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
                         throw new NetcodeException(message);
                 }
 
-                var last = synchronizer.GetLastSavedFrame();
+                var last = synchronizer.Store.Last();
                 if (current.Checksum != last.Checksum)
                     HandleDesync(frame, current, last);
                 else

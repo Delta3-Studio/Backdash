@@ -17,7 +17,7 @@ public interface IStateStore
     ///     Try loads a <see cref="SavedState" /> for <paramref name="frame" />.
     /// </summary>
     /// <returns>true if the frame was found, false otherwise</returns>
-    bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedState savedState);
+    bool TryGet(Frame frame, [MaybeNullWhen(false)] out SavedState savedState);
 
     /// <summary>
     ///     Returns last <see cref="SavedState" />.
@@ -33,4 +33,9 @@ public interface IStateStore
     ///     Advance the store pointer
     /// </summary>
     void Advance();
+
+    /// <summary>
+    ///     Return a <see cref="SavedState" /> for <paramref name="frame" /> if exists, <c>null</c> otherwise.
+    /// </summary>
+    SavedState? Get(Frame frame) => TryGet(frame, out var savedState) ? savedState : null;
 }

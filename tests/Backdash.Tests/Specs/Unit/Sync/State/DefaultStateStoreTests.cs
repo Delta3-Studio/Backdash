@@ -20,7 +20,7 @@ public class DefaultStateStoreTests
         var gameState = GameState.CreateRandom();
         GameStateSerializer.Shared.Serialize(new(currentState.GameState), in gameState);
 
-        if (!store.TryLoad(Frame.One, out var loaded))
+        if (!store.TryGet(Frame.One, out var loaded))
             Assert.Fail("Failed to load state.");
 
         GameState newGameState = new();

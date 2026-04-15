@@ -159,6 +159,7 @@ sealed class SpectatorSession<TInput> :
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public bool IsInRollback => false;
     public SavedState GetSavedState() => stateStore.Last();
+    public SavedState? GetSavedState(Frame frame) => stateStore.Get(frame);
     public INetcodeRandom Random => random;
     public INetcodeSessionHandler GetHandler() => callbacks;
     public int NumberOfPlayers { get; private set; }
@@ -337,7 +338,7 @@ sealed class SpectatorSession<TInput> :
             return true;
         }
 
-        if (!stateStore.TryLoad(frame, out var savedFrame))
+        if (!stateStore.TryGet(frame, out var savedFrame))
             return false;
 
         logger.Write(LogLevel.Trace,

@@ -102,6 +102,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public bool IsInRollback => false;
     public SavedState GetSavedState() => stateStore.Last();
+    public SavedState? GetSavedState(Frame frame) => stateStore.Get(frame);
 
     public int NumberOfSpectators => 0;
     public int LocalPort => 0;
@@ -229,7 +230,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
             return true;
         }
 
-        if (!stateStore.TryLoad(frame, out var savedFrame))
+        if (!stateStore.TryGet(frame, out var savedFrame))
         {
             ReplayController.IsBackward = false;
             ReplayController.Pause();
