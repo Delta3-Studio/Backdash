@@ -274,6 +274,12 @@ public readonly ref struct BinaryBufferReader
     /// <inheritdoc cref="ReadFrame()" />
     public Frame? ReadNullableFrame() => ReadBoolean() ? ReadFrame() : null;
 
+    /// <summary>Reads single <see cref="Checksum" /> from the buffer.</summary>
+    public Checksum ReadChecksum() => ReadAsUInt32<Checksum>();
+
+    /// <summary>Reads single <see cref="Checksum" /> from the buffer.</summary>
+    public Checksum? ReadNullableChecksum() => ReadBoolean() ? ReadChecksum() : null;
+
     /// <summary>Reads an unmanaged struct from the buffer.</summary>
     public void ReadStruct<T>(ref T value) where T : unmanaged
     {
@@ -432,7 +438,7 @@ public readonly ref struct BinaryBufferReader
     /// <summary>Reads a nullable <see cref="IBinarySerializable" /> <paramref name="value" /> from the buffer.</summary>
     /// <typeparam name="T">A nullable reference type that implements <see cref="IBinarySerializable" />.</typeparam>
     public void ReadNullable<T>(ref T? value, bool forceReturn = true) where T : class, IBinarySerializable, new() =>
-        ReadNullable(ref value, DefaultObjectPool<T>.Instance, forceReturn);
+        ReadNullable(ref value, ObjectPool.Singleton<T>(), forceReturn);
 
     /// <summary>Reads a <see cref="IBinarySerializable" /> <paramref name="value" /> from the buffer.</summary>
     /// <typeparam name="T">A value type that implements <see cref="IBinarySerializable" />.</typeparam>
@@ -504,7 +510,7 @@ public readonly ref struct BinaryBufferReader
 
     /// <summary>Reads a span of <see cref="IBinarySerializable" /> <paramref name="values" /> into buffer.</summary>
     /// <typeparam name="T">A list of a reference type that implements <see cref="IBinarySerializable" />.</typeparam>
-    public void Read<T>(in Span<T> values, in IObjectPool<T> pool) where T : IBinarySerializable
+    public void Read<T>(in Span<T> values, IObjectPool<T> pool) where T : IBinarySerializable
     {
         if (values.IsEmpty) return;
         ref var current = ref MemoryMarshal.GetReference(values);
@@ -527,20 +533,20 @@ public readonly ref struct BinaryBufferReader
     /// <typeparam name="T">A reference type that implements <see cref="IBinarySerializable" />.</typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Read<T>(in T[] values, in IObjectPool<T> pool) where T : class, IBinarySerializable =>
-        Read(values.AsSpan(), in pool);
+        Read(values.AsSpan(), pool);
 
     /// <summary>Reads an array of <see cref="IBinarySerializable" /> <paramref name="values" /> into buffer.</summary>
     /// <typeparam name="T">A reference that implements <see cref="IBinarySerializable" />.</typeparam>
     public void Read<T>(in List<T> values, IObjectPool<T> pool) where T : class, IBinarySerializable =>
-        Read(GetListSpan(in values, pool), in pool);
+        Read(GetListSpan(in values, pool), pool);
 
     /// <summary>
     ///     Reads a span of <see cref="IBinarySerializable" /> <paramref name="values" /> from the buffer.
     /// </summary>
-    /// <seealso cref="Read{T}(in Span{T},in IObjectPool{T})" />
+    /// <seealso cref="Read{T}(in Span{T}, IObjectPool{T})" />
     /// <typeparam name="T">A reference that implements <see cref="IBinarySerializable" />.</typeparam>
     public void Read<T>(Span<T> values) where T : class, IBinarySerializable, new() =>
-        Read(values, in DefaultObjectPool<T>.Instance);
+        Read(values, ObjectPool.Singleton<T>());
 
     /// <summary>
     ///     Reads an array of <see cref="IBinarySerializable" /> <paramref name="values" /> from the buffer.
@@ -557,7 +563,7 @@ public readonly ref struct BinaryBufferReader
     /// <seealso cref="Read{T}(in List{T}, IObjectPool{T})" />
     /// <typeparam name="T">A reference that implements <see cref="IBinarySerializable" />.</typeparam>
     public void Read<T>(List<T> values) where T : class, IBinarySerializable, new() =>
-        Read(GetListSpan(in values, in DefaultObjectPool<T>.Instance));
+        Read(GetListSpan(in values, ObjectPool.Singleton<T>()));
 
     /// <summary>
     ///     Reads a StringBuilder into <paramref name="values" /> from the buffer.
@@ -701,6 +707,12 @@ public readonly ref struct BinaryBufferReader
 
     /// <inheritdoc cref="ReadTimeOnly()" />
     public void Read(ref Frame? value) => value = ReadNullableFrame();
+
+    /// <inheritdoc cref="ReadChecksum()" />
+    public void Read(ref Checksum value) => value = ReadChecksum();
+
+    /// <inheritdoc cref="ReadChecksum()" />
+    public void Read(ref Checksum? value) => value = ReadNullableChecksum();
 
     /// <summary>Reads a span of <see cref="byte" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in Span<byte> values)

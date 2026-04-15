@@ -19,7 +19,7 @@ public interface IStateDesyncHandler
 public readonly ref struct DesyncState(
     string value,
     ref readonly BinaryBufferReader reader,
-    uint checksum,
+    Checksum checksum,
     object? state
 )
 {
@@ -34,7 +34,7 @@ public readonly ref struct DesyncState(
     public readonly BinaryBufferReader Reader = reader;
 
     /// <summary>State checksum value</summary>
-    public readonly uint Checksum = checksum;
+    public readonly Checksum Checksum = checksum;
 
     /// <inheritdoc />
     public override string ToString() => Value;

@@ -117,7 +117,7 @@ public sealed class GameSession(
     void UpdateStats()
     {
         nonGameState.RollbackFrames = session.RollbackFrames;
-        var saved = session.GetCurrentSavedFrame();
+        var saved = session.GetSavedState();
         nonGameState.StateChecksum = saved.Checksum;
         nonGameState.StateSize = saved.Size;
     }
@@ -156,7 +156,7 @@ public sealed class GameSession(
                 nonGameState.SetConnectState(player, PlayerConnectState.Disconnected);
                 break;
             case PeerEvent.ChecksumMismatch:
-                Log($"=>  CHECKSUM MISMATCH: {evt.ChecksumMismatch}");
+                Log($"=>  CHECKSUM MISMATCH: {player.EndPoint} => {evt.ChecksumMismatch}");
                 break;
         }
     }
@@ -164,7 +164,10 @@ public sealed class GameSession(
     // used by SyncTest, the return value is used on the state desync handler call
     object? INetcodeSessionHandler.CreateState(Frame frame, ref readonly BinaryBufferReader reader)
     {
-        GameState state = new();
+        GameState state = new()
+        {
+            Ships = new Ship[session.NumberOfPlayers],
+        };
         state.LoadState(in reader);
         return state;
     }

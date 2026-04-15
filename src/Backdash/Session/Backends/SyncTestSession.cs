@@ -18,7 +18,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 {
     readonly record struct SavedFrameBytes(
         Frame Frame,
-        uint Checksum,
+        Checksum Checksum,
         byte[] State,
         int StateSize,
         GameInput<ConfirmedInputs<TInput>> Inputs
@@ -130,7 +130,8 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;
 
     public bool IsInRollback => synchronizer.InRollback;
-    public SavedFrame GetCurrentSavedFrame() => synchronizer.GetLastSavedFrame();
+    public SavedState GetSavedState() => synchronizer.Store.Last();
+    public SavedState? GetSavedState(Frame frame) => synchronizer.Store.Get(frame);
 
     public IReadOnlySet<NetcodePlayer> GetPlayers() =>
         addedPlayers.Count is 0 ? localPlayerFallback : addedPlayers.Keys.ToHashSet();
@@ -277,7 +278,20 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         return synchronizer.TryLoadFrame(frame);
     }
 
-    public void LoadSnapshot(StateSnapshot snapshot) { }
+    public void LoadSnapshot(StateSnapshot snapshot)
+    {
+        if (snapshot.State is []) return;
+        var frame = CurrentFrame;
+
+        if (snapshot.Frame.Number > 0)
+        {
+            frame = snapshot.Frame;
+            synchronizer.Store.Seek(frame);
+        }
+
+        synchronizer.ApplyState(frame, snapshot.State);
+        savedFrames.Clear();
+    }
 
     public void AdvanceFrame()
     {
@@ -298,7 +312,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 
         // Hold onto the current frame in our queue of saved states.
         // We'll need the checksum later to verify that our replay of the same frame got the same results.
-        var lastSaved = synchronizer.GetLastSavedFrame();
+        var lastSaved = synchronizer.Store.Last();
         var stateBytes = ArrayPool<byte>.Shared.Rent(lastSaved.GameState.WrittenCount);
         lastSaved.GameState.WrittenSpan.CopyTo(stateBytes);
 
@@ -336,12 +350,12 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
                         throw new NetcodeException(message);
                 }
 
-                var last = synchronizer.GetLastSavedFrame();
+                var last = synchronizer.Store.Last();
                 if (current.Checksum != last.Checksum)
                     HandleDesync(frame, current, last);
                 else
                     logger.Write(LogLevel.Trace,
-                        $"Checksum #{last.Checksum:x8} for frame {current.Frame.Number} matches");
+                        $"Checksum #{last.Checksum} for frame {current.Frame.Number} matches");
             }
             finally
             {
@@ -353,11 +367,11 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         inRollback = false;
     }
 
-    void HandleDesync(Frame frame, SavedFrameBytes current, SavedFrame previous)
+    void HandleDesync(Frame frame, SavedFrameBytes current, SavedState previous)
     {
         const LogLevel level = LogLevel.Error;
         var message =
-            $"Checksum for frame {frame} does NOT match: (#{previous.Checksum:x8} != #{current.Checksum:x8})\n";
+            $"Checksum for frame {frame} does NOT match: (#{previous.Checksum} != #{current.Checksum})\n";
         logger.Write(LogLevel.Error, message);
 
 
@@ -389,15 +403,15 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 
     void LogSaveState(LogLevel level,
         string description, string body,
-        uint checksum, Frame frame,
+        Checksum checksum, Frame frame,
         object? extra = null
     )
     {
         if (!logStateOnDesync) return;
         logger.Write(level, $"=> SAVED [{description}] (Frame {frame}{(extra is not null ? $" / {extra}" : "")})");
-        logger.Write(level, $"== START STATE #{checksum:x8} ==");
+        logger.Write(level, $"== START STATE #{checksum} ==");
         LogText(level, body);
-        logger.Write(level, $"== END STATE #{checksum:x8} ==\n");
+        logger.Write(level, $"== END STATE #{checksum} ==\n");
     }
 
     void LogText(LogLevel level, string text)

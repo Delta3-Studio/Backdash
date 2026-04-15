@@ -35,6 +35,13 @@ public class ByteSizeJsonSerializationTests() :
     [Fact] public void ShouldSerialize() => SerializeTest();
 }
 
+public class ChecksumJsonSerializationTests() :
+    BaseJsonConverterTests<Checksum>(Gen.Checksum, x => $"\"{x.Value:x8}\"")
+{
+    [Fact] public void ShouldDeserialize() => DeserializeTest();
+    [Fact] public void ShouldSerialize() => SerializeTest();
+}
+
 public class CircularBufferJsonSerializationTests() :
     BaseJsonConverterTests<CircularBuffer<int>>(
         () => CircularBuffer<int>.CreateFrom([10, 99, 22, 11, 77]),

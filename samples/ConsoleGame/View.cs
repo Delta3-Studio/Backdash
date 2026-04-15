@@ -169,7 +169,7 @@ public class View
             $"""
              Ping:             {peer.Ping.TotalMilliseconds:f4} ms
              Rollback:         {info.RollbackFrames}
-             Checksum:         {nonGameState.Checksum:x8}
+             Checksum:         {nonGameState.Checksum}
              Rng Seed:         {currentState.RandomSeed:x8}
              """
         );

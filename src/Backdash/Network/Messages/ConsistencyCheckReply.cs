@@ -7,7 +7,7 @@ namespace Backdash.Network.Messages;
 record struct ConsistencyCheckReply : IUtf8SpanFormattable
 {
     public Frame Frame;
-    public uint Checksum;
+    public Checksum Checksum;
 
     public readonly void Serialize(in BinarySpanWriter writer)
     {
@@ -18,7 +18,7 @@ record struct ConsistencyCheckReply : IUtf8SpanFormattable
     public void Deserialize(in BinaryBufferReader reader)
     {
         Frame = reader.ReadFrame();
-        Checksum = reader.ReadUInt32();
+        Checksum = reader.ReadChecksum();
     }
 
     public readonly bool TryFormat(
@@ -28,7 +28,7 @@ record struct ConsistencyCheckReply : IUtf8SpanFormattable
     )
     {
         bytesWritten = 0;
-        using Utf8ObjectStringWriter writer = new(in utf8Destination, ref bytesWritten);
+        using Utf8ObjectStringBuilder writer = new(in utf8Destination, ref bytesWritten);
         return writer.Write(in Frame) && writer.Write(in Checksum);
     }
 }

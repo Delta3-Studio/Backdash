@@ -199,7 +199,8 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     public FrameSpan FramesBehind => synchronizer.FramesBehind;
     public FrameSpan RollbackFrames => synchronizer.RollbackFrames;
     public bool IsInRollback => synchronizer.InRollback;
-    public SavedFrame GetCurrentSavedFrame() => synchronizer.GetLastSavedFrame();
+    public SavedState GetSavedState() => synchronizer.Store.Last();
+    public SavedState? GetSavedState(Frame frame) => synchronizer.Store.Get(frame);
     public int NumberOfPlayers => addedPlayers.Count;
     public int NumberOfSpectators => addedSpectators.Count;
     public int LocalPort => udp.BindPort;

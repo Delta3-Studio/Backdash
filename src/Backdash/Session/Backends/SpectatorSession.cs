@@ -158,7 +158,8 @@ sealed class SpectatorSession<TInput> :
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public bool IsInRollback => false;
-    public SavedFrame GetCurrentSavedFrame() => stateStore.Last();
+    public SavedState GetSavedState() => stateStore.Last();
+    public SavedState? GetSavedState(Frame frame) => stateStore.Get(frame);
     public INetcodeRandom Random => random;
     public INetcodeSessionHandler GetHandler() => callbacks;
     public int NumberOfPlayers { get; private set; }
@@ -324,7 +325,7 @@ sealed class SpectatorSession<TInput> :
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
 
         stateStore.Advance();
-        logger.Write(LogLevel.Trace, $"spectator: saved frame {nextState.Frame} (checksum: {nextState.Checksum:x8}).");
+        logger.Write(LogLevel.Trace, $"spectator: saved frame {nextState.Frame} (checksum: {nextState.Checksum}).");
     }
 
     public bool LoadFrame(Frame frame)
@@ -341,7 +342,7 @@ sealed class SpectatorSession<TInput> :
             return false;
 
         logger.Write(LogLevel.Trace,
-            $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum:x8})");
+            $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum})");
 
         var offset = 0;
         BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);

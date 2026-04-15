@@ -60,6 +60,11 @@ abstract class DataGenerator
             .Select(x => new Frame(x.Item))
             .ToArbitrary();
 
+    public static Arbitrary<Checksum> ChecksumGenerator() =>
+        ArbMap.Default.GeneratorFor<uint>()
+            .Select(x => new Checksum(x))
+            .ToArbitrary();
+
     public static Arbitrary<TimeOnly> TimeOnlyGenerator() =>
         ArbMap.Default.GeneratorFor<long>()
             .Where(x => x >= TimeOnly.MinValue.Ticks && x <= TimeOnly.MaxValue.Ticks)
@@ -242,11 +247,23 @@ abstract class DataGenerator
 
     public static Arbitrary<ConsistencyCheckReply> ConsistencyCheckReplyGenerator() => Arb.From(
         from frame in Generate<Frame>()
-        from checksum in Generate<uint>()
+        from checksum in Generate<Checksum>()
         select new ConsistencyCheckReply
         {
             Frame = frame,
             Checksum = checksum,
+        }
+    );
+
+    public static Arbitrary<ConsistencyCheckFail> ConsistencyCheckFailGenerator() => Arb.From(
+        from frame in Generate<Frame>()
+        from localChecksum in Generate<Checksum>()
+        from remoteChecksum in Generate<Checksum>()
+        select new ConsistencyCheckFail
+        {
+            Frame = frame,
+            LocalChecksum = localChecksum,
+            RemoteChecksum = remoteChecksum,
         }
     );
 
@@ -285,7 +302,8 @@ abstract class DataGenerator
         Arbitrary<KeepAlive> keepAliveArb,
         Arbitrary<InputAck> inputAckArb,
         Arbitrary<ConsistencyCheckRequest> consistencyCheckReqArb,
-        Arbitrary<ConsistencyCheckReply> consistencyCheckReplyArb
+        Arbitrary<ConsistencyCheckReply> consistencyCheckReplyArb,
+        Arbitrary<ConsistencyCheckFail> consistencyCheckFailArb
     ) =>
         headerArb.Generator
             .Where(h => h.Type is not MessageType.Unknown)
@@ -338,6 +356,12 @@ abstract class DataGenerator
                     {
                         Header = header,
                         ConsistencyCheckReply = x,
+                    }),
+                MessageType.ConsistencyCheckFail =>
+                    consistencyCheckFailArb.Generator.Select(x => new ProtocolMessage
+                    {
+                        Header = header,
+                        ConsistencyCheckFail = x,
                     }),
                 MessageType.InputAck =>
                     inputAckArb.Generator.Select(x => new ProtocolMessage

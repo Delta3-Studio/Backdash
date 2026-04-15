@@ -16,7 +16,6 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     readonly NetcodeOptions options;
     readonly Logger logger;
     readonly IReadOnlyCollection<NetcodePlayer> players;
-    readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
     readonly ChecksumStore checksumStore;
     readonly ConnectionsState localConnections;
@@ -27,8 +26,6 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     Frame lastConfirmedFrame = Frame.Zero;
     bool reachedPredictionBarrier;
     int NumberOfPlayers => players.Count;
-
-    readonly EndiannessSerializer.INumberSerializer endianness;
 
     public Synchronizer(
         NetcodeOptions options,
@@ -44,25 +41,27 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         this.options = options;
         this.logger = logger;
         this.players = players;
-        this.stateStore = stateStore;
+        this.Store = stateStore;
         this.checksumProvider = checksumProvider;
         this.localConnections = localConnections;
         this.inputComparer = inputComparer ?? EqualityComparer<TInput>.Default;
         this.checksumStore = checksumStore;
 
         inputQueues = new(2);
-        endianness = options.GetEndiannessNumberStateSerializer();
+        NumberSerializer = options.GetEndiannessNumberStateSerializer();
         var saveBufferSize = options.TotalSavedFramesAllowed;
         stateStore.Initialize(saveBufferSize);
     }
 
     public bool InRollback { get; private set; }
+    public IStateStore Store { get; }
+    public EndiannessSerializer.INumberSerializer NumberSerializer { get; }
 
     float rollbackFrameCounter;
 
     public Frame CurrentFrame => currentFrame;
-    public EndiannessSerializer.INumberSerializer NumberSerializer => endianness;
-    public Endianness SerializationEndianness => endianness.Endianness;
+
+    public Endianness SerializationEndianness => NumberSerializer.Endianness;
     public FrameSpan FramesBehind => new(currentFrame.Number - lastConfirmedFrame.Number);
     public FrameSpan RollbackFrames => new((int)Math.Round(rollbackFrameCounter));
 
@@ -213,21 +212,25 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
             return true;
         }
 
-        if (!stateStore.TryLoad(frame, out var savedFrame))
+        if (!Store.TryLoad(frame, out var savedFrame))
             return false;
 
         logger.Write(LogLevel.Information,
-            $"* Loading frame info {savedFrame.Frame} (checksum: {savedFrame.Checksum:x8})");
+            $"* Loading frame info {savedFrame.Frame} (checksum: {savedFrame.Checksum})");
 
+        ApplyState(savedFrame.Frame, savedFrame.GameState.WrittenSpan);
+        return true;
+    }
+
+    public void ApplyState(Frame frame, ReadOnlySpan<byte> state)
+    {
         var offset = 0;
-        BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
-
+        BinaryBufferReader reader = new(state, ref offset, NumberSerializer);
         Callbacks.LoadState(frame, ref reader);
 
         // Reset frame count and the head of the state ring-buffer to point in
         // advance of the current frame (as if we had just finished executing it).
-        currentFrame = savedFrame.Frame;
-        return true;
+        currentFrame = frame;
     }
 
     public void LoadFrame(Frame frame)
@@ -236,20 +239,18 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
             throw new NetcodeException($"Save state not found for frame {frame.Number}");
     }
 
-    public SavedFrame GetLastSavedFrame() => stateStore.Last();
-
     public void SaveCurrentFrame()
     {
-        ref var nextState = ref stateStore.Next();
+        ref var nextState = ref Store.Next();
 
-        BinaryBufferWriter writer = new(nextState.GameState, endianness);
+        BinaryBufferWriter writer = new(nextState.GameState, NumberSerializer);
         Callbacks.SaveState(currentFrame, ref writer);
         nextState.Frame = currentFrame;
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
         checksumStore.Add(nextState.Frame, nextState.Checksum);
 
-        stateStore.Advance();
-        logger.Write(LogLevel.Trace, $"sync: saved frame {nextState.Frame} (checksum: {nextState.Checksum:x8})");
+        Store.Advance();
+        logger.Write(LogLevel.Trace, $"sync: saved frame {nextState.Frame} (checksum: {nextState.Checksum})");
     }
 
     bool CheckSimulationConsistency(out Frame seekTo)

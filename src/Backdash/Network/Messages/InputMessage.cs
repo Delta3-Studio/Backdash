@@ -78,7 +78,7 @@ struct InputMessage : IEquatable<InputMessage>, IUtf8SpanFormattable
         ReadOnlySpan<char> format, IFormatProvider? provider)
     {
         bytesWritten = 0;
-        using Utf8ObjectStringWriter writer = new(in utf8Destination, ref bytesWritten);
+        using Utf8ObjectStringBuilder writer = new(in utf8Destination, ref bytesWritten);
         return writer.Write(in StartFrame) && writer.Write(in AckFrame) && writer.Write(in NumBits);
     }
 

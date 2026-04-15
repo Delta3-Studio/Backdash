@@ -378,7 +378,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         state.Consistency.AskedFrame = new(checkFrame);
         state.Consistency.AskedChecksum = checksumStore.Get(state.Consistency.AskedFrame);
 
-        if (state.Consistency.AskedFrame.IsNull || state.Consistency.AskedChecksum is 0)
+        if (state.Consistency.AskedFrame.IsNull || state.Consistency.AskedChecksum.IsEmpty)
             return;
 
         if (state.Consistency.LastCheck is 0)
@@ -394,7 +394,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         }
 
         logger.Write(LogLevel.Debug,
-            $"Begin consistency-check request for frame {state.Consistency.AskedFrame.Number} #{state.Consistency.AskedChecksum:x8}");
+            $"Begin consistency-check request for frame {state.Consistency.AskedFrame.Number} #{state.Consistency.AskedChecksum}");
 
         outbox
             .SendMessage(new(MessageType.ConsistencyCheckRequest)

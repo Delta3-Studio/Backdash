@@ -101,7 +101,8 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public bool IsInRollback => false;
-    public SavedFrame GetCurrentSavedFrame() => stateStore.Last();
+    public SavedState GetSavedState() => stateStore.Last();
+    public SavedState? GetSavedState(Frame frame) => stateStore.Get(frame);
 
     public int NumberOfSpectators => 0;
     public int LocalPort => 0;
@@ -216,7 +217,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
 
         stateStore.Advance();
-        logger.Write(LogLevel.Trace, $"replay: saved frame {nextState.Frame} (checksum: {nextState.Checksum:x8})");
+        logger.Write(LogLevel.Trace, $"replay: saved frame {nextState.Frame} (checksum: {nextState.Checksum})");
     }
 
     public bool LoadFrame(Frame frame)
@@ -237,7 +238,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         }
 
         logger.Write(LogLevel.Trace,
-            $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum:x8})");
+            $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum})");
         var offset = 0;
         BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
         callbacks.LoadState(frame, ref reader);

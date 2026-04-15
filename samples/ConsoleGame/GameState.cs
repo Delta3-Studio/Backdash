@@ -31,7 +31,7 @@ public class NonGameState
     public bool IsRunning;
     public float SyncProgress;
     public string LastError = "";
-    public uint Checksum;
+    public Checksum Checksum;
     public PlayerStatus RemotePlayerStatus;
     public DateTime LostConnectionTime;
     public TimeSpan DisconnectTimeout;

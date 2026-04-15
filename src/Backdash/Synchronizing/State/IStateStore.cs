@@ -14,23 +14,39 @@ public interface IStateStore
     void Initialize(int saveCount);
 
     /// <summary>
-    ///     Try loads a <see cref="SavedFrame" /> for <paramref name="frame" />.
+    ///     Try to load the <see cref="SavedState" /> for <paramref name="frame" />.
     /// </summary>
     /// <returns>true if the frame was found, false otherwise</returns>
-    bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedFrame savedFrame);
+    bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedState result);
 
     /// <summary>
-    ///     Returns last <see cref="SavedFrame" />.
+    ///     Try to read the <see cref="SavedState" /> for <paramref name="frame" />.
     /// </summary>
-    SavedFrame Last();
+    /// <returns>true if the frame was found, false otherwise</returns>
+    bool TryGet(Frame frame, [MaybeNullWhen(false)] out SavedState result);
 
     /// <summary>
-    ///     Returns next writable <see cref="SavedFrame" />.
+    ///     Try set the state pointer to the first <paramref name="frame"/> entry.
     /// </summary>
-    ref SavedFrame Next();
+    bool Seek(Frame frame);
+
+    /// <summary>
+    ///     Returns last <see cref="SavedState" />.
+    /// </summary>
+    SavedState Last();
+
+    /// <summary>
+    ///     Returns next writable <see cref="SavedState" />.
+    /// </summary>
+    ref SavedState Next();
 
     /// <summary>
     ///     Advance the store pointer
     /// </summary>
     void Advance();
+
+    /// <summary>
+    ///     Return a <see cref="SavedState" /> for <paramref name="frame" /> if exists, <see langword="null" /> otherwise.
+    /// </summary>
+    SavedState? Get(Frame frame) => TryGet(frame, out var savedState) ? savedState : null;
 }

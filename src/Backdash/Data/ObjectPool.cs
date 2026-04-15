@@ -22,33 +22,37 @@ public interface IObjectPool<T>
 /// <summary>
 ///     Default object pool for types with empty constructor
 /// </summary>
-public sealed class DefaultObjectPool<T> : IObjectPool<T>, IEnumerable<T> where T : class, new()
+public sealed class ObjectPool<T> : IObjectPool<T>, IEnumerable<T>, IDisposable where T : class
 {
-    /// <summary>
-    ///     Default object pool singleton.
-    /// </summary>
-    public static readonly IObjectPool<T> Instance = new DefaultObjectPool<T>();
-
     /// <summary>
     ///     Maximum number of objects allowed in the pool
     /// </summary>
-    public readonly int MaxCapacity; // -1 to account for fastItem
+    public int Capacity { get; } // -1 to account for fastItem
 
     int numItems;
+    T? fastItem;
     readonly Stack<T> items;
     readonly HashSet<T> set;
+    readonly Func<T> createFunc;
+    readonly Action<T>? returnFunc;
     readonly IEqualityComparer<T> comparer;
-    T? fastItem;
 
     /// <summary>
-    ///     Instantiate new <see cref="DefaultObjectPool{T}" />
+    ///     Instantiate new <see cref="ObjectPool{T}" />
     /// </summary>
-    public DefaultObjectPool(int capacity = 100, IEqualityComparer<T>? comparer = null)
+    public ObjectPool(
+        Func<T> createFunc,
+        Action<T>? returnFunc = null,
+        int? capacity = null,
+        IEqualityComparer<T>? comparer = null
+    )
     {
-        MaxCapacity = capacity - 1;
+        this.createFunc = createFunc;
+        this.returnFunc = returnFunc;
         this.comparer = comparer ?? ReferenceEqualityComparer.Instance;
-        items = new(MaxCapacity);
-        set = new(MaxCapacity, this.comparer);
+        Capacity = (capacity ?? 100) - 1;
+        items = new(Capacity);
+        set = new(Capacity, this.comparer);
     }
 
     bool Contains(T value) => comparer.Equals(fastItem, value) || set.Contains(value);
@@ -65,7 +69,7 @@ public sealed class DefaultObjectPool<T> : IObjectPool<T>, IEnumerable<T> where 
         }
 
         if (!items.TryPop(out item))
-            return new();
+            return createFunc();
 
         numItems--;
         set.Remove(item);
@@ -78,13 +82,15 @@ public sealed class DefaultObjectPool<T> : IObjectPool<T>, IEnumerable<T> where 
         ArgumentNullException.ThrowIfNull(value);
         if (Contains(value)) return true;
 
+        returnFunc?.Invoke(value);
+
         if (fastItem is null)
         {
             fastItem = value;
             return true;
         }
 
-        if (numItems >= MaxCapacity)
+        if (numItems >= Capacity)
             return false;
 
         if (!set.Add(value)) return true;
@@ -105,9 +111,32 @@ public sealed class DefaultObjectPool<T> : IObjectPool<T>, IEnumerable<T> where 
     }
 
     /// <summary>
+    ///     Preload <paramref name="count"/> pool items.
+    /// </summary>
+    public void WarmUp(int count)
+    {
+        List<T> temp = [];
+        for (var i = 0; i < count; i++) temp.Add(Rent());
+        foreach (var player in temp) Return(player);
+    }
+
+    /// <summary>
     ///     Number of instances in the object pool
     /// </summary>
     public int Count => numItems + (fastItem is null ? 0 : 1);
+
+    /// <summary>
+    ///     Dispose all disposable objects in the pool
+    /// </summary>
+    public void Dispose()
+    {
+        (fastItem as IDisposable)?.Dispose();
+        while (items.TryPop(out var item))
+            if (item is IDisposable disposable)
+                disposable.Dispose();
+
+        Clear();
+    }
 
     /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
     public Stack<T>.Enumerator GetEnumerator() => items.GetEnumerator();
@@ -115,4 +144,33 @@ public sealed class DefaultObjectPool<T> : IObjectPool<T>, IEnumerable<T> where 
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
+
+/// <summary>
+/// Factory for <see cref="ObjectPool{T}"/>
+/// </summary>
+public static class ObjectPool
+{
+    /// <summary>
+    /// Create new instance of object pool for <typeparamref name="T"/> with constructor.
+    /// </summary>
+    public static ObjectPool<T> Create<T>(int? capacity = null, Action<T>? returnWith = null)
+        where T : class, new() =>
+        new(static () => new(), returnWith, capacity);
+
+    /// <summary>
+    /// Create new instance of object pool for <typeparamref name="T"/> with constructor.
+    /// </summary>
+    public static ObjectPool<T> Create<T>(Action<T> returnWith) where T : class, new() =>
+        Create(null, returnWith);
+
+    /// <summary>
+    /// Object pool singleton factory
+    /// </summary>
+    public static ObjectPool<T> Singleton<T>() where T : class, new() => SingletonWrapper<T>.Instance;
+
+    static class SingletonWrapper<T> where T : class, new()
+    {
+        public static readonly ObjectPool<T> Instance = Create<T>();
+    }
 }

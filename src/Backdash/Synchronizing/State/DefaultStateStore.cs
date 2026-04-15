@@ -12,18 +12,21 @@ namespace Backdash.Synchronizing.State;
 public sealed class DefaultStateStore(int hintSize) : IStateStore
 {
     int head;
-    SavedFrame[] savedStates = [];
+    SavedState[] savedStates = [];
 
     /// <inheritdoc />
     public void Initialize(int saveCount)
     {
-        savedStates = new SavedFrame[saveCount];
+        savedStates = new SavedState[saveCount];
         for (var i = 0; i < saveCount; i++)
-            savedStates[i] = new(Frame.Null, new(hintSize), 0);
+            savedStates[i] = new(Frame.Null, new(hintSize), Checksum.Empty);
     }
 
     /// <inheritdoc />
-    public ref SavedFrame Next()
+    public void Advance() => head = (head + 1) % savedStates.Length;
+
+    /// <inheritdoc />
+    public ref SavedState Next()
     {
         ref var result = ref savedStates[head];
         result.GameState.ResetWrittenCount();
@@ -31,20 +34,40 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     }
 
     /// <inheritdoc />
-    public bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedFrame savedFrame)
+    public SavedState Last()
     {
-        var i = 0;
-        var span = savedStates.AsSpan();
-        ref var current = ref MemoryMarshal.GetReference(span);
-        ref var limit = ref Unsafe.Add(ref current, span.Length);
+        var i = head - 1;
+        var index = i < 0 ? savedStates.Length - 1 : i;
+        return savedStates[index];
+    }
 
+    bool IsInRange(Frame frame)
+    {
+        if (frame.IsNull) return false;
+        var last = Last().Frame;
+        if (last.Number <= 0) return true;
+        return frame.Number <= last.Number;
+    }
+
+    /// <inheritdoc />
+    public bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedState result)
+    {
+        if (!IsInRange(frame))
+        {
+            result = null;
+            return false;
+        }
+
+        var i = 0;
+        ref var current = ref MemoryMarshal.GetReference(savedStates.AsSpan());
+        ref var limit = ref Unsafe.Add(ref current, savedStates.Length);
         while (Unsafe.IsAddressLessThan(ref current, ref limit))
         {
             if (current.Frame.Number == frame.Number)
             {
                 head = i;
                 Advance();
-                savedFrame = current;
+                result = current;
                 return true;
             }
 
@@ -52,18 +75,49 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
             current = ref Unsafe.Add(ref current, 1)!;
         }
 
-        savedFrame = null;
+        result = null;
         return false;
     }
 
     /// <inheritdoc />
-    public SavedFrame Last()
+    public bool TryGet(Frame frame, [MaybeNullWhen(false)] out SavedState result)
     {
-        var i = head - 1;
-        var index = i < 0 ? savedStates.Length - 1 : i;
-        return savedStates[index];
+        ref var current = ref MemoryMarshal.GetReference(savedStates.AsSpan());
+        ref var limit = ref Unsafe.Add(ref current, savedStates.Length);
+        while (Unsafe.IsAddressLessThan(ref current, ref limit))
+        {
+            if (current.Frame.Number == frame.Number)
+            {
+                result = current;
+                return true;
+            }
+
+            current = ref Unsafe.Add(ref current, 1)!;
+        }
+
+        result = null;
+        return false;
     }
 
     /// <inheritdoc />
-    public void Advance() => head = (head + 1) % savedStates.Length;
+    public bool Seek(Frame frame)
+    {
+        if (!IsInRange(frame)) return false;
+        var i = 0;
+        ref var current = ref MemoryMarshal.GetReference(savedStates.AsSpan());
+        ref var limit = ref Unsafe.Add(ref current, savedStates.Length);
+        while (Unsafe.IsAddressLessThan(ref current, ref limit))
+        {
+            if (current.Frame == frame)
+            {
+                head = i;
+                return true;
+            }
+
+            i++;
+            current = ref Unsafe.Add(ref current, 1)!;
+        }
+
+        return false;
+    }
 }

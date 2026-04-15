@@ -75,7 +75,8 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public bool IsInRollback => false;
-    public SavedFrame GetCurrentSavedFrame() => stateStore.Last();
+    public SavedState GetSavedState() => stateStore.Last();
+    public SavedState? GetSavedState(Frame frame) => stateStore.Get(frame);
 
     public IReadOnlySet<NetcodePlayer> GetPlayers() => addedPlayers;
 
@@ -233,6 +234,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         {
             CurrentFrame = snapshot.Frame;
             DiscardInputsAfter(CurrentFrame);
+            stateStore.Seek(CurrentFrame);
         }
 
         var offset = 0;
@@ -263,7 +265,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
 
         stateStore.Advance();
-        logger.Write(LogLevel.Trace, $"replay: saved frame {nextState.Frame} (checksum: {nextState.Checksum:x8})");
+        logger.Write(LogLevel.Trace, $"replay: saved frame {nextState.Frame} (checksum: {nextState.Checksum})");
     }
 
     public void SetFrameDelay(NetcodePlayer player, int delayInFrames)

@@ -35,6 +35,9 @@ struct ProtocolMessage(MessageType type = MessageType.Unknown) : IEquatable<Prot
     public ConsistencyCheckReply ConsistencyCheckReply;
 
     [FieldOffset(Header.Size)]
+    public ConsistencyCheckFail ConsistencyCheckFail;
+
+    [FieldOffset(Header.Size)]
     public InputMessage Input;
 
     public readonly void Serialize(in BinarySpanWriter writer)
@@ -64,6 +67,9 @@ struct ProtocolMessage(MessageType type = MessageType.Unknown) : IEquatable<Prot
                 break;
             case MessageType.ConsistencyCheckReply:
                 ConsistencyCheckReply.Serialize(in writer);
+                break;
+            case MessageType.ConsistencyCheckFail:
+                ConsistencyCheckFail.Serialize(in writer);
                 break;
             case MessageType.Input:
                 Input.Serialize(in writer);
@@ -102,6 +108,9 @@ struct ProtocolMessage(MessageType type = MessageType.Unknown) : IEquatable<Prot
             case MessageType.ConsistencyCheckReply:
                 ConsistencyCheckReply.Deserialize(in reader);
                 break;
+            case MessageType.ConsistencyCheckFail:
+                ConsistencyCheckFail.Deserialize(in reader);
+                break;
             case MessageType.Input:
                 Input.Deserialize(in reader);
                 break;
@@ -120,6 +129,7 @@ struct ProtocolMessage(MessageType type = MessageType.Unknown) : IEquatable<Prot
                 MessageType.SyncReply => SyncReply.ToString(),
                 MessageType.ConsistencyCheckRequest => ConsistencyCheckRequest.ToString(),
                 MessageType.ConsistencyCheckReply => ConsistencyCheckReply.ToString(),
+                MessageType.ConsistencyCheckFail => ConsistencyCheckFail.ToString(),
                 MessageType.Input => Input.ToString(),
                 MessageType.QualityReport => QualityReport.ToString(),
                 MessageType.QualityReply => QualityReply.ToString(),
@@ -148,6 +158,7 @@ struct ProtocolMessage(MessageType type = MessageType.Unknown) : IEquatable<Prot
             MessageType.SyncReply => writer.Write(in SyncReply),
             MessageType.ConsistencyCheckRequest => writer.Write(in ConsistencyCheckRequest),
             MessageType.ConsistencyCheckReply => writer.Write(in ConsistencyCheckReply),
+            MessageType.ConsistencyCheckFail => writer.Write(in ConsistencyCheckFail),
             MessageType.QualityReply => writer.Write(in QualityReply),
             MessageType.QualityReport => writer.Write(in QualityReport),
             MessageType.InputAck => writer.Write(in InputAck),
@@ -165,6 +176,7 @@ struct ProtocolMessage(MessageType type = MessageType.Unknown) : IEquatable<Prot
             MessageType.SyncReply => SyncReply.Equals(other.SyncReply),
             MessageType.ConsistencyCheckRequest => ConsistencyCheckRequest.Equals(other.ConsistencyCheckRequest),
             MessageType.ConsistencyCheckReply => ConsistencyCheckReply.Equals(other.ConsistencyCheckReply),
+            MessageType.ConsistencyCheckFail => ConsistencyCheckFail.Equals(other.ConsistencyCheckFail),
             MessageType.Input => Input.Equals(in other.Input),
             MessageType.QualityReport => QualityReport.Equals(other.QualityReport),
             MessageType.QualityReply => QualityReply.Equals(other.QualityReply),

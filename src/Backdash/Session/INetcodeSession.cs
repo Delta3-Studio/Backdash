@@ -75,24 +75,34 @@ public interface INetcodeSessionInfo
     Endianness InputSerializationEndianness { get; }
 
     /// <summary>
-    ///     Returns the last saved state.
-    /// </summary>
-    SavedFrame GetCurrentSavedFrame();
-
-    /// <summary>
     ///     Returns the checksum of the current saved state.
     /// </summary>
-    uint CurrentChecksum => GetCurrentSavedFrame().Checksum;
+    Checksum CurrentChecksum => GetSavedState().Checksum;
 
     /// <summary>
     ///     Returns the size of the current saved state.
     /// </summary>
-    ByteSize CurrentStateSize => GetCurrentSavedFrame().Size;
+    ByteSize CurrentStateSize => GetSavedState().Size;
 
     /// <summary>
-    ///     Returns the last saved state snapshot.
+    ///     Returns the current saved state for <paramref name="frame"/> if exists, <see langword="null" /> otherwise.
     /// </summary>
-    StateSnapshot CurrentStateSnapshot() => GetCurrentSavedFrame().ToSnapshot();
+    SavedState? GetSavedState(Frame frame);
+
+    /// <summary>
+    ///     Returns the current saved state.
+    /// </summary>
+    SavedState GetSavedState();
+
+    /// <summary>
+    ///     Returns the current state snapshot for <paramref name="frame"/> if exists, <see langword="null" /> otherwise.
+    /// </summary>
+    StateSnapshot? GetStateSnapshot(Frame frame) => GetSavedState(frame)?.ToSnapshot();
+
+    /// <summary>
+    ///     Returns the current saved state snapshot.
+    /// </summary>
+    StateSnapshot GetStateSnapshot() => GetSavedState().ToSnapshot();
 }
 
 /// <summary>
@@ -289,6 +299,9 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     /// <inheritdoc cref="TryGetPlayerByCustomId"/>
     NetcodePlayer? GetPlayerByCustomId(int customId) =>
         TryGetPlayerByCustomId(customId, out var player) ? player : null;
+
+    /// <inheritdoc cref="TryGetPlayerByCustomId"/>
+    NetcodePlayer? GetLocalPlayer() => TryGetLocalPlayer(out var player) ? player : null;
 }
 
 /// <summary>
