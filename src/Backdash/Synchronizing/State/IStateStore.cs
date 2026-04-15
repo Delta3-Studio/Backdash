@@ -14,20 +14,20 @@ public interface IStateStore
     void Initialize(int saveCount);
 
     /// <summary>
-    ///     Try loads a <see cref="SavedFrame" /> for <paramref name="frame" />.
+    ///     Try loads a <see cref="SavedState" /> for <paramref name="frame" />.
     /// </summary>
     /// <returns>true if the frame was found, false otherwise</returns>
-    bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedFrame savedFrame);
+    bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedState savedState);
 
     /// <summary>
-    ///     Returns last <see cref="SavedFrame" />.
+    ///     Returns last <see cref="SavedState" />.
     /// </summary>
-    SavedFrame Last();
+    SavedState Last();
 
     /// <summary>
-    ///     Returns next writable <see cref="SavedFrame" />.
+    ///     Returns next writable <see cref="SavedState" />.
     /// </summary>
-    ref SavedFrame Next();
+    ref SavedState Next();
 
     /// <summary>
     ///     Advance the store pointer

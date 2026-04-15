@@ -12,18 +12,18 @@ namespace Backdash.Synchronizing.State;
 public sealed class DefaultStateStore(int hintSize) : IStateStore
 {
     int head;
-    SavedFrame[] savedStates = [];
+    SavedState[] savedStates = [];
 
     /// <inheritdoc />
     public void Initialize(int saveCount)
     {
-        savedStates = new SavedFrame[saveCount];
+        savedStates = new SavedState[saveCount];
         for (var i = 0; i < saveCount; i++)
             savedStates[i] = new(Frame.Null, new(hintSize), 0);
     }
 
     /// <inheritdoc />
-    public ref SavedFrame Next()
+    public ref SavedState Next()
     {
         ref var result = ref savedStates[head];
         result.GameState.ResetWrittenCount();
@@ -31,7 +31,7 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     }
 
     /// <inheritdoc />
-    public bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedFrame savedFrame)
+    public bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedState savedState)
     {
         var i = 0;
         var span = savedStates.AsSpan();
@@ -44,7 +44,7 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
             {
                 head = i;
                 Advance();
-                savedFrame = current;
+                savedState = current;
                 return true;
             }
 
@@ -52,12 +52,12 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
             current = ref Unsafe.Add(ref current, 1)!;
         }
 
-        savedFrame = null;
+        savedState = null;
         return false;
     }
 
     /// <inheritdoc />
-    public SavedFrame Last()
+    public SavedState Last()
     {
         var i = head - 1;
         var index = i < 0 ? savedStates.Length - 1 : i;

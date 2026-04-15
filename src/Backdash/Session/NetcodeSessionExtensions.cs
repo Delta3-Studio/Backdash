@@ -14,7 +14,7 @@ public static class NetcodeSessionExtensions
     public static string GetStateString<T>(this INetcodeSession<T> @this, IStateStringParser? parser = null)
         where T : unmanaged
     {
-        var state = @this.GetCurrentSavedFrame();
+        var state = @this.GetSavedState();
         var currentBytes = state.GameState.WrittenSpan;
         return @this.GetStateString(state.Frame, currentBytes, parser);
     }

@@ -83,7 +83,7 @@ public sealed record NetcodeOptions
     public int InputDelayFrames { get; set; } = 2;
 
     /// <summary>
-    ///     Value to override the total number of <see cref="SavedFrame" /> in state store.
+    ///     Value to override the total number of <see cref="SavedState" /> in state store.
     /// </summary>
     /// <value>Defaults to <see cref="PredictionFrames" /> + <see cref="PredictionFramesOffset"/></value>
     /// <seealso cref="IStateStore" />

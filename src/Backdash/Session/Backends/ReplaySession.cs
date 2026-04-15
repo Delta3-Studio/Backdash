@@ -101,7 +101,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public bool IsInRollback => false;
-    public SavedFrame GetCurrentSavedFrame() => stateStore.Last();
+    public SavedState GetSavedState() => stateStore.Last();
 
     public int NumberOfSpectators => 0;
     public int LocalPort => 0;

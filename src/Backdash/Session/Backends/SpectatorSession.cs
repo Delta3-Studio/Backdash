@@ -158,7 +158,7 @@ sealed class SpectatorSession<TInput> :
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public bool IsInRollback => false;
-    public SavedFrame GetCurrentSavedFrame() => stateStore.Last();
+    public SavedState GetSavedState() => stateStore.Last();
     public INetcodeRandom Random => random;
     public INetcodeSessionHandler GetHandler() => callbacks;
     public int NumberOfPlayers { get; private set; }

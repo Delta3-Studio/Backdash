@@ -170,7 +170,7 @@ public class Game1 : Game
 
         if (keyboard.IsKeyPressed(Keys.S))
         {
-            snapshot = session.CurrentStateSnapshot();
+            snapshot = session.GetStateSnapshot();
             session.WriteLog($"Snapshot saved {snapshot?.Frame}");
         }
         else if (keyboard.IsKeyPressed(Keys.L) && snapshot is not null)

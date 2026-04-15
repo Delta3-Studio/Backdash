@@ -75,7 +75,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public bool IsInRollback => false;
-    public SavedFrame GetCurrentSavedFrame() => stateStore.Last();
+    public SavedState GetSavedState() => stateStore.Last();
 
     public IReadOnlySet<NetcodePlayer> GetPlayers() => addedPlayers;
 

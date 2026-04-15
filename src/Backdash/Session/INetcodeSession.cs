@@ -75,24 +75,24 @@ public interface INetcodeSessionInfo
     Endianness InputSerializationEndianness { get; }
 
     /// <summary>
-    ///     Returns the last saved state.
+    ///     Returns the current saved state.
     /// </summary>
-    SavedFrame GetCurrentSavedFrame();
+    SavedState GetSavedState();
 
     /// <summary>
     ///     Returns the checksum of the current saved state.
     /// </summary>
-    uint CurrentChecksum => GetCurrentSavedFrame().Checksum;
+    uint CurrentChecksum => GetSavedState().Checksum;
 
     /// <summary>
     ///     Returns the size of the current saved state.
     /// </summary>
-    ByteSize CurrentStateSize => GetCurrentSavedFrame().Size;
+    ByteSize CurrentStateSize => GetSavedState().Size;
 
     /// <summary>
-    ///     Returns the last saved state snapshot.
+    ///     Returns the current saved state snapshot.
     /// </summary>
-    StateSnapshot CurrentStateSnapshot() => GetCurrentSavedFrame().ToSnapshot();
+    StateSnapshot GetStateSnapshot() => GetSavedState().ToSnapshot();
 }
 
 /// <summary>

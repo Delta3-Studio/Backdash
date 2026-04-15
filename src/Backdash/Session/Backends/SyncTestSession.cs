@@ -130,7 +130,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;
 
     public bool IsInRollback => synchronizer.InRollback;
-    public SavedFrame GetCurrentSavedFrame() => synchronizer.GetLastSavedFrame();
+    public SavedState GetSavedState() => synchronizer.GetLastSavedFrame();
 
     public IReadOnlySet<NetcodePlayer> GetPlayers() =>
         addedPlayers.Count is 0 ? localPlayerFallback : addedPlayers.Keys.ToHashSet();
@@ -353,7 +353,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         inRollback = false;
     }
 
-    void HandleDesync(Frame frame, SavedFrameBytes current, SavedFrame previous)
+    void HandleDesync(Frame frame, SavedFrameBytes current, SavedState previous)
     {
         const LogLevel level = LogLevel.Error;
         var message =

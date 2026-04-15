@@ -117,7 +117,7 @@ public sealed class GameSession(
     void UpdateStats()
     {
         nonGameState.RollbackFrames = session.RollbackFrames;
-        var saved = session.GetCurrentSavedFrame();
+        var saved = session.GetSavedState();
         nonGameState.StateChecksum = saved.Checksum;
         nonGameState.StateSize = saved.Size;
     }

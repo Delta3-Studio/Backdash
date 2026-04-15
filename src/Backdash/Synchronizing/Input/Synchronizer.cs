@@ -236,7 +236,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
             throw new NetcodeException($"Save state not found for frame {frame.Number}");
     }
 
-    public SavedFrame GetLastSavedFrame() => stateStore.Last();
+    public SavedState GetLastSavedFrame() => stateStore.Last();
 
     public void SaveCurrentFrame()
     {
