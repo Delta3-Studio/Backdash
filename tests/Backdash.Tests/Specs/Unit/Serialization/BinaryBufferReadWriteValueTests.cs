@@ -404,8 +404,7 @@ public class BinaryBufferReadWriteValueTests
         return value == result;
     }
 
-    static DefaultObjectPool<SimpleRefData> DataPool =>
-        (DefaultObjectPool<SimpleRefData>)DefaultObjectPool<SimpleRefData>.Instance;
+    static ObjectPool<SimpleRefData> DataPool => ObjectPool.Singleton<SimpleRefData>();
 
     [PropertyTest]
     public bool SerializableNullableObjectToObject(
