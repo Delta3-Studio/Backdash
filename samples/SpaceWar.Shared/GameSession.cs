@@ -164,7 +164,10 @@ public sealed class GameSession(
     // used by SyncTest, the return value is used on the state desync handler call
     object? INetcodeSessionHandler.CreateState(Frame frame, ref readonly BinaryBufferReader reader)
     {
-        GameState state = new();
+        GameState state = new()
+        {
+            Ships = new Ship[session.NumberOfPlayers],
+        };
         state.LoadState(in reader);
         return state;
     }

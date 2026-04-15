@@ -165,6 +165,18 @@ public class Game1 : Game
         if (keyboard.IsKeyPressed(Keys.Escape))
             Exit();
 
+        if (keyboard.IsKeyPressed(Keys.Z))
+        {
+            foreach (var s in session.EnumerateStateStrings().Take(3))
+            {
+                Console.WriteLine($"--> State(Frame: {s.Frame.Number}, Checksum: {s.Checksum}");
+                Console.WriteLine(s.State);
+                Console.WriteLine($"--> End State(Frame: {s.Frame.Number})");
+            }
+
+            return;
+        }
+
         if (session.IsOnline())
             return;
 

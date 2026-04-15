@@ -11,25 +11,27 @@ public static class NetcodeSessionExtensions
     /// <summary>
     ///    Returns the current state string representation
     /// </summary>
-    public static string GetStateString<T>(this INetcodeSession<T> @this, IStateStringParser? parser = null)
+    public static StatePreview GetStateString<T>(this INetcodeSession<T> @this, IStateStringParser? parser = null)
         where T : unmanaged
     {
         var state = @this.GetSavedState();
         var currentBytes = state.GameState.WrittenSpan;
-        return @this.GetStateString(state.Frame, currentBytes, parser);
+        var text = @this.GetStateString(state.Frame, currentBytes, parser);
+        return new(state.Frame, state.Checksum, text);
     }
 
     /// <summary>
     ///    Returns string representation for given <paramref name="state"/>
     /// </summary>
-    public static string GetStateString<T>(
+    public static StatePreview GetStateString<T>(
         this INetcodeSession<T> @this,
         StateSnapshot state,
         IStateStringParser? parser = null
     ) where T : unmanaged
     {
         var stateBytes = state.State.AsSpan(0, (int)state.Size);
-        return @this.GetStateString(state.Frame, stateBytes, parser);
+        var text = @this.GetStateString(state.Frame, stateBytes, parser);
+        return new(state.Frame, state.Checksum, text);
     }
 
     /// <summary>
@@ -48,4 +50,26 @@ public static class NetcodeSessionExtensions
         var stateObject = @this.GetHandler().CreateState(frame, ref reader);
         return parser.GetStateString(frame, in reader, stateObject);
     }
+
+    /// <summary>
+    ///    Enumerate all valid state saved snapshots in descending order
+    /// </summary>
+    public static IEnumerable<StateSnapshot> EnumerateSnapshots<T>(this INetcodeSession<T> @this, Frame? frame = null)
+        where T : unmanaged
+    {
+        StateSnapshot? next = frame.HasValue ? @this.GetStateSnapshot(frame.Value) : @this.GetStateSnapshot();
+        while (next is not null)
+        {
+            yield return next;
+            next = @this.GetStateSnapshot(next.Frame.Previous());
+        }
+    }
+
+    /// <summary>
+    ///    Enumerate string representation for all saved states in descending order
+    /// </summary>
+    public static IEnumerable<StatePreview> EnumerateStateStrings<T>(
+        this INetcodeSession<T> @this, Frame? frame = null, IStateStringParser? parser = null)
+        where T : unmanaged =>
+        @this.EnumerateSnapshots(frame).Select(s => @this.GetStateString(s, parser));
 }
