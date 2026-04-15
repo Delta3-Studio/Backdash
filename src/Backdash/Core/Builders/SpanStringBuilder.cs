@@ -103,36 +103,4 @@ public readonly ref struct SpanStringBuilder(
                 succeeded = succeeded && builder.Write(value, format);
         }
     }
-
-    public readonly ref struct ObjectBuilder
-    {
-        readonly SpanStringBuilder writer;
-        readonly int firstOffset;
-        readonly ref int offset;
-
-        public ObjectBuilder(
-            in Span<char> destination,
-            ref int writtenCount,
-            IFormatProvider? formatProvider = null
-        )
-        {
-            offset = ref writtenCount;
-            writer = new(in destination, ref offset, formatProvider);
-            writer.Write('{');
-            firstOffset = offset;
-        }
-
-        public bool Write<T>(
-            in T value,
-            ReadOnlySpan<char> format = default,
-            [CallerArgumentExpression(nameof(value))]
-            string name = ""
-        ) where T : ISpanFormattable
-        {
-            if (firstOffset != offset && !writer.Write(", ")) return false;
-            return writer.Write(name) && writer.Write(": ") && writer.Write(value, format);
-        }
-
-        public void Dispose() => writer.Write("}");
-    }
 }
