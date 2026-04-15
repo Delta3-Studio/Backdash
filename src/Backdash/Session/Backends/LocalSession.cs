@@ -234,6 +234,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         {
             CurrentFrame = snapshot.Frame;
             DiscardInputsAfter(CurrentFrame);
+            stateStore.Seek(CurrentFrame);
         }
 
         var offset = 0;
@@ -256,7 +257,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     void SaveCurrentFrame()
     {
         var currentFrame = CurrentFrame;
-        ref var nextState = ref stateStore.Current();
+        ref var nextState = ref stateStore.Next();
 
         BinaryBufferWriter writer = new(nextState.GameState, endianness);
         callbacks.SaveState(currentFrame, ref writer);

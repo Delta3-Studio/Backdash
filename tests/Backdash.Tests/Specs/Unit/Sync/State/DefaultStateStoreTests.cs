@@ -13,7 +13,7 @@ public class DefaultStateStoreTests
         DefaultStateStore store = new(40);
         store.Initialize(1);
 
-        ref var currentState = ref store.Current();
+        ref var currentState = ref store.Next();
         currentState.Frame = Frame.One;
         currentState.Checksum = Checksum.Empty;
 

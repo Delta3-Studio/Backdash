@@ -26,6 +26,11 @@ public interface IStateStore
     bool TryGet(Frame frame, [MaybeNullWhen(false)] out SavedState result);
 
     /// <summary>
+    ///     Try set the state pointer to the first <paramref name="frame"/> entry.
+    /// </summary>
+    bool Seek(Frame frame);
+
+    /// <summary>
     ///     Returns last <see cref="SavedState" />.
     /// </summary>
     SavedState Last();
@@ -33,7 +38,7 @@ public interface IStateStore
     /// <summary>
     ///     Returns next writable <see cref="SavedState" />.
     /// </summary>
-    ref SavedState Current();
+    ref SavedState Next();
 
     /// <summary>
     ///     Advance the store pointer

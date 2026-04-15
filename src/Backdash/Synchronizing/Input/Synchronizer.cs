@@ -241,7 +241,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
     public void SaveCurrentFrame()
     {
-        ref var nextState = ref Store.Current();
+        ref var nextState = ref Store.Next();
 
         BinaryBufferWriter writer = new(nextState.GameState, NumberSerializer);
         Callbacks.SaveState(currentFrame, ref writer);

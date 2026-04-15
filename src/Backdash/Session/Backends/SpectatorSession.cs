@@ -317,7 +317,7 @@ sealed class SpectatorSession<TInput> :
 
     void SaveCurrentFrame()
     {
-        ref var nextState = ref stateStore.Current();
+        ref var nextState = ref stateStore.Next();
 
         BinaryBufferWriter writer = new(nextState.GameState, endianness);
         callbacks.SaveState(CurrentFrame, ref writer);

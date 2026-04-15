@@ -209,7 +209,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     void SaveCurrentFrame()
     {
         var currentFrame = CurrentFrame;
-        ref var nextState = ref stateStore.Current();
+        ref var nextState = ref stateStore.Next();
 
         BinaryBufferWriter writer = new(nextState.GameState, endianness);
         callbacks.SaveState(currentFrame, ref writer);

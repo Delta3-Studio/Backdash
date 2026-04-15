@@ -26,7 +26,7 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     public void Advance() => head = (head + 1) % savedStates.Length;
 
     /// <inheritdoc />
-    public ref SavedState Current()
+    public ref SavedState Next()
     {
         ref var result = ref savedStates[head];
         result.GameState.ResetWrittenCount();
@@ -34,8 +34,30 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     }
 
     /// <inheritdoc />
+    public SavedState Last()
+    {
+        var i = head - 1;
+        var index = i < 0 ? savedStates.Length - 1 : i;
+        return savedStates[index];
+    }
+
+    bool IsInRange(Frame frame)
+    {
+        if (frame.IsNull) return false;
+        var last = Last().Frame;
+        if (last.Number <= 0) return true;
+        return frame.Number <= last.Number;
+    }
+
+    /// <inheritdoc />
     public bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedState result)
     {
+        if (!IsInRange(frame))
+        {
+            result = null;
+            return false;
+        }
+
         var i = 0;
         ref var current = ref MemoryMarshal.GetReference(savedStates.AsSpan());
         ref var limit = ref Unsafe.Add(ref current, savedStates.Length);
@@ -50,7 +72,7 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
             }
 
             i++;
-            current = ref Unsafe.Subtract(ref current, 1)!;
+            current = ref Unsafe.Add(ref current, 1)!;
         }
 
         result = null;
@@ -70,7 +92,7 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
                 return true;
             }
 
-            current = ref Unsafe.Subtract(ref current, 1)!;
+            current = ref Unsafe.Add(ref current, 1)!;
         }
 
         result = null;
@@ -78,10 +100,24 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     }
 
     /// <inheritdoc />
-    public SavedState Last()
+    public bool Seek(Frame frame)
     {
-        var i = head - 1;
-        var index = i < 0 ? savedStates.Length - 1 : i;
-        return savedStates[index];
+        if (!IsInRange(frame)) return false;
+        var i = 0;
+        ref var current = ref MemoryMarshal.GetReference(savedStates.AsSpan());
+        ref var limit = ref Unsafe.Add(ref current, savedStates.Length);
+        while (Unsafe.IsAddressLessThan(ref current, ref limit))
+        {
+            if (current.Frame == frame)
+            {
+                head = i;
+                return true;
+            }
+
+            i++;
+            current = ref Unsafe.Add(ref current, 1)!;
+        }
+
+        return false;
     }
 }
