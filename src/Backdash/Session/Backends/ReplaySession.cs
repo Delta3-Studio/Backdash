@@ -230,7 +230,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
             return true;
         }
 
-        if (!stateStore.TryGet(frame, out var savedFrame))
+        if (!stateStore.TryLoad(frame, out var savedFrame))
         {
             ReplayController.IsBackward = false;
             ReplayController.Pause();

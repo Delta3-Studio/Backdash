@@ -338,7 +338,7 @@ sealed class SpectatorSession<TInput> :
             return true;
         }
 
-        if (!stateStore.TryGet(frame, out var savedFrame))
+        if (!stateStore.TryLoad(frame, out var savedFrame))
             return false;
 
         logger.Write(LogLevel.Trace,

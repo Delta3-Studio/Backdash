@@ -212,7 +212,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
             return true;
         }
 
-        if (!Store.TryGet(frame, out var savedFrame))
+        if (!Store.TryLoad(frame, out var savedFrame))
             return false;
 
         logger.Write(LogLevel.Information,

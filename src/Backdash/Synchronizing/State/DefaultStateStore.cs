@@ -31,28 +31,46 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     }
 
     /// <inheritdoc />
-    public bool TryGet(Frame frame, [MaybeNullWhen(false)] out SavedState savedState)
+    public bool TryLoad(Frame frame, [MaybeNullWhen(false)] out SavedState result)
     {
         var i = 0;
-        var span = savedStates.AsSpan();
-        ref var current = ref MemoryMarshal.GetReference(span);
-        ref var limit = ref Unsafe.Add(ref current, span.Length);
-
+        ref var current = ref MemoryMarshal.GetReference(savedStates.AsSpan());
+        ref var limit = ref Unsafe.Add(ref current, savedStates.Length);
         while (Unsafe.IsAddressLessThan(ref current, ref limit))
         {
             if (current.Frame.Number == frame.Number)
             {
                 head = i;
                 Advance();
-                savedState = current;
+                result = current;
                 return true;
             }
 
             i++;
-            current = ref Unsafe.Add(ref current, 1)!;
+            current = ref Unsafe.Subtract(ref current, 1)!;
         }
 
-        savedState = null;
+        result = null;
+        return false;
+    }
+
+    /// <inheritdoc />
+    public bool TryGet(Frame frame, [MaybeNullWhen(false)] out SavedState result)
+    {
+        ref var current = ref MemoryMarshal.GetReference(savedStates.AsSpan());
+        ref var limit = ref Unsafe.Add(ref current, savedStates.Length);
+        while (Unsafe.IsAddressLessThan(ref current, ref limit))
+        {
+            if (current.Frame.Number == frame.Number)
+            {
+                result = current;
+                return true;
+            }
+
+            current = ref Unsafe.Subtract(ref current, 1)!;
+        }
+
+        result = null;
         return false;
     }
 

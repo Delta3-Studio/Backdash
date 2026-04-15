@@ -216,7 +216,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
             return true;
         }
 
-        if (!stateStore.TryGet(frame, out var savedFrame))
+        if (!stateStore.TryLoad(frame, out var savedFrame))
             return false;
 
         var offset = 0;
