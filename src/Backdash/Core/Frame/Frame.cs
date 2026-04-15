@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Backdash.Core;
 
@@ -87,11 +88,21 @@ public readonly record struct Frame :
     const string DefaultFormat = "(Frame 0);(Frame -#)";
 
     /// <inheritdoc />
-    public string ToString(string? format, IFormatProvider? formatProvider) =>
+    public string ToString(
+        [StringSyntax(StringSyntaxAttribute.NumericFormat)]
+        string? format,
+        IFormatProvider? formatProvider
+    ) =>
         Number.ToString(format ?? DefaultFormat, formatProvider);
 
     /// <inheritdoc />
     public override string ToString() => ToString(null, null);
+
+    /// <inheritdoc cref="ToString(string, IFormatProvider)" />
+    public string ToString(
+        [StringSyntax(StringSyntaxAttribute.NumericFormat)]
+        string format
+    ) => ToString(format, null);
 
     /// <inheritdoc />
     public bool TryFormat(

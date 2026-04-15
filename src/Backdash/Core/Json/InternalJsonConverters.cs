@@ -11,7 +11,7 @@ sealed class UnsafeInt32JsonConverter<T> : JsonConverter<T> where T : unmanaged
         Unsafe.BitCast<int, T>(reader.GetInt32());
 
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options) =>
-        writer.WriteNumberValue(Unsafe.As<T, int>(ref Unsafe.AsRef(ref value)));
+        writer.WriteNumberValue(Unsafe.As<T, int>(ref value));
 }
 
 [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Property | AttributeTargets.Field)]
@@ -25,7 +25,7 @@ sealed class UnsafeInt64JsonConverter<T> : JsonConverter<T> where T : unmanaged
         Unsafe.BitCast<long, T>(reader.GetInt64());
 
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options) =>
-        writer.WriteNumberValue(Unsafe.As<T, long>(ref Unsafe.AsRef(ref value)));
+        writer.WriteNumberValue(Unsafe.As<T, long>(ref value));
 }
 
 [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Property | AttributeTargets.Field)]
