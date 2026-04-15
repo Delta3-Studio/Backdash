@@ -299,6 +299,9 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     /// <inheritdoc cref="TryGetPlayerByCustomId"/>
     NetcodePlayer? GetPlayerByCustomId(int customId) =>
         TryGetPlayerByCustomId(customId, out var player) ? player : null;
+
+    /// <inheritdoc cref="TryGetPlayerByCustomId"/>
+    NetcodePlayer? GetLocalPlayer() => TryGetLocalPlayer(out var player) ? player : null;
 }
 
 /// <summary>

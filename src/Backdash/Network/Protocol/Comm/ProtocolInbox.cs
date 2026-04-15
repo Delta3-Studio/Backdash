@@ -358,12 +358,14 @@ sealed class ProtocolInbox<TInput>(
         var body = message.ConsistencyCheckFail;
         logger.Write(LogLevel.Warning, $"Failure in consistency-check for {body}");
 
+        var localChecksum = body.RemoteChecksum;
+        var remoteChecksum = body.LocalChecksum;
         networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.ChecksumMismatch)
             {
                 ChecksumMismatch = new(
                     MismatchFrame: body.Frame,
-                    LocalChecksum: body.LocalChecksum,
-                    RemoteChecksum: body.RemoteChecksum
+                    LocalChecksum: localChecksum,
+                    RemoteChecksum: remoteChecksum
                 ),
             }
         );
