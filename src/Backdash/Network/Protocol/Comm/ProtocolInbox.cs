@@ -263,12 +263,12 @@ sealed class ProtocolInbox<TInput>(
         else
         {
             networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.Synchronizing)
-                {
-                    Synchronizing = new(
+            {
+                Synchronizing = new(
                         TotalSteps: options.NumberOfSyncRoundTrips,
                         CurrentStep: options.NumberOfSyncRoundTrips - state.Sync.RemainingRoundTrips
                     ),
-                }
+            }
             );
             sync.CreateRequestMessage(ref replyMsg);
         }
@@ -334,13 +334,13 @@ sealed class ProtocolInbox<TInput>(
             replyMsg.ConsistencyCheckFail.LocalChecksum = localChecksum;
 
             networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.ChecksumMismatch)
-                {
-                    ChecksumMismatch = new(
+            {
+                ChecksumMismatch = new(
                         MismatchFrame: checkFrame,
                         LocalChecksum: localChecksum,
                         RemoteChecksum: checksum
                     ),
-                }
+            }
             );
 
             return true;
@@ -361,13 +361,13 @@ sealed class ProtocolInbox<TInput>(
         var localChecksum = body.RemoteChecksum;
         var remoteChecksum = body.LocalChecksum;
         networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.ChecksumMismatch)
-            {
-                ChecksumMismatch = new(
+        {
+            ChecksumMismatch = new(
                     MismatchFrame: body.Frame,
                     LocalChecksum: localChecksum,
                     RemoteChecksum: remoteChecksum
                 ),
-            }
+        }
         );
 
         return true;
