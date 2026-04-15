@@ -44,9 +44,9 @@ public class ChecksumBenchmark
 public sealed class Fletcher32SpanChecksumProvider : IChecksumProvider
 {
     /// <inheritdoc />
-    public uint Compute(ReadOnlySpan<byte> data)
+    public Checksum Compute(ReadOnlySpan<byte> data)
     {
-        if (data.IsEmpty) return 0;
+        if (data.IsEmpty) return Checksum.Empty;
         var buffer = MemoryMarshal.Cast<byte, ushort>(data);
         uint sum1 = 0xFFFF, sum2 = 0xFFFF;
         var dataIndex = 0;
@@ -75,7 +75,7 @@ public sealed class Fletcher32SpanChecksumProvider : IChecksumProvider
 
         sum1 = (sum1 & 0xFFFF) + (sum1 >> 16);
         sum2 = (sum2 & 0xFFFF) + (sum2 >> 16);
-        return (sum2 << 16) | sum1;
+        return new((sum2 << 16) | sum1);
     }
 }
 
@@ -84,9 +84,9 @@ public sealed class Fletcher32UnsafeChecksumProvider : IChecksumProvider
     const int BlockSize = 360;
 
     /// <inheritdoc />
-    public unsafe uint Compute(ReadOnlySpan<byte> data)
+    public unsafe Checksum Compute(ReadOnlySpan<byte> data)
     {
-        if (data.IsEmpty) return 0;
+        if (data.IsEmpty) return Checksum.Empty;
 
         uint sum1 = 0xFFFF, sum2 = 0xFFFF;
         var dataIndex = 0;
@@ -121,16 +121,16 @@ public sealed class Fletcher32UnsafeChecksumProvider : IChecksumProvider
 
         sum1 = (sum1 & 0xFFFF) + (sum1 >> 16);
         sum2 = (sum2 & 0xFFFF) + (sum2 >> 16);
-        return (sum2 << 16) | sum1;
+        return new((sum2 << 16) | sum1);
     }
 }
 
 public sealed class Crc32ChecksumProvider : IChecksumProvider
 {
     /// <inheritdoc />
-    public uint Compute(ReadOnlySpan<byte> data)
+    public Checksum Compute(ReadOnlySpan<byte> data)
     {
-        if (data.Length == 0) return 0;
+        if (data.Length == 0) return Checksum.Empty;
 
         uint sum0 = 0, sum1 = 0, sum2 = 0, sum3 = 0;
 
@@ -146,17 +146,16 @@ public sealed class Crc32ChecksumProvider : IChecksumProvider
         }
 
         var sum = sum3 + (sum2 << 8) + (sum1 << 16) + (sum0 << 24);
-
-        return sum;
+        return (Checksum)sum;
     }
 }
 
 public sealed class Crc32BigEndianChecksumProvider : IChecksumProvider
 {
     /// <inheritdoc />
-    public unsafe uint Compute(ReadOnlySpan<byte> data)
+    public unsafe Checksum Compute(ReadOnlySpan<byte> data)
     {
-        if (data.Length == 0) return 0;
+        if (data.Length == 0) return Checksum.Empty;
 
         fixed (byte* ptr = data)
         {
@@ -203,7 +202,7 @@ public sealed class Crc32BigEndianChecksumProvider : IChecksumProvider
                     break;
             }
 
-            return sum;
+            return (Checksum)sum;
         }
     }
 }

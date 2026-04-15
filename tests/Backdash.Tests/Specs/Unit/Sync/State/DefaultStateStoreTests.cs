@@ -15,7 +15,7 @@ public class DefaultStateStoreTests
 
         ref var currentState = ref store.Next();
         currentState.Frame = Frame.One;
-        currentState.Checksum = 0;
+        currentState.Checksum = Checksum.Empty;
 
         var gameState = GameState.CreateRandom();
         GameStateSerializer.Shared.Serialize(new(currentState.GameState), in gameState);

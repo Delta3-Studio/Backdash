@@ -18,7 +18,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 {
     readonly record struct SavedFrameBytes(
         Frame Frame,
-        uint Checksum,
+        Checksum Checksum,
         byte[] State,
         int StateSize,
         GameInput<ConfirmedInputs<TInput>> Inputs
@@ -396,7 +396,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 
     void LogSaveState(LogLevel level,
         string description, string body,
-        uint checksum, Frame frame,
+        Checksum checksum, Frame frame,
         object? extra = null
     )
     {

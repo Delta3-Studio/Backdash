@@ -274,6 +274,12 @@ public readonly ref struct BinaryBufferReader
     /// <inheritdoc cref="ReadFrame()" />
     public Frame? ReadNullableFrame() => ReadBoolean() ? ReadFrame() : null;
 
+    /// <summary>Reads single <see cref="Checksum" /> from the buffer.</summary>
+    public Checksum ReadChecksum() => ReadAsUInt32<Checksum>();
+
+    /// <summary>Reads single <see cref="Checksum" /> from the buffer.</summary>
+    public Checksum? ReadNullableChecksum() => ReadBoolean() ? ReadChecksum() : null;
+
     /// <summary>Reads an unmanaged struct from the buffer.</summary>
     public void ReadStruct<T>(ref T value) where T : unmanaged
     {
@@ -701,6 +707,12 @@ public readonly ref struct BinaryBufferReader
 
     /// <inheritdoc cref="ReadTimeOnly()" />
     public void Read(ref Frame? value) => value = ReadNullableFrame();
+
+    /// <inheritdoc cref="ReadChecksum()" />
+    public void Read(ref Checksum value) => value = ReadChecksum();
+
+    /// <inheritdoc cref="ReadChecksum()" />
+    public void Read(ref Checksum? value) => value = ReadNullableChecksum();
 
     /// <summary>Reads a span of <see cref="byte" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in Span<byte> values)

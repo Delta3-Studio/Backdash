@@ -41,7 +41,7 @@ public interface IStateStore
     void Advance();
 
     /// <summary>
-    ///     Return a <see cref="SavedState" /> for <paramref name="frame" /> if exists, <c>null</c> otherwise.
+    ///     Return a <see cref="SavedState" /> for <paramref name="frame" /> if exists, <see langword="null" /> otherwise.
     /// </summary>
     SavedState? Get(Frame frame) => TryGet(frame, out var savedState) ? savedState : null;
 }

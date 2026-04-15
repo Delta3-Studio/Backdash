@@ -71,13 +71,13 @@ readonly ref struct Utf8StringBuilder
     }
 }
 
-readonly ref struct Utf8ObjectStringWriter
+readonly ref struct Utf8ObjectStringBuilder
 {
     readonly Utf8StringBuilder writer;
     readonly int firstOffset;
     readonly ref int offset;
 
-    public Utf8ObjectStringWriter(in Span<byte> bufferArg, ref int offset)
+    public Utf8ObjectStringBuilder(in Span<byte> bufferArg, ref int offset)
     {
         writer = new(in bufferArg, ref offset);
         this.offset = ref offset;

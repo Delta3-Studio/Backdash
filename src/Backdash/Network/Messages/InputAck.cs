@@ -19,7 +19,7 @@ record struct InputAck : IUtf8SpanFormattable
     )
     {
         bytesWritten = 0;
-        using Utf8ObjectStringWriter writer = new(in utf8Destination, ref bytesWritten);
+        using Utf8ObjectStringBuilder writer = new(in utf8Destination, ref bytesWritten);
         return writer.Write(in AckFrame);
     }
 }

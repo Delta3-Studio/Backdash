@@ -60,6 +60,11 @@ abstract class DataGenerator
             .Select(x => new Frame(x.Item))
             .ToArbitrary();
 
+    public static Arbitrary<Checksum> ChecksumGenerator() =>
+        ArbMap.Default.GeneratorFor<uint>()
+            .Select(x => new Checksum(x))
+            .ToArbitrary();
+
     public static Arbitrary<TimeOnly> TimeOnlyGenerator() =>
         ArbMap.Default.GeneratorFor<long>()
             .Where(x => x >= TimeOnly.MinValue.Ticks && x <= TimeOnly.MaxValue.Ticks)
@@ -242,7 +247,7 @@ abstract class DataGenerator
 
     public static Arbitrary<ConsistencyCheckReply> ConsistencyCheckReplyGenerator() => Arb.From(
         from frame in Generate<Frame>()
-        from checksum in Generate<uint>()
+        from checksum in Generate<Checksum>()
         select new ConsistencyCheckReply
         {
             Frame = frame,

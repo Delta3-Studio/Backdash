@@ -262,12 +262,12 @@ sealed class ProtocolInbox<TInput>(
         else
         {
             networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.Synchronizing)
-            {
-                Synchronizing = new(
+                {
+                    Synchronizing = new(
                         TotalSteps: options.NumberOfSyncRoundTrips,
                         CurrentStep: options.NumberOfSyncRoundTrips - state.Sync.RemainingRoundTrips
                     ),
-            }
+                }
             );
             sync.CreateRequestMessage(ref replyMsg);
         }
@@ -295,36 +295,36 @@ sealed class ProtocolInbox<TInput>(
         var checksum = message.ConsistencyCheckReply.Checksum;
         var localChecksum = state.Consistency.AskedChecksum;
 
-        logger.Write(LogLevel.Debug, $"Reply consistency-check for {checkFrame} #{checksum:x8}");
+        logger.Write(LogLevel.Debug, $"Reply consistency-check for {checkFrame} #{checksum}");
 
-        if (state.Consistency.AskedFrame != checkFrame || localChecksum is 0 || checksum is 0)
+        if (state.Consistency.AskedFrame != checkFrame || localChecksum.IsEmpty || checksum.IsEmpty)
         {
-            logger.Write(LogLevel.Warning, $"Unable to find reply local checksum #{checksum:x8} for {checkFrame}");
+            logger.Write(LogLevel.Warning, $"Unable to find reply local checksum #{checksum} for {checkFrame}");
             return false;
         }
 
         if (localChecksum != checksum)
         {
             logger.Write(LogLevel.Error,
-                $"Invalid remote checksum on frame {checkFrame}, {localChecksum:x8} != {checksum:x8}");
+                $"Invalid remote checksum on frame {checkFrame}, {localChecksum:x8} != {checksum}");
 
             networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.ChecksumMismatch)
-            {
-                ChecksumMismatch = new(
+                {
+                    ChecksumMismatch = new(
                         MismatchFrame: checkFrame,
                         LocalChecksum: localChecksum,
                         RemoteChecksum: checksum
                     ),
-            }
+                }
             );
 
             return false;
         }
 
-        logger.Write(LogLevel.Debug, $"Finish consistency-check request check for {checkFrame} #{checksum:x8}");
+        logger.Write(LogLevel.Debug, $"Finish consistency-check request check for {checkFrame} #{checksum}");
         state.Consistency.LastCheck = Stopwatch.GetTimestamp();
         state.Consistency.AskedFrame = Frame.Null;
-        state.Consistency.AskedChecksum = 0;
+        state.Consistency.AskedChecksum = Checksum.Empty;
 
         return true;
     }
@@ -334,9 +334,9 @@ sealed class ProtocolInbox<TInput>(
         var checkFrame = message.ConsistencyCheckRequest.Frame;
         var checksum = checksumStore.Get(checkFrame);
 
-        logger.Write(LogLevel.Debug, $"Received consistency request check for: {checkFrame} (reply {checksum:x8})");
+        logger.Write(LogLevel.Debug, $"Received consistency request check for: {checkFrame} (reply {checksum})");
 
-        if (checksum is 0)
+        if (checksum.IsEmpty)
         {
             logger.Write(LogLevel.Warning, $"Unable to find requested local checksum for {checkFrame}");
             return false;

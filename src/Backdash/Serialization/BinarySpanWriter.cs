@@ -184,6 +184,9 @@ public readonly ref struct BinarySpanWriter
     /// <summary>Writes single <see cref="Frame" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in Frame value) => WriteAsInt32(in value);
 
+    /// <summary>Writes single <see cref="Checksum" /> <paramref name="value" /> into buffer.</summary>
+    public void Write(in Checksum value) => WriteAsUInt32(in value);
+
     /// <summary>Writes a span of <see cref="byte" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<byte> value)
     {

@@ -10,7 +10,7 @@ public interface IChecksumProvider
     /// </summary>
     /// <param name="data"></param>
     /// <returns><see cref="int" /> checksum value</returns>
-    uint Compute(ReadOnlySpan<byte> data);
+    Checksum Compute(ReadOnlySpan<byte> data);
 }
 
 /// <inheritdoc cref="IChecksumProvider" />
@@ -18,7 +18,7 @@ public delegate uint ChecksumDelegate(ReadOnlySpan<byte> data);
 
 sealed class DelegateChecksumProvider(ChecksumDelegate compute) : IChecksumProvider
 {
-    public uint Compute(ReadOnlySpan<byte> data) => compute(data);
+    public Checksum Compute(ReadOnlySpan<byte> data) => (Checksum)compute(data);
 }
 
 /// <summary>
@@ -27,7 +27,7 @@ sealed class DelegateChecksumProvider(ChecksumDelegate compute) : IChecksumProvi
 public class EmptyChecksumProvider : IChecksumProvider
 {
     /// <inheritdoc />
-    public uint Compute(ReadOnlySpan<byte> data) => 0;
+    public Checksum Compute(ReadOnlySpan<byte> data) => Checksum.Empty;
 }
 
 /// <summary>
@@ -39,9 +39,9 @@ public sealed class Fletcher32ChecksumProvider : IChecksumProvider
     const int BlockSize = 360;
 
     /// <inheritdoc />
-    public unsafe uint Compute(ReadOnlySpan<byte> data)
+    public unsafe Checksum Compute(ReadOnlySpan<byte> data)
     {
-        if (data.IsEmpty) return 0;
+        if (data.IsEmpty) return Checksum.Empty;
 
         uint sum1 = 0xFFFF, sum2 = 0xFFFF;
         var dataIndex = 0;
@@ -77,6 +77,6 @@ public sealed class Fletcher32ChecksumProvider : IChecksumProvider
 
         sum1 = (sum1 & 0xFFFF) + (sum1 >> 16);
         sum2 = (sum2 & 0xFFFF) + (sum2 >> 16);
-        return (sum2 << 16) | sum1;
+        return new((sum2 << 16) | sum1);
     }
 }

@@ -172,4 +172,8 @@ public readonly record struct SynchronizedEventInfo(TimeSpan Ping);
 /// <summary>
 ///     Data for <see cref="PeerEvent.ChecksumMismatch" /> event.
 /// </summary>
-public readonly record struct ChecksumMismatchEventInfo(Frame MismatchFrame, uint LocalChecksum, uint RemoteChecksum);
+public readonly record struct ChecksumMismatchEventInfo(
+    Frame MismatchFrame,
+    Checksum LocalChecksum,
+    Checksum RemoteChecksum
+);

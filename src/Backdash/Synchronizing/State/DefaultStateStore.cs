@@ -19,7 +19,7 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     {
         savedStates = new SavedState[saveCount];
         for (var i = 0; i < saveCount; i++)
-            savedStates[i] = new(Frame.Null, new(hintSize), 0);
+            savedStates[i] = new(Frame.Null, new(hintSize), Checksum.Empty);
     }
 
     /// <inheritdoc />

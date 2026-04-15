@@ -77,7 +77,7 @@ public interface INetcodeSessionInfo
     /// <summary>
     ///     Returns the checksum of the current saved state.
     /// </summary>
-    uint CurrentChecksum => GetSavedState().Checksum;
+    Checksum CurrentChecksum => GetSavedState().Checksum;
 
     /// <summary>
     ///     Returns the size of the current saved state.
@@ -85,7 +85,7 @@ public interface INetcodeSessionInfo
     ByteSize CurrentStateSize => GetSavedState().Size;
 
     /// <summary>
-    ///     Returns the current saved state for <paramref name="frame"/> if exists, <c>null</c> otherwise.
+    ///     Returns the current saved state for <paramref name="frame"/> if exists, <see langword="null" /> otherwise.
     /// </summary>
     SavedState? GetSavedState(Frame frame);
 
@@ -95,7 +95,7 @@ public interface INetcodeSessionInfo
     SavedState GetSavedState();
 
     /// <summary>
-    ///     Returns the current state snapshot for <paramref name="frame"/> if exists, <c>null</c> otherwise.
+    ///     Returns the current state snapshot for <paramref name="frame"/> if exists, <see langword="null" /> otherwise.
     /// </summary>
     StateSnapshot? GetStateSnapshot(Frame frame) => GetSavedState(frame)?.ToSnapshot();
 
