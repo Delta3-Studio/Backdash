@@ -33,7 +33,7 @@ public interface IStateStore
     /// <summary>
     ///     Returns next writable <see cref="SavedState" />.
     /// </summary>
-    ref SavedState Next();
+    ref SavedState Current();
 
     /// <summary>
     ///     Advance the store pointer

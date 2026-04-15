@@ -23,7 +23,10 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
     }
 
     /// <inheritdoc />
-    public ref SavedState Next()
+    public void Advance() => head = (head + 1) % savedStates.Length;
+
+    /// <inheritdoc />
+    public ref SavedState Current()
     {
         ref var result = ref savedStates[head];
         result.GameState.ResetWrittenCount();
@@ -81,7 +84,4 @@ public sealed class DefaultStateStore(int hintSize) : IStateStore
         var index = i < 0 ? savedStates.Length - 1 : i;
         return savedStates[index];
     }
-
-    /// <inheritdoc />
-    public void Advance() => head = (head + 1) % savedStates.Length;
 }

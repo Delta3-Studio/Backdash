@@ -209,7 +209,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     void SaveCurrentFrame()
     {
         var currentFrame = CurrentFrame;
-        ref var nextState = ref stateStore.Next();
+        ref var nextState = ref stateStore.Current();
 
         BinaryBufferWriter writer = new(nextState.GameState, endianness);
         callbacks.SaveState(currentFrame, ref writer);
@@ -217,7 +217,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
 
         stateStore.Advance();
-        logger.Write(LogLevel.Trace, $"replay: saved frame {nextState.Frame} (checksum: {nextState.Checksum:x8})");
+        logger.Write(LogLevel.Trace, $"replay: saved frame {nextState.Frame} (checksum: {nextState.Checksum})");
     }
 
     public bool LoadFrame(Frame frame)
@@ -238,7 +238,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         }
 
         logger.Write(LogLevel.Trace,
-            $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum:x8})");
+            $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum})");
         var offset = 0;
         BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
         callbacks.LoadState(frame, ref reader);

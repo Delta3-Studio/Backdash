@@ -394,7 +394,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         }
 
         logger.Write(LogLevel.Debug,
-            $"Begin consistency-check request for frame {state.Consistency.AskedFrame.Number} #{state.Consistency.AskedChecksum:x8}");
+            $"Begin consistency-check request for frame {state.Consistency.AskedFrame.Number} #{state.Consistency.AskedChecksum}");
 
         outbox
             .SendMessage(new(MessageType.ConsistencyCheckRequest)

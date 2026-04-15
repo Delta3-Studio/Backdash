@@ -279,7 +279,7 @@ public sealed class Renderer(
         const int statsPadding = 2;
 
         stateInfoString.Clear();
-        stateInfoString.Append($"State: {ngs.StateChecksum:x8} {ngs.StateSize}");
+        stateInfoString.Append($"State: {ngs.StateChecksum} {ngs.StateSize}");
         var size = gameAssets.MainFont.MeasureString(stateInfoString) * statsScale;
 
         Vector2 pos = new((gs.Bounds.Width - size.X) / 2, gs.Bounds.Top - Config.WindowPadding);

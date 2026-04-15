@@ -348,7 +348,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
                     HandleDesync(frame, current, last);
                 else
                     logger.Write(LogLevel.Trace,
-                        $"Checksum #{last.Checksum:x8} for frame {current.Frame.Number} matches");
+                        $"Checksum #{last.Checksum} for frame {current.Frame.Number} matches");
             }
             finally
             {
@@ -364,7 +364,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     {
         const LogLevel level = LogLevel.Error;
         var message =
-            $"Checksum for frame {frame} does NOT match: (#{previous.Checksum:x8} != #{current.Checksum:x8})\n";
+            $"Checksum for frame {frame} does NOT match: (#{previous.Checksum} != #{current.Checksum})\n";
         logger.Write(LogLevel.Error, message);
 
 
@@ -402,9 +402,9 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     {
         if (!logStateOnDesync) return;
         logger.Write(level, $"=> SAVED [{description}] (Frame {frame}{(extra is not null ? $" / {extra}" : "")})");
-        logger.Write(level, $"== START STATE #{checksum:x8} ==");
+        logger.Write(level, $"== START STATE #{checksum} ==");
         LogText(level, body);
-        logger.Write(level, $"== END STATE #{checksum:x8} ==\n");
+        logger.Write(level, $"== END STATE #{checksum} ==\n");
     }
 
     void LogText(LogLevel level, string text)

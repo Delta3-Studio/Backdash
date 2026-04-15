@@ -256,7 +256,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     void SaveCurrentFrame()
     {
         var currentFrame = CurrentFrame;
-        ref var nextState = ref stateStore.Next();
+        ref var nextState = ref stateStore.Current();
 
         BinaryBufferWriter writer = new(nextState.GameState, endianness);
         callbacks.SaveState(currentFrame, ref writer);
@@ -264,7 +264,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
 
         stateStore.Advance();
-        logger.Write(LogLevel.Trace, $"replay: saved frame {nextState.Frame} (checksum: {nextState.Checksum:x8})");
+        logger.Write(LogLevel.Trace, $"replay: saved frame {nextState.Frame} (checksum: {nextState.Checksum})");
     }
 
     public void SetFrameDelay(NetcodePlayer player, int delayInFrames)

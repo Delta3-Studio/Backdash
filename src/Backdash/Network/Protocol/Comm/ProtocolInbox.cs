@@ -306,7 +306,7 @@ sealed class ProtocolInbox<TInput>(
         if (localChecksum != checksum)
         {
             logger.Write(LogLevel.Error,
-                $"Invalid remote checksum on frame {checkFrame}, {localChecksum:x8} != {checksum}");
+                $"Invalid remote checksum on frame {checkFrame}, {localChecksum} != {checksum}");
 
             networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.ChecksumMismatch)
                 {

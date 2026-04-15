@@ -216,7 +216,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
             return false;
 
         logger.Write(LogLevel.Information,
-            $"* Loading frame info {savedFrame.Frame} (checksum: {savedFrame.Checksum:x8})");
+            $"* Loading frame info {savedFrame.Frame} (checksum: {savedFrame.Checksum})");
 
         ApplyState(savedFrame.Frame, savedFrame.GameState.WrittenSpan);
         return true;
@@ -241,7 +241,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
     public void SaveCurrentFrame()
     {
-        ref var nextState = ref Store.Next();
+        ref var nextState = ref Store.Current();
 
         BinaryBufferWriter writer = new(nextState.GameState, NumberSerializer);
         Callbacks.SaveState(currentFrame, ref writer);
@@ -250,7 +250,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         checksumStore.Add(nextState.Frame, nextState.Checksum);
 
         Store.Advance();
-        logger.Write(LogLevel.Trace, $"sync: saved frame {nextState.Frame} (checksum: {nextState.Checksum:x8})");
+        logger.Write(LogLevel.Trace, $"sync: saved frame {nextState.Frame} (checksum: {nextState.Checksum})");
     }
 
     bool CheckSimulationConsistency(out Frame seekTo)
