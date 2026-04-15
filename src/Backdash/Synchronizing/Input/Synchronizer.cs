@@ -218,15 +218,19 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         logger.Write(LogLevel.Information,
             $"* Loading frame info {savedFrame.Frame} (checksum: {savedFrame.Checksum:x8})");
 
-        var offset = 0;
-        BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, NumberSerializer);
+        ApplyState(savedFrame.Frame, savedFrame.GameState.WrittenSpan);
+        return true;
+    }
 
+    public void ApplyState(Frame frame, ReadOnlySpan<byte> state)
+    {
+        var offset = 0;
+        BinaryBufferReader reader = new(state, ref offset, NumberSerializer);
         Callbacks.LoadState(frame, ref reader);
 
         // Reset frame count and the head of the state ring-buffer to point in
         // advance of the current frame (as if we had just finished executing it).
-        currentFrame = savedFrame.Frame;
-        return true;
+        currentFrame = frame;
     }
 
     public void LoadFrame(Frame frame)

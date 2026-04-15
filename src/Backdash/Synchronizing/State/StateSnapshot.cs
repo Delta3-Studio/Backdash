@@ -17,10 +17,10 @@ public sealed class StateSnapshot(Frame frame, uint checksum, byte[] state)
     public StateSnapshot() : this(Frame.Null, 0, []) { }
 
     /// <summary>Saved frame number</summary>
-    public uint Checksum = checksum;
+    public Frame Frame = frame;
 
     /// <summary>Saved frame number</summary>
-    public readonly Frame Frame = frame;
+    public readonly uint Checksum = checksum;
 
     /// <summary>Saved game state</summary>
     public readonly byte[] State = state;

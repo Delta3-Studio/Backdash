@@ -278,7 +278,13 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         return synchronizer.TryLoadFrame(frame);
     }
 
-    public void LoadSnapshot(StateSnapshot snapshot) { }
+    public void LoadSnapshot(StateSnapshot snapshot)
+    {
+        if (snapshot.State is []) return;
+        var frame = snapshot.Frame.Number <= 0 ? CurrentFrame : snapshot.Frame;
+        synchronizer.ApplyState(frame, snapshot.State);
+        savedFrames.Clear();
+    }
 
     public void AdvanceFrame()
     {
