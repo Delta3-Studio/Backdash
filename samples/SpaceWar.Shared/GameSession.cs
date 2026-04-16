@@ -157,6 +157,14 @@ public sealed class GameSession(
                 break;
             case PeerEvent.ChecksumMismatch:
                 Log($"=>  CHECKSUM MISMATCH: {player.EndPoint} => {evt.ChecksumMismatch}");
+
+                foreach (var s in session.EnumerateStateStrings(evt.ChecksumMismatch.MismatchFrame).Take(10))
+                {
+                    Log($"--> State(Frame: {s.Frame.Number}, Checksum: {s.Checksum}");
+                    Log(s.State);
+                    Log($"--> End State(Frame: {s.Frame.Number})");
+                }
+
                 break;
         }
     }
