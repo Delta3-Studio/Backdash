@@ -85,9 +85,8 @@ public sealed record SyncTestOptions<TInput> where TInput : unmanaged
     /// <inheritdoc cref="UseJsonStateParser(JsonSerializerOptions?)" />
     public SyncTestOptions<TInput> UseJsonStateParser(Action<JsonSerializerOptions> configure)
     {
-        var options = JsonStateStringParser.CreateDefaultJsonOptions();
-        configure.Invoke(options);
-        return UseJsonStateParser(options);
+        StateStringParser = new JsonStateStringParser(configure);
+        return this;
     }
 
     /// <inheritdoc cref="StateStringParser" />

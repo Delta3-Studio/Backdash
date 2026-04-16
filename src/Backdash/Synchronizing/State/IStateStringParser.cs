@@ -53,21 +53,34 @@ public sealed class JsonStateStringParser(
     /// <summary>Singleton instance</summary>
     public static IStateStringParser Singleton => singleton.Value;
 
+    static JsonSerializerOptions CreateDefaultJsonOptions(Action<JsonSerializerOptions>? configure = null)
+    {
+        JsonSerializerOptions options = new()
+        {
+            WriteIndented = true,
+            IncludeFields = true,
+            AllowTrailingCommas = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters = { new JsonStringEnumConverter() },
+        };
+
+        configure?.Invoke(options);
+        return options;
+    }
+
     internal Logger? Logger = null;
     readonly JsonSerializerOptions jsonOptions = options ?? CreateDefaultJsonOptions();
     readonly IStateStringParser fallback = stateStringFallback ?? new DefaultStateStringParser();
     readonly HexStateStringParser nullFallback = new();
 
-    internal static JsonSerializerOptions CreateDefaultJsonOptions() =>
-        new()
-        {
-            WriteIndented = true,
-            IncludeFields = true,
-            AllowTrailingCommas = true,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            Converters = { new JsonStringEnumConverter() },
-        };
+    /// <summary>
+    /// Create and configure a JSON <see cref="IStateStringParser"/>
+    /// </summary>
+    public JsonStateStringParser(Action<JsonSerializerOptions> configure,
+        IStateStringParser? stateStringFallback = null) :
+        this(CreateDefaultJsonOptions(configure), stateStringFallback) { }
 
     /// <inheritdoc />
     public string GetStateString(in Frame frame, ref readonly BinaryBufferReader reader, object? currentState)
