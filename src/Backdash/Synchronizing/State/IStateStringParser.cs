@@ -80,7 +80,8 @@ public sealed class JsonStateStringParser(
     /// </summary>
     public JsonStateStringParser(Action<JsonSerializerOptions> configure,
         IStateStringParser? stateStringFallback = null) :
-        this(CreateDefaultJsonOptions(configure), stateStringFallback) { }
+        this(CreateDefaultJsonOptions(configure), stateStringFallback)
+    { }
 
     /// <inheritdoc />
     public string GetStateString(in Frame frame, ref readonly BinaryBufferReader reader, object? currentState)
