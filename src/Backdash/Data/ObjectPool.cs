@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Backdash.Data;
 
@@ -98,6 +100,27 @@ public sealed class ObjectPool<T> : IObjectPool<T>, IEnumerable<T>, IDisposable 
         items.Push(value);
         return true;
     }
+
+    /// <inheritdoc cref="Return"/>
+    public bool ReturnMany(params T[] values)
+    {
+        var result = true;
+
+        ref var current = ref MemoryMarshal.GetReference(values.AsSpan());
+        ref var limit = ref Unsafe.Add(ref current, values.Length);
+
+        while (Unsafe.IsAddressLessThan(ref current, ref limit))
+        {
+            result = result && Return(current);
+            current = ref Unsafe.Add(ref current, 1)!;
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc cref="ReturnMany(T[])"/>
+    public bool ReturnMany(IEnumerable<T> values) =>
+        values.Aggregate(true, (result, current) => result && Return(current));
 
     /// <summary>
     ///     Clear the object pool

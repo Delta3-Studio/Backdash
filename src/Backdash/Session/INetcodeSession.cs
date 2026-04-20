@@ -300,8 +300,11 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     NetcodePlayer? GetPlayerByCustomId(int customId) =>
         TryGetPlayerByCustomId(customId, out var player) ? player : null;
 
-    /// <inheritdoc cref="TryGetPlayerByCustomId"/>
+    /// <inheritdoc cref="TryGetLocalPlayer"/>
     NetcodePlayer? GetLocalPlayer() => TryGetLocalPlayer(out var player) ? player : null;
+
+    /// <inheritdoc cref="TryGetRemotePlayer"/>
+    NetcodePlayer? GetRemotePlayer() => TryGetRemotePlayer(out var player) ? player : null;
 }
 
 /// <summary>
