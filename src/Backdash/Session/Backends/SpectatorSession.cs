@@ -191,9 +191,7 @@ sealed class SpectatorSession<TInput> :
         ConsumeProtocolNetworkEvents();
         host.Update();
         jobManager.ThrowIfError();
-
-        if (isSynchronizing)
-            return;
+        if (isSynchronizing || closed) return;
 
         if (lastReceivedInputTime > 0 &&
             Stopwatch.GetElapsedTime(lastReceivedInputTime) > options.Protocol.DisconnectTimeout)

@@ -615,9 +615,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         var eps = UpdateEndpoints();
         var specs = UpdateSpectators();
-
-        if (isSynchronizing) return;
-
+        if (isSynchronizing || closed) return;
         synchronizer.CheckSimulation();
 
         // notify all of our endpoints of their local frame number for their next connection quality report
@@ -759,7 +757,10 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
                 if (player.Type is PlayerType.Spectator)
                     RemoveSpectator(player);
                 else
+                {
                     Close();
+                    udp.Stop();
+                }
 
                 break;
         }
@@ -859,6 +860,9 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             $"Changing player {player} local connect status for last frame from {connStatus.LastFrame.Number} to {syncTo} on disconnect request (current: {frameCount})");
         connStatus.Disconnected = true;
         connStatus.LastFrame = syncTo;
+
+        if (closed) return;
+
         if (syncTo < frameCount && !syncTo.IsNull)
         {
             logger.Write(LogLevel.Information,
