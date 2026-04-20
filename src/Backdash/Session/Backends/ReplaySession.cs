@@ -162,7 +162,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         isSynchronizing = false;
     }
 
-    public Task WaitUntilFinish(CancellationToken stoppingToken = default) => Task.CompletedTask;
+    public ValueTask WaitUntilFinish(CancellationToken stoppingToken = default) => ValueTask.CompletedTask;
 
     [MemberNotNull(nameof(callbacks))]
     public void SetHandler(INetcodeSessionHandler handler)

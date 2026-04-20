@@ -235,7 +235,7 @@ sealed class SpectatorSession<TInput> :
         logger.Write(LogLevel.Information, $"Spectating started on host {hostEndpoint}");
     }
 
-    public async Task WaitUntilFinish(CancellationToken stoppingToken = default)
+    public async ValueTask WaitUntilFinish(CancellationToken stoppingToken = default)
     {
         jobManager.Stop(TimeSpan.Zero);
         await backgroundJobTask.WaitAsync(stoppingToken).ConfigureAwait(false);

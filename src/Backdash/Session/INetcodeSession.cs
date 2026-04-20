@@ -195,7 +195,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     /// <summary>
     ///     Waits for the session background work to finish.
     /// </summary>
-    Task WaitUntilFinish(CancellationToken stoppingToken = default);
+    ValueTask WaitUntilFinish(CancellationToken stoppingToken = default);
 
     /// <summary>
     ///     Set the handler for the current session.

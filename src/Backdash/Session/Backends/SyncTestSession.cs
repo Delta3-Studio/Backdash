@@ -151,7 +151,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
         backGroundJobTask = tsc.Task.WaitAsync(stoppingToken);
     }
 
-    public async Task WaitUntilFinish(CancellationToken stoppingToken = default)
+    public async ValueTask WaitUntilFinish(CancellationToken stoppingToken = default)
     {
         // ReSharper disable once MethodSupportsCancellation
         tsc.SetCanceled(stoppingToken);

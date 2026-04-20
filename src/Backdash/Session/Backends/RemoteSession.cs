@@ -249,13 +249,11 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         backgroundJobTask = jobManager.Start(options.UseBackgroundThread, stoppingToken);
     }
 
-    public Task WaitUntilFinish(CancellationToken stoppingToken = default)
+    public async ValueTask WaitUntilFinish(CancellationToken stoppingToken = default)
     {
-        if (!jobManager.IsRunning)
-            return Task.CompletedTask;
-
+        if (!jobManager.IsRunning) return;
         jobManager.Stop(TimeSpan.Zero);
-        return backgroundJobTask.WaitAsync(stoppingToken);
+        await backgroundJobTask.WaitAsync(stoppingToken);
     }
 
     public void BeginFrame()
