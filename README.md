@@ -44,6 +44,7 @@ $ dotnet add package Backdash
 | Monogame Lobby   | [![Monogame Online](https://img.youtube.com/vi/LGM_9XfzRUI/default.jpg)](https://youtu.be/LGM_9XfzRUI)      |
 | Godot Lobby      | [![Godot Online](https://img.youtube.com/vi/8M8QnTiJZzA/default.jpg)](https://youtu.be/8M8QnTiJZzA)         |
 | Save/Load Replay | [![Save and load Replay](https://img.youtube.com/vi/iSbOJpLCx5M/default.jpg)](https://youtu.be/iSbOJpLCx5M) |
+| Fighting Game    | [![Save and load Replay](https://img.itch.zone/aW1nLzI2NDM0Mzg4LnBuZw==/180x143%23c/YGofud.png)](https://lucasteles.itch.io/prototype-fighter) | 
 
 ## Samples
 
