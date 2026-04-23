@@ -10,7 +10,6 @@ using Backdash.Options;
 using Backdash.Synchronizing;
 using Backdash.Synchronizing.Input;
 using Backdash.Synchronizing.State;
-using Timer = System.Timers.Timer;
 
 namespace Backdash.Network;
 
@@ -27,11 +26,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     readonly ProtocolInputBuffer<TInput> inputBuffer;
     readonly ChecksumStore checksumStore;
 
-    readonly Timer qualityReportTimer;
-    readonly Timer networkStatsTimer;
-    readonly Timer keepAliveTimer;
-    readonly Timer resendInputsTimer;
-    readonly Timer consistencyCheckTimer;
+    readonly ConnectionTimers timers;
     readonly bool disconnectCheckEnabled;
     long startedAt;
 
@@ -58,24 +53,16 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         this.outbox = outbox;
         this.inputBuffer = inputBuffer;
         this.checksumStore = checksumStore;
+        timers = new(options);
         disconnectCheckEnabled = options.IsDisconnectTimeoutEnabled();
 
-        keepAliveTimer = new(options.KeepAliveInterval);
-        keepAliveTimer.Elapsed += OnKeepAliveTick;
+        timers.KeepAlive.Elapsed += OnKeepAliveTick;
+        timers.ResendInputs.Elapsed += OnResendInputs;
+        timers.QualityReport.Elapsed += OnQualityReportTick;
+        timers.NetworkStats.Elapsed += OnNetworkStatsTick;
+        timers.ConsistencyCheck.Elapsed += OnConsistencyCheck;
 
-        resendInputsTimer = new(options.ResendInputInterval);
-        resendInputsTimer.Elapsed += OnResendInputs;
-
-        qualityReportTimer = new(options.QualityReportInterval);
-        qualityReportTimer.Elapsed += OnQualityReportTick;
-
-        networkStatsTimer = new(options.NetworkPackageStatsInterval);
-        networkStatsTimer.Elapsed += OnNetworkStatsTick;
-
-        consistencyCheckTimer = new(options.ConsistencyCheckInterval);
-        consistencyCheckTimer.Elapsed += OnConsistencyCheck;
-
-        state.StoppingToken.Register(StopTimers);
+        state.StoppingToken.Register(timers.Stop);
     }
 
     public void Dispose()
@@ -84,46 +71,14 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         if (!state.StoppingTokenSource.IsCancellationRequested)
             state.StoppingTokenSource.Cancel();
 
-        StopTimers();
+        timers.Stop();
         DispatchDisconnectEvent();
-
-        keepAliveTimer.Elapsed -= OnKeepAliveTick;
-        resendInputsTimer.Elapsed -= OnKeepAliveTick;
-        qualityReportTimer.Elapsed -= OnQualityReportTick;
-        networkStatsTimer.Elapsed -= OnNetworkStatsTick;
-        consistencyCheckTimer.Elapsed -= OnConsistencyCheck;
-
-        keepAliveTimer.Dispose();
-        resendInputsTimer.Dispose();
-        qualityReportTimer.Dispose();
-        networkStatsTimer.Dispose();
-        consistencyCheckTimer.Dispose();
-    }
-
-    void StartTimers()
-    {
-        keepAliveTimer.Start();
-        qualityReportTimer.Start();
-        resendInputsTimer.Start();
-
-        if (options.IsNetworkPackageStatsEnabled())
-            networkStatsTimer.Start();
-
-        if (options.IsConsistencyCheckEnabled())
-            consistencyCheckTimer.Start();
-    }
-
-    void StopTimers()
-    {
-        keepAliveTimer.Stop();
-        qualityReportTimer.Stop();
-        resendInputsTimer.Stop();
-
-        if (options.IsNetworkPackageStatsEnabled())
-            networkStatsTimer.Stop();
-
-        if (options.IsConsistencyCheckEnabled())
-            consistencyCheckTimer.Stop();
+        timers.KeepAlive.Elapsed -= OnKeepAliveTick;
+        timers.ResendInputs.Elapsed -= OnKeepAliveTick;
+        timers.QualityReport.Elapsed -= OnQualityReportTick;
+        timers.NetworkStats.Elapsed -= OnNetworkStatsTick;
+        timers.ConsistencyCheck.Elapsed -= OnConsistencyCheck;
+        timers.Dispose();
     }
 
     public void Disconnect()
@@ -149,7 +104,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     public void Start()
     {
         if (startedAt is 0)
-            StartTimers();
+            timers.Start();
 
         startedAt = Stopwatch.GetTimestamp();
     }
@@ -260,41 +215,34 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         }
     }
 
-    readonly object eventLocker = new();
 
     bool DispatchInterruptedEvent(TimeSpan timeout)
     {
-        lock (eventLocker)
+        if (state.Connection is not { DisconnectNotifySent: false, DisconnectEventSent: false })
+            return false;
+
+        networkEventHandler.OnNetworkEvent(state.Player, new(PeerEvent.ConnectionInterrupted)
         {
-            if (state.Connection is not { DisconnectNotifySent: false, DisconnectEventSent: false })
-                return false;
-
-            networkEventHandler.OnNetworkEvent(state.Player, new(PeerEvent.ConnectionInterrupted)
+            ConnectionInterrupted = new()
             {
-                ConnectionInterrupted = new()
-                {
-                    DisconnectTimeout = timeout,
-                },
-            });
+                DisconnectTimeout = timeout,
+            },
+        });
 
-            state.Connection.DisconnectNotifySent = true;
+        state.Connection.DisconnectNotifySent = true;
 
-            return true;
-        }
+        return true;
     }
 
     bool DispatchDisconnectEvent()
     {
-        lock (eventLocker)
-        {
-            if (state.Connection.DisconnectEventSent)
-                return false;
+        if (state.Connection.DisconnectEventSent)
+            return false;
 
-            state.Connection.DisconnectEventSent = true;
-            networkEventHandler.OnNetworkEvent(PeerEvent.Disconnected, state.Player);
+        state.Connection.DisconnectEventSent = true;
+        networkEventHandler.OnNetworkEvent(PeerEvent.Disconnected, state.Player);
 
-            return true;
-        }
+        return true;
     }
 
     void OnKeepAliveTick(object? sender, ElapsedEventArgs e)

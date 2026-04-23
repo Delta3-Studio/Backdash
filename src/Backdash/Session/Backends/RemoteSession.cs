@@ -100,7 +100,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             inputListener = new MemoryInputListener<TInput>(inputListener);
 
 
-        udp = services.ProtocolClientFactory.CreateClient(options.LocalPort, peerObservers);
+        udp = services.PeerClientFactory.CreateClient(options.LocalPort, peerObservers);
 
         peerConnectionFactory = new(
             networkEventQueue,

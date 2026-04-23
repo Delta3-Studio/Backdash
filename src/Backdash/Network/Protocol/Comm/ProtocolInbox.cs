@@ -319,7 +319,8 @@ sealed class ProtocolInbox<TInput>(
 
         if (state.Consistency.AskedFrame != checkFrame || localChecksum.IsEmpty || checksum.IsEmpty)
         {
-            logger.Write(LogLevel.Warning, $"Unable to find reply local checksum #{checksum} for {checkFrame}");
+            logger.Write(LogLevel.Warning,
+                $"Unable to find reply local checksum #{checksum} for {checkFrame} [last: {checksumStore.LastFrame()}]");
             return false;
         }
 

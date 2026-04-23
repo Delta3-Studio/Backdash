@@ -76,7 +76,7 @@ sealed class SpectatorSession<TInput> :
         inputs = new GameInput<ConfirmedInputs<TInput>>[options.SpectatorInputBufferLength];
         callbacks = services.SessionHandler;
         endianness = options.GetEndiannessNumberStateSerializer();
-        udp = services.ProtocolClientFactory.CreateClient(options.LocalPort, peerObservers);
+        udp = services.PeerClientFactory.CreateClient(options.LocalPort, peerObservers);
         ConfigureJobs(services);
 
         var magicNumber = services.Random.SyncNumber();

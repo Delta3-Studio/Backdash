@@ -23,6 +23,8 @@ sealed class ChecksumStore
         return entry.Frame == frame ? entry.Checksum : Checksum.Empty;
     }
 
+    public Frame LastFrame() => data is [] ? Frame.Null : data.Max(x => x.Frame);
+
     struct Entry
     {
         public Frame Frame;

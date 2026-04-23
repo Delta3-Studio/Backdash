@@ -16,7 +16,7 @@ sealed class SessionServices<TInput> where TInput : unmanaged
     public IChecksumProvider ChecksumProvider { get; }
     public Logger Logger { get; }
     public NetcodeJobManager JobManager { get; }
-    public ProtocolClientFactory ProtocolClientFactory { get; }
+    public PeerClientFactory PeerClientFactory { get; }
     public IStateStore StateStore { get; }
     public ChecksumStore ChecksumStore { get; }
     public IRandomNumberGenerator Random { get; }
@@ -60,7 +60,7 @@ sealed class SessionServices<TInput> where TInput : unmanaged
         SessionHandler = services?.SessionHandler ?? new EmptySessionHandler(Logger);
 
         var socketFactory = services?.PeerSocketFactory ?? new PeerSocketFactory();
-        ProtocolClientFactory = new(options, socketFactory, Logger, LatencyStrategy);
+        PeerClientFactory = new(options, socketFactory, Logger, LatencyStrategy);
         Jobs = services?.Jobs.ToArray() ?? [];
         PluginManager = new(Logger, services?.Plugin);
     }

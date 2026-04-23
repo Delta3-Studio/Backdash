@@ -6,7 +6,7 @@ using Backdash.Options;
 
 namespace Backdash.Network.Protocol;
 
-sealed class ProtocolClientFactory(
+sealed class PeerClientFactory(
     NetcodeOptions options,
     IPeerSocketFactory socketFactory,
     Logger logger,

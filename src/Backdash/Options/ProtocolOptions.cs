@@ -177,15 +177,15 @@ public sealed record ProtocolOptions
     ///     On each interval one peer requests a frame to other peer which must respond
     ///     with the state checksum of that frame.
     /// </summary>
-    /// <value>Defaults to <c>3_000</c> milliseconds</value>
+    /// <value>Defaults to <c>1</c> second</value>
     /// <seealso cref="ConsistencyCheckDistance" />
     /// <seealso cref="ConsistencyCheckTimeout" />
-    public TimeSpan ConsistencyCheckInterval { get; set; } = TimeSpan.FromSeconds(3);
+    public TimeSpan ConsistencyCheckInterval { get; set; } = TimeSpan.FromSeconds(1);
 
     /// <summary>
     ///     The number of checksum frames that will be keep for consistency checks.
     /// </summary>
-    /// <value>Defaults to <c>180</c></value>
+    /// <value>Defaults to <c>250</c></value>
     /// <seealso cref="ConsistencyCheckTimeout" />
     /// <seealso cref="ConsistencyCheckInterval" />
     public int ConsistencyCheckStoreSize { get; set; } = 250;
@@ -203,11 +203,10 @@ public sealed record ProtocolOptions
     /// <summary>
     ///     Max wait time for non-success consistency checks (0 to disable).
     /// </summary>
-    /// <value>Defaults to <c>10_000</c> milliseconds</value>
+    /// <value>Defaults to <c>10</c> seconds</value>
     /// <seealso cref="ConsistencyCheckDistance" />
     /// <seealso cref="ConsistencyCheckInterval" />
-    public TimeSpan ConsistencyCheckTimeout { get; set; } =
-        TimeSpan.FromMilliseconds(10_000);
+    public TimeSpan ConsistencyCheckTimeout { get; set; } = TimeSpan.FromSeconds(10);
 
     /// <summary>
     ///     Custom receive socket address size
