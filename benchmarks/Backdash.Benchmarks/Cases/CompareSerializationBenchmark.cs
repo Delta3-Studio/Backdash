@@ -4,6 +4,8 @@
 
 using System.Buffers;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Backdash.Data;
 using Backdash.Network;
 using Backdash.Serialization;
@@ -12,28 +14,33 @@ using MemoryPack;
 
 namespace Backdash.Benchmarks.Cases;
 
-[InProcess, MemoryDiagnoser]
-[RPlotExporter, RankColumn]
+[RPlotExporter]
+[InProcess, MemoryDiagnoser, RankColumn]
 public class CompareSerializationBenchmark
 {
     TestData data = null!;
     TestData result = null!;
+    (BinaryReader Reader, BinaryWriter Writer) native;
 
-    readonly ArrayBufferWriter<byte> buffer = new((int)ByteSize.FromMebiBytes(10).ByteCount);
+    static int InitialBufferCapacity => (int)ByteSize.FromMebiBytes(10).ByteCount;
+    readonly ArrayBufferWriter<byte> buffer = new(InitialBufferCapacity);
+    readonly MemoryStream stream = new(InitialBufferCapacity);
 
     [GlobalSetup]
     public void Setup()
     {
         Random random = new(42);
         data = TestData.Generate(random);
+        native = new(new(stream), new(stream));
         Console.WriteLine($"===> Current-Endianness: {Platform.Endianness})");
     }
 
     [IterationSetup]
     public void BeforeEach()
     {
-        buffer.Clear();
         result = new();
+        buffer.Clear();
+        stream.Seek(0, SeekOrigin.Begin);
     }
 
     [IterationCleanup]
@@ -41,6 +48,15 @@ public class CompareSerializationBenchmark
     {
         var size = ByteSize.FromBytes(buffer.WrittenCount);
         Console.WriteLine($"Data-Size: {size} ({size.ByteCount} bytes)");
+    }
+
+    [Benchmark(Baseline = true)]
+    public void NativeSerializer()
+    {
+        data.Serialize(native.Writer);
+        stream.Seek(0, SeekOrigin.Begin);
+        result.Deserialize(native.Reader);
+        Debug.Assert(data == result);
     }
 
     [Benchmark]
@@ -77,17 +93,19 @@ public class CompareSerializationBenchmark
 }
 
 [MemoryPackable]
-public sealed partial class TestData : IBinarySerializable, IEquatable<TestData>
+public sealed partial class TestData : IBinarySerializable, INativeSerializable, IEquatable<TestData>
 {
     public bool Field1;
     public ulong Field2;
-    public TestEntryData[] Field3;
+    public byte[] Field3;
+    public TestEntryData[] Field4;
 
     public TestData()
     {
-        Field3 = new TestEntryData[20_000];
-        for (var i = 0; i < Field3.Length; i++)
-            Field3[i].Field9 = new int[10_000];
+        Field3 = new byte[100_000];
+        Field4 = new TestEntryData[20_000];
+        for (var i = 0; i < Field4.Length; i++)
+            Field4[i].Field9 = new int[10_000];
     }
 
     public void Serialize(ref readonly BinaryBufferWriter writer)
@@ -95,13 +113,31 @@ public sealed partial class TestData : IBinarySerializable, IEquatable<TestData>
         writer.Write(in Field1);
         writer.Write(in Field2);
         writer.Write(in Field3);
+        writer.Write(in Field4);
     }
 
     public void Deserialize(ref readonly BinaryBufferReader reader)
     {
         reader.Read(ref Field1);
         reader.Read(ref Field2);
-        reader.Read(in Field3);
+        reader.Read(Field3);
+        reader.Read(Field4);
+    }
+
+    public void Serialize(BinaryWriter writer)
+    {
+        writer.Write(Field1);
+        writer.Write(Field2);
+        writer.Write(Field3);
+        writer.WriteObject<TestEntryData>(Field4);
+    }
+
+    public void Deserialize(BinaryReader reader)
+    {
+        Field1 = reader.ReadBoolean();
+        Field2 = reader.ReadUInt64();
+        _ = reader.Read(Field3);
+        reader.ReadObject<TestEntryData>(Field4.AsSpan());
     }
 
     public override int GetHashCode() => throw new InvalidOperationException();
@@ -116,7 +152,8 @@ public sealed partial class TestData : IBinarySerializable, IEquatable<TestData>
 
         return left.Field1 == right.Field1
                && left.Field2 == right.Field2
-               && left.Field3.AsSpan().SequenceEqual(right.Field3);
+               && left.Field3.AsSpan().SequenceEqual(right.Field3)
+               && left.Field4.AsSpan().SequenceEqual(right.Field4);
     }
 
     public static bool operator ==(TestData? left, TestData? right) => Equals(left, right);
@@ -130,9 +167,11 @@ public sealed partial class TestData : IBinarySerializable, IEquatable<TestData>
             Field2 = random.Generate<ulong>(),
         };
 
-        for (int i = 0; i < testData.Field3.Length; i++)
+        random.Generate(testData.Field3);
+
+        for (int i = 0; i < testData.Field4.Length; i++)
         {
-            ref var entry = ref testData.Field3[i];
+            ref var entry = ref testData.Field4[i];
             entry.Field1 = random.Next();
             entry.Field2 = random.Generate<uint>();
             entry.Field3 = random.Generate<ulong>();
@@ -149,7 +188,7 @@ public sealed partial class TestData : IBinarySerializable, IEquatable<TestData>
 }
 
 [MemoryPackable]
-public partial struct TestEntryData() : IBinarySerializable, IEquatable<TestEntryData>
+public partial struct TestEntryData() : IBinarySerializable, INativeSerializable, IEquatable<TestEntryData>
 {
     public int Field1;
     public uint Field2;
@@ -187,6 +226,32 @@ public partial struct TestEntryData() : IBinarySerializable, IEquatable<TestEntr
         reader.Read(Field9);
     }
 
+    public readonly void Serialize(BinaryWriter writer)
+    {
+        writer.Write(Field1);
+        writer.Write(Field2);
+        writer.Write(Field3);
+        writer.Write(Field4);
+        writer.Write(Field5);
+        writer.Write(Field6);
+        writer.Write(Field7);
+        writer.Write(Field8);
+        writer.WriteSpan<int>(Field9);
+    }
+
+    public void Deserialize(BinaryReader reader)
+    {
+        Field1 = reader.ReadInt32();
+        Field2 = reader.ReadUInt32();
+        Field3 = reader.ReadUInt64();
+        Field4 = reader.ReadInt64();
+        Field5 = reader.ReadInt16();
+        Field6 = reader.ReadUInt16();
+        Field7 = reader.ReadByte();
+        Field8 = reader.ReadSByte();
+        reader.ReadSpan(Field9.AsSpan());
+    }
+
     public override readonly int GetHashCode() => throw new InvalidOperationException();
 
     public readonly bool Equals(TestEntryData other) => Equals(in this, in other);
@@ -205,4 +270,49 @@ public partial struct TestEntryData() : IBinarySerializable, IEquatable<TestEntr
 
     public static bool operator ==(TestEntryData left, TestEntryData right) => Equals(in left, in right);
     public static bool operator !=(TestEntryData left, TestEntryData right) => !Equals(in left, in right);
+}
+
+interface INativeSerializable
+{
+    void Serialize(BinaryWriter writer);
+    void Deserialize(BinaryReader reader);
+}
+
+static class BinaryWriterEx
+{
+    public static void WriteObject<T>(this BinaryWriter @this, T value) where T : INativeSerializable =>
+        value.Serialize(@this);
+
+    public static void WriteObject<T>(this BinaryWriter @this, ReadOnlySpan<T> values) where T : INativeSerializable
+    {
+        ref var current = ref MemoryMarshal.GetReference(values);
+        ref var limit = ref Unsafe.Add(ref current, values.Length);
+
+        while (Unsafe.IsAddressLessThan(ref current, ref limit))
+        {
+            current.Serialize(@this);
+            current = ref Unsafe.Add(ref current, 1)!;
+        }
+    }
+
+    public static void ReadObject<T>(this BinaryReader @this, T value) where T : INativeSerializable =>
+        value.Deserialize(@this);
+
+    public static void ReadObject<T>(this BinaryReader @this, ReadOnlySpan<T> values) where T : INativeSerializable
+    {
+        ref var current = ref MemoryMarshal.GetReference(values);
+        ref var limit = ref Unsafe.Add(ref current, values.Length);
+
+        while (Unsafe.IsAddressLessThan(ref current, ref limit))
+        {
+            current.Deserialize(@this);
+            current = ref Unsafe.Add(ref current, 1)!;
+        }
+    }
+
+    public static void WriteSpan<T>(this BinaryWriter @this, ReadOnlySpan<T> values) where T : unmanaged =>
+        @this.Write(MemoryMarshal.AsBytes(values));
+
+    public static void ReadSpan<T>(this BinaryReader @this, Span<T> values) where T : unmanaged =>
+        _ = @this.Read(MemoryMarshal.AsBytes(values));
 }

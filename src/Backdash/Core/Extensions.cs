@@ -71,6 +71,12 @@ public static class NetcodeExtensions
         random.NextBytes(MemoryMarshal.AsBytes(buffer));
 
     /// <summary>
+    /// Fill <paramref name="buffer"/> with random <typeparamref name="T"/> values.
+    /// </summary>
+    public static void Generate<T>(this Random random, T[] buffer) where T : unmanaged =>
+        random.Generate(buffer.AsSpan());
+
+    /// <summary>
     /// Return an  array with random <typeparamref name="T"/> values.
     /// </summary>
     public static T[] Generate<T>(this Random random, int count) where T : unmanaged

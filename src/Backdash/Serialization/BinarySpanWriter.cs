@@ -327,6 +327,14 @@ public readonly ref struct BinarySpanWriter
             Write(in Nullable.GetValueRefOrDefaultRef(in value));
     }
 
+    /// <inheritdoc cref="Write(in Checksum)" />
+    public void Write(in Checksum? value)
+    {
+        Write(value.HasValue);
+        if (value.HasValue)
+            Write(in Nullable.GetValueRefOrDefaultRef(in value));
+    }
+
     #endregion
 
     /// <summary>Writes a span of <see cref="sbyte" /> <paramref name="value" /> into buffer.</summary>
@@ -472,6 +480,9 @@ public readonly ref struct BinarySpanWriter
 
     /// <summary>Writes a span of <see cref="Frame" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<Frame> values) => Write(MemoryMarshal.Cast<Frame, int>(values));
+
+    /// <summary>Writes a span of <see cref="Checksum" /> <paramref name="values" /> into buffer.</summary>
+    public void Write(in ReadOnlySpan<Checksum> values) => Write(MemoryMarshal.Cast<Checksum, uint>(values));
 
     #region Lists
 

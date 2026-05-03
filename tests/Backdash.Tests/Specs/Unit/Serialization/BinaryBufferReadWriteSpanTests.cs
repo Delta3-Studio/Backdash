@@ -316,6 +316,18 @@ public class BinaryBufferReadWriteSpanTests
     }
 
     [PropertyTest]
+    public bool SpanOfChecksum(Checksum[] value, Endianness endianness)
+    {
+        var size = Setup(value, endianness, out var writer);
+        writer.Write(value);
+        var reader = GetReader(writer);
+        Span<Checksum> read = stackalloc Checksum[value.Length];
+        reader.Read(in read);
+        reader.ReadCount.Should().Be(size);
+        return value.AsSpan().SequenceEqual(read);
+    }
+
+    [PropertyTest]
     public bool SpanOfDateTime(DateTime[] value, Endianness endianness)
     {
         var kindSize = 1 * value.Length;

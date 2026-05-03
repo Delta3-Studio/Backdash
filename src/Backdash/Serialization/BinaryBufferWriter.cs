@@ -175,6 +175,9 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes single <see cref="Frame" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in Frame value) => WriteAsInt32(in value);
 
+    /// <summary>Writes single <see cref="Checksum" /> <paramref name="value" /> into buffer.</summary>
+    public void Write(in Checksum value) => WriteAsUInt32(in value);
+
     #region Nullable Values
 
     /// <inheritdoc cref="Write(in byte)" />
@@ -308,17 +311,37 @@ public readonly struct BinaryBufferWriter(
             Write(in Nullable.GetValueRefOrDefaultRef(in value));
     }
 
+    /// <inheritdoc cref="Write(in Checksum)" />
+    public void Write(in Checksum? value)
+    {
+        Write(value.HasValue);
+        if (value.HasValue)
+            Write(in Nullable.GetValueRefOrDefaultRef(in value));
+    }
+
     #endregion
 
     /// <summary>Writes a span bytes of <see cref="byte" /> <paramref name="value" /> into buffer.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(in ReadOnlySpan<byte> value) => buffer.Write(value);
 
+    /// <inheritdoc cref="Write(in ReadOnlySpan{byte})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in byte[] value) => Write(value.AsSpan());
+
     /// <summary>Writes a span of <see cref="sbyte" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<sbyte> value) => WriteSpan(in value);
 
+    /// <inheritdoc cref="Write(in ReadOnlySpan{sbyte})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in sbyte[] value) => Write(value.AsSpan());
+
     /// <summary>Writes a span of <see cref="bool" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<bool> value) => WriteSpan(in value);
+
+    /// <inheritdoc cref="Write(in ReadOnlySpan{bool})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in bool[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="short" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<short> value)
@@ -329,6 +352,10 @@ public readonly struct BinaryBufferWriter(
             WriteSpan(in value);
     }
 
+    /// <inheritdoc cref="Write(in ReadOnlySpan{short})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in short[] value) => Write(value.AsSpan());
+
     /// <summary>Writes a span of <see cref="ushort" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<ushort> value)
     {
@@ -338,8 +365,16 @@ public readonly struct BinaryBufferWriter(
             WriteSpan(in value);
     }
 
+    /// <inheritdoc cref="Write(in ReadOnlySpan{ushort})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in ushort[] value) => Write(value.AsSpan());
+
     /// <summary>Writes a span of <see cref="char" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<char> value) => Write(MemoryMarshal.Cast<char, ushort>(value));
+
+    /// <inheritdoc cref="Write(in ReadOnlySpan{char})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in char[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="int" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<int> value)
@@ -350,6 +385,10 @@ public readonly struct BinaryBufferWriter(
             WriteSpan(in value);
     }
 
+    /// <inheritdoc cref="Write(in ReadOnlySpan{int})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in int[] value) => Write(value.AsSpan());
+
     /// <summary>Writes a span of <see cref="uint" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<uint> value)
     {
@@ -358,6 +397,10 @@ public readonly struct BinaryBufferWriter(
         else
             WriteSpan(in value);
     }
+
+    /// <inheritdoc cref="Write(in ReadOnlySpan{uint})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in uint[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="long" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<long> value)
@@ -368,6 +411,10 @@ public readonly struct BinaryBufferWriter(
             WriteSpan(in value);
     }
 
+    /// <inheritdoc cref="Write(in ReadOnlySpan{long})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in long[] value) => Write(value.AsSpan());
+
     /// <summary>Writes a span of <see cref="ulong" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<ulong> value)
     {
@@ -376,6 +423,10 @@ public readonly struct BinaryBufferWriter(
         else
             WriteSpan(in value);
     }
+
+    /// <inheritdoc cref="Write(in ReadOnlySpan{ulong})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in ulong[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="Int128" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<Int128> value)
@@ -386,6 +437,10 @@ public readonly struct BinaryBufferWriter(
             WriteSpan(in value);
     }
 
+    /// <inheritdoc cref="Write(in ReadOnlySpan{Int128})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in Int128[] value) => Write(value.AsSpan());
+
     /// <summary>Writes a span of <see cref="UInt128" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<UInt128> values)
     {
@@ -395,8 +450,16 @@ public readonly struct BinaryBufferWriter(
             WriteSpan(in values);
     }
 
+    /// <inheritdoc cref="Write(in ReadOnlySpan{UInt128})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in UInt128[] value) => Write(value.AsSpan());
+
     /// <summary>Writes a span of <see cref="float" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<float> values) => Write(MemoryMarshal.Cast<float, int>(values));
+
+    /// <inheritdoc cref="Write(in ReadOnlySpan{float})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(in float[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="double" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<double> values) => Write(MemoryMarshal.Cast<double, long>(values));
@@ -457,6 +520,9 @@ public readonly struct BinaryBufferWriter(
 
     /// <summary>Writes a span of <see cref="Frame" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<Frame> values) => Write(MemoryMarshal.Cast<Frame, int>(values));
+
+    /// <summary>Writes a span of <see cref="Checksum" /> <paramref name="values" /> into buffer.</summary>
+    public void Write(in ReadOnlySpan<Checksum> values) => Write(MemoryMarshal.Cast<Checksum, uint>(values));
 
     #region Lists
 
@@ -525,6 +591,9 @@ public readonly struct BinaryBufferWriter(
 
     /// <summary>Writes a list <see cref="Frame" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in List<Frame> values) => Write(GetListSpan(in values));
+
+    /// <summary>Writes a list <see cref="Checksum" /> <paramref name="values" /> into buffer.</summary>
+    public void Write(in List<Checksum> values) => Write(GetListSpan(in values));
 
     #endregion
 

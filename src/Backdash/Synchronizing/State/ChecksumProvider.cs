@@ -24,7 +24,7 @@ sealed class DelegateChecksumProvider(ChecksumDelegate compute) : IChecksumProvi
 /// <summary>
 ///     Provider always zero checksum
 /// </summary>
-public class EmptyChecksumProvider : IChecksumProvider
+public sealed class EmptyChecksumProvider : IChecksumProvider
 {
     /// <inheritdoc />
     public Checksum Compute(ReadOnlySpan<byte> data) => Checksum.Empty;

@@ -943,6 +943,15 @@ public readonly ref struct BinaryBufferReader
     /// <summary>Reads a list of <see cref="Frame" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<Frame> values) => Read(GetListSpan(in values));
 
+    /// <summary>Reads a span of <see cref="Checksum" /> from buffer into <paramref name="values" />.</summary>
+    public void Read(in Span<Checksum> values)
+    {
+        if (values.IsEmpty) return;
+        Read(MemoryMarshal.Cast<Checksum, uint>(values));
+    }
+
+    /// <summary>Reads a list of <see cref="Checksum" /> from buffer into <paramref name="values" />.</summary>
+    public void Read(in List<Checksum> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a <see cref="byte" /> from buffer and reinterprets it as <typeparamref name="T" />.</summary>
     public T ReadAsByte<T>() where T : unmanaged
