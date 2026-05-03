@@ -8,6 +8,7 @@ using Backdash.Options;
 using Backdash.Serialization;
 using Backdash.Serialization.Internal;
 using Backdash.Synchronizing.Input;
+using Backdash.Synchronizing.Input.Confirmed;
 using Backdash.Synchronizing.Random;
 using Backdash.Synchronizing.State;
 
@@ -19,6 +20,8 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     readonly Logger logger;
     readonly HashSet<NetcodePlayer> addedPlayers = new(Max.NumberOfPlayers);
     readonly Dictionary<Guid, NetcodePlayer> allPlayers = [];
+    readonly IInputListener<TInput>? inputListener;
+    readonly InputContext<TInput> inputContext;
 
     InputQueue<TInput>[] inputQueues = [];
     SynchronizedInput<TInput>[] syncInputBuffer = [];
@@ -32,6 +35,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     readonly NetcodeOptions options;
 
     bool running;
+    bool disposed;
 
     INetcodeSessionHandler callbacks;
     Task backGroundJobTask = Task.CompletedTask;
@@ -52,12 +56,42 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         callbacks = services.SessionHandler;
         comparer = services.InputComparer;
         stateStore.Initialize(options.TotalSavedFramesAllowed);
+
+        var inputSerializer = services.InputSerializer;
+        var inputGroupSerializer = new ConfirmedInputsSerializer<TInput>(inputSerializer);
+        inputContext = new(options, inputSerializer, inputGroupSerializer);
+        inputListener = services.InputListener;
+        if (options.SaveConfirmedInputHistory)
+            inputListener = new MemoryInputListener<TInput>(inputListener);
+
         this.options = options;
     }
 
-    public void Dispose() => tsc.TrySetCanceled();
+    void Close()
+    {
+        callbacks.OnSessionClose();
+        inputListener?.OnSessionClose();
+    }
 
-    public async ValueTask DisposeAsync() => await WaitUntilFinish();
+    void DisposeInternal()
+    {
+        if (disposed) return;
+        disposed = true;
+        Close();
+        inputListener?.Dispose();
+    }
+
+    public void Dispose()
+    {
+        DisposeInternal();
+        tsc.TrySetCanceled();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        DisposeInternal();
+        await WaitUntilFinish();
+    }
 
     public int NumberOfPlayers => Math.Max(addedPlayers.Count, 1);
     public int NumberOfSpectators => 0;
@@ -90,6 +124,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         if (running) return;
         running = true;
         callbacks.OnSessionStart();
+        inputListener?.OnSessionStart(inputContext);
         backGroundJobTask = tsc.Task.WaitAsync(stoppingToken);
     }
 
@@ -103,17 +138,13 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public void WriteLog(LogLevel level, string message) => logger.Write(level, message);
     public void WriteLog(string message, Exception? error = null) => logger.Write(message, error);
 
-    public ResultCode AddPlayer(NetcodePlayer player)
-    {
-        var result = player.Type switch
+    public ResultCode AddPlayer(NetcodePlayer player) =>
+        player.Type switch
         {
             PlayerType.Local => AddLocalPlayer(player),
             PlayerType.Spectator or PlayerType.Remote => ResultCode.NotSupported,
             _ => throw new ArgumentOutOfRangeException(nameof(player)),
         };
-
-        return result;
-    }
 
     public ResultCode AddLocalPlayer(NetcodePlayer player)
     {
@@ -201,9 +232,33 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     {
         CurrentFrame++;
         SaveCurrentFrame();
+        SyncListeners();
         Array.Clear(inputBuffer);
         Array.Clear(syncInputBuffer);
         logger.Write(LogLevel.Trace, $"End of frame({CurrentFrame.Number})");
+    }
+
+    void SyncListeners()
+    {
+        if (inputListener is null) return;
+        var frame = CurrentFrame;
+        GameInput<ConfirmedInputs<TInput>> confirmed = new(frame);
+        confirmed.Data.Count = (byte)NumberOfPlayers;
+        confirmed.Frame = frame;
+        GameInput<TInput> current = new();
+
+        for (var playerNumber = 0; playerNumber < NumberOfPlayers; playerNumber++)
+        {
+            if (!inputQueues[playerNumber].GetConfirmedInput(in frame, ref current)) return;
+            confirmed.Data.Inputs[playerNumber] = current.Data;
+            inputListener.OnConfirmed(in confirmed.Frame, in confirmed.Data);
+        }
+    }
+
+    void TryDropSavedInputsAfter(Frame newFrame)
+    {
+        if (inputListener is not MemoryInputListener<TInput> listener) return;
+        listener.Drop(CurrentFrame.Number - newFrame.Number);
     }
 
     public bool LoadFrame(Frame frame)
@@ -222,6 +277,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         var offset = 0;
         BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
         callbacks.LoadState(frame, ref reader);
+        TryDropSavedInputsAfter(frame);
         CurrentFrame = frame;
         DiscardInputsAfter(frame);
 
@@ -232,6 +288,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     {
         if (snapshot.Frame.Number >= 0)
         {
+            TryDropSavedInputsAfter(snapshot.Frame);
             CurrentFrame = snapshot.Frame;
             DiscardInputsAfter(CurrentFrame);
             stateStore.Seek(CurrentFrame);
@@ -288,4 +345,6 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         ArgumentNullException.ThrowIfNull(handler);
         callbacks = handler;
     }
+
+    public IInputCollection<TInput>? GetSavedInputs() => inputListener as MemoryInputListener<TInput>;
 }

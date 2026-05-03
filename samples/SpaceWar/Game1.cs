@@ -66,12 +66,13 @@ public class Game1 : Game
 
     void SaveInputsFile()
     {
-        Console.WriteLine($"Confirmed Inputs: {session.GetConfirmedInputs().Count}");
+        if (session.GetSavedInputs() is not { } listener) return;
+        Console.WriteLine($"Confirmed Inputs: {listener.Count}");
 
         if (!session.TryGetLocalPlayer(out var player))
             return;
 
-        var inputs = session.GetConfirmedInputsBytes();
+        var inputs = listener.GetCompressedInputs();
         File.WriteAllBytes($"player{player.Number}.inputs", inputs);
     }
 

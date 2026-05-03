@@ -10,7 +10,7 @@ namespace Backdash.Synchronizing.Input.Confirmed;
 /// <summary>
 ///  Listener that saves the confirmed inputs in-memory
 /// </summary>
-public sealed class MemoryInputListener<TInput> : IInputListener<TInput>, IEnumerable<ConfirmedInputs<TInput>>
+public sealed class MemoryInputListener<TInput> : IInputListener<TInput>, IInputCollection<TInput>
     where TInput : unmanaged
 {
     readonly IInputListener<TInput>? nextListener;
@@ -22,6 +22,11 @@ public sealed class MemoryInputListener<TInput> : IInputListener<TInput>, IEnume
     /// Returns all read inputs
     /// </summary>
     public IReadOnlyList<ConfirmedInputs<TInput>> Inputs { get; }
+
+    /// <summary>
+    /// Returns the input count
+    /// </summary>
+    public int Count => inputList.Count;
 
     internal MemoryInputListener(IInputListener<TInput>? next)
     {
@@ -39,6 +44,23 @@ public sealed class MemoryInputListener<TInput> : IInputListener<TInput>, IEnume
     /// Clear current inputs
     /// </summary>
     public void Clear() => inputList.Clear();
+
+    /// <summary>
+    /// Drop <paramref name="count"/> inputs
+    /// </summary>
+    public void Drop(int count)
+    {
+        if (count <= 0) return;
+        var from = Count - count;
+
+        if (from < 0)
+        {
+            Clear();
+            return;
+        }
+
+        inputList.RemoveRange(from, Count - from);
+    }
 
     /// <summary>
     /// Return all input bytes compressed with Deflate
@@ -95,4 +117,35 @@ public sealed class MemoryInputListener<TInput> : IInputListener<TInput>, IEnume
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     IEnumerator<ConfirmedInputs<TInput>> IEnumerable<ConfirmedInputs<TInput>>.GetEnumerator() => GetEnumerator();
+}
+
+/// <summary>
+///  Provides in-memory confirmed inputs
+/// </summary>
+public interface IInputCollection<TInput> : IEnumerable<ConfirmedInputs<TInput>> where TInput : unmanaged
+{
+    /// <summary>
+    /// Returns the input count
+    /// </summary>
+    int Count { get; }
+
+    /// <summary>
+    /// Returns all read inputs
+    /// </summary>
+    IReadOnlyList<ConfirmedInputs<TInput>> Inputs { get; }
+
+    /// <summary>
+    /// Clear current inputs
+    /// </summary>
+    void Clear();
+
+    /// <summary>
+    /// Drop <paramref name="count"/> inputs
+    /// </summary>
+    void Drop(int count);
+
+    /// <summary>
+    /// Return all input bytes compressed with Deflate
+    /// </summary>
+    byte[] GetCompressedInputs();
 }

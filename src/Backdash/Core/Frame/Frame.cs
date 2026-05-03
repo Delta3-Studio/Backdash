@@ -144,12 +144,22 @@ public readonly record struct Frame :
     /// <summary>
     ///     Clamps frame value to a range
     /// </summary>
-    public static Frame Clamp(in Frame frame, int min, int max) => new(Math.Clamp(frame.Number, min, max));
+    public static Frame Clamp(Frame frame, int min, int max) => new(Math.Clamp(frame.Number, min, max));
 
     /// <summary>
     ///     Clamps frame value to a range
     /// </summary>
-    public static Frame Clamp(Frame frame, Frame min, Frame max) => Clamp(in frame, min.Number, max.Number);
+    public static Frame Clamp(Frame frame, Frame min, Frame max) => Clamp(frame, min.Number, max.Number);
+
+    /// <summary>
+    ///     Clamps frame value to be greater than zero
+    /// </summary>
+    public static Frame Positive(int frame) => new(Math.Clamp(frame, 0, int.MaxValue));
+
+    /// <summary>
+    ///     Clamps frame value to be greater than zero
+    /// </summary>
+    public static Frame Positive(Frame frame) => Positive(frame.Number);
 
     /// <inheritdoc />
     public static bool operator >(Frame left, Frame right) => left.Number > right.Number;

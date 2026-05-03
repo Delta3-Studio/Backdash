@@ -59,7 +59,9 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
             .Select(x => new NetcodePlayer((sbyte)x, PlayerType.Remote))
             .ToFrozenSet();
         playerMap = fakePlayers.ToFrozenDictionary(x => x.Id, x => x);
-        stateStore.Initialize(ReplayController.MaxBackwardFrames);
+
+        var maxSavedFrames = Math.Max(ReplayController.MaxBackwardFrames.Frames, options.TotalSavedFramesAllowed);
+        stateStore.Initialize(maxSavedFrames);
 
         InputContext<TInput> inputContext = new(
             options, services.InputSerializer,
@@ -71,6 +73,8 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
                 inputList = provider.GetInputs(inputContext);
         else
             inputList = [];
+
+        ReplayController.LastInputFrame = Frame.Positive(inputList.Count - 1);
     }
 
     public void Dispose()
@@ -137,6 +141,9 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
             SaveCurrentFrame();
         }
 
+        if (CurrentFrame >= inputList.Count)
+            callbacks.OnReplayCompleted();
+
         CurrentFrame = Frame.Clamp(CurrentFrame, 0, inputList.Count);
         logger.Write(LogLevel.Debug, $"[End Frame {CurrentFrame}]");
     }
@@ -177,7 +184,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
             return ResultCode.NotSynchronized;
 
         if (CurrentFrame.Number >= inputList.Count)
-            return ResultCode.NotSynchronized;
+            return ResultCode.InputDropped;
 
         var confirmed = inputList[CurrentFrame.Number];
 

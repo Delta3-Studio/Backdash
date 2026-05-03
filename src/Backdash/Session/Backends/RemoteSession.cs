@@ -46,6 +46,10 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     readonly ProtocolNetworkEventQueue networkEventQueue;
     readonly PluginManager plugins;
 
+    delegate Frame GetMinFramePlayers();
+
+    readonly GetMinFramePlayers getMinFramePlayers;
+
     bool isSynchronizing = true;
     int nextSyncInterval;
     Frame nextSpectatorFrame = Frame.Zero;
@@ -54,6 +58,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     SynchronizedInput<TInput>[] syncInputBuffer = [];
     TInput[] inputBuffer = [];
     Task backgroundJobTask = Task.CompletedTask;
+    uint extraSeedState;
     readonly ushort syncNumber;
     bool started;
     bool disposed;
@@ -81,6 +86,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         inputComparer = services.InputComparer;
         confirmedInputComparer = ConfirmedInputComparer<TInput>.Create(services.InputComparer);
+        getMinFramePlayers = NumberOfPlayers <= 2 ? MinimumFrame2Players : MinimumFrameNPlayers;
 
         inputSerializer = services.InputSerializer;
         inputGroupSerializer = new ConfirmedInputsSerializer<TInput>(inputSerializer);
@@ -98,7 +104,6 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         if (this.options.SaveConfirmedInputHistory)
             inputListener = new MemoryInputListener<TInput>(inputListener);
-
 
         udp = services.PeerClientFactory.CreateClient(options.LocalPort, peerObservers);
 
@@ -529,8 +534,9 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         return ResultCode.Ok;
     }
 
-    uint extraSeedState;
     public void SetRandomSeed(uint seed, uint extraState = 0) => extraSeedState = unchecked(seed + extraState);
+
+    public IInputCollection<TInput>? GetSavedInputs() => inputListener as MemoryInputListener<TInput>;
 
     bool IsPlayerKnown(NetcodePlayer player) =>
         player.Index >= 0
@@ -624,7 +630,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         for (i = 0; i < eps.Length; i++)
             eps[i]?.SetLocalFrameNumber(currentFrame, FixedFrameRate);
 
-        var minConfirmedFrame = NumberOfPlayers <= 2 ? MinimumFrame2Players() : MinimumFrameNPlayers();
+        var minConfirmedFrame = getMinFramePlayers();
         ThrowIf.Assert(minConfirmedFrame != Frame.MaxValue);
         logger.Write(LogLevel.Trace, $"last confirmed frame in p2p backend is {minConfirmedFrame}");
 
@@ -766,6 +772,30 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         }
     }
 
+    void DisconnectPlayerQueue(NetcodePlayer player, in Frame syncTo)
+    {
+        var frameCount = synchronizer.CurrentFrame;
+        endpoints[player.Index]?.Disconnect();
+        ref var connStatus = ref localConnections[player];
+        logger.Write(LogLevel.Debug,
+            $"Changing player {player} local connect status for last frame from {connStatus.LastFrame.Number} to {syncTo} on disconnect request (current: {frameCount})");
+        connStatus.Disconnected = true;
+        connStatus.LastFrame = syncTo;
+
+        if (closed) return;
+
+        if (syncTo < frameCount && !syncTo.IsNull)
+        {
+            logger.Write(LogLevel.Information,
+                $"adjusting simulation to account for the fact that {player} disconnected on frame {syncTo}");
+            synchronizer.AdjustSimulation(syncTo);
+            logger.Write(LogLevel.Information, "finished adjusting simulation.");
+        }
+
+        callbacks.OnPeerEvent(player, new(PeerEvent.Disconnected));
+        CheckInitialSync();
+    }
+
     Frame MinimumFrame2Players()
     {
         // discard confirmed frames as appropriate
@@ -850,34 +880,4 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         return totalMinConfirmed;
     }
-
-    void DisconnectPlayerQueue(NetcodePlayer player, in Frame syncTo)
-    {
-        var frameCount = synchronizer.CurrentFrame;
-        endpoints[player.Index]?.Disconnect();
-        ref var connStatus = ref localConnections[player];
-        logger.Write(LogLevel.Debug,
-            $"Changing player {player} local connect status for last frame from {connStatus.LastFrame.Number} to {syncTo} on disconnect request (current: {frameCount})");
-        connStatus.Disconnected = true;
-        connStatus.LastFrame = syncTo;
-
-        if (closed) return;
-
-        if (syncTo < frameCount && !syncTo.IsNull)
-        {
-            logger.Write(LogLevel.Information,
-                $"adjusting simulation to account for the fact that {player} disconnected on frame {syncTo}");
-            synchronizer.AdjustSimulation(syncTo);
-            logger.Write(LogLevel.Information, "finished adjusting simulation.");
-        }
-
-        callbacks.OnPeerEvent(player, new(PeerEvent.Disconnected));
-        CheckInitialSync();
-    }
-
-    public IReadOnlyList<ConfirmedInputs<TInput>> GetConfirmedInputs() =>
-        (inputListener as MemoryInputListener<TInput>)?.Inputs ?? [];
-
-    public byte[] GetConfirmedInputsBytes() =>
-        (inputListener as MemoryInputListener<TInput>)?.GetCompressedInputs() ?? [];
 }

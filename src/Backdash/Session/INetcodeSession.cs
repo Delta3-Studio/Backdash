@@ -378,14 +378,8 @@ public interface INetcodeSession<TInput> : INetcodeSession where TInput : unmana
     void GetInputs(Span<TInput> buffer) => CurrentInputs.CopyTo(buffer);
 
     /// <summary>
-    ///     Return all confirmed inputs of a <see cref="SessionMode.Remote"/> session.
+    ///     Return all saved inputs for current session.
     ///     Requires <see cref="NetcodeOptions.SaveConfirmedInputHistory"/> to be <c>true</c>.
     /// </summary>
-    IReadOnlyList<ConfirmedInputs<TInput>> GetConfirmedInputs() => [];
-
-    /// <summary>
-    ///     Return bytes for all  confirmed inputs of a <see cref="SessionMode.Remote"/> session.
-    ///     Requires <see cref="NetcodeOptions.SaveConfirmedInputHistory"/> to be <c>true</c>.
-    /// </summary>
-    byte[] GetConfirmedInputsBytes() => [];
+    IInputCollection<TInput>? GetSavedInputs() => null;
 }

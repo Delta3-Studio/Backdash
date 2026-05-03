@@ -10,7 +10,12 @@ public class SessionReplayControl
     ///     Maximum number of frames for backward play on Replays
     ///     Defaults to 300 (5 seconds in 60 fps)
     /// </summary>
-    public int MaxBackwardFrames { get; init; } = 60 * 5;
+    public FrameSpan MaxBackwardFrames { get; init; } = FrameSpan.FromSeconds(5);
+
+    /// <summary>
+    ///     Last session recorded input frame
+    /// </summary>
+    public Frame LastInputFrame { get; internal set; } = Frame.Zero;
 
     /// <summary>
     ///     true if replay will flow backwards

@@ -67,6 +67,13 @@ public interface INetcodeSessionHandler
     /// <seealso cref="IStateStringParser" />
     /// <seealso cref="IStateStringParser.GetStateString" />
     object? CreateState(Frame frame, ref readonly BinaryBufferReader reader) => null;
+
+    /// <summary>
+    ///     Called when a replay session run all inputs
+    /// </summary>
+    /// <seealso cref="SessionMode.Replay" />
+    /// <seealso cref="NetcodeSessionBuilder{TInput}.ForReplay" />
+    void OnReplayCompleted() { }
 }
 
 sealed class EmptySessionHandler(Logger logger) : INetcodeSessionHandler
