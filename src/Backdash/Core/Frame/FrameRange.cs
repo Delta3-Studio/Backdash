@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
@@ -12,6 +14,7 @@ namespace Backdash;
 ///     Value representation of a frame range (inclusive)
 /// </summary>
 [Serializable]
+[DebuggerDisplay("{ToString()}")]
 [JsonConverter(typeof(FrameRangeJsonConverter))]
 public readonly record struct FrameRange(Frame Start, Frame End)
     : IComparable<FrameRange>,
@@ -20,7 +23,8 @@ public readonly record struct FrameRange(Frame Start, Frame End)
         ISpanFormattable,
         IComparisonOperators<FrameRange, FrameRange, bool>,
         IAdditionOperators<FrameRange, FrameSpan, FrameRange>,
-        ISubtractionOperators<FrameRange, FrameSpan, FrameRange>
+        ISubtractionOperators<FrameRange, FrameSpan, FrameRange>,
+        IReadOnlyList<Frame>
 {
     /// <inheritdoc />
     public FrameRange(int start, int end) : this((Frame)start, (Frame)end) { }
@@ -34,7 +38,7 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     /// <summary>
     /// Get or set the duration of the range
     /// </summary>
-    public FrameSpan Duration => new(End.Number - Start.Number + 1);
+    public FrameSpan Duration => new(Math.Abs(End.Number - Start.Number) + 1);
 
     /// <summary>
     /// Checks if an int frame is contained in the range
@@ -46,6 +50,15 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     /// </summary>
     public bool Contains(Frame frame) => Contains(frame.Number);
 
+    /// <inheritdoc cref="Intersects(in FrameRange, in FrameRange)"/>
+    public bool Intersects(in FrameRange other) => Intersects(in this, in other);
+
+    /// <inheritdoc cref="Normalize(in FrameRange)"/>
+    public FrameRange Normalized() => Normalize(in this);
+
+    /// <inheritdoc cref="Reverse(in FrameRange)"/>
+    public FrameRange Reversed() => Reverse(in this);
+
     /// <summary>
     /// Returns a new range with the duration changed
     /// </summary>
@@ -53,6 +66,36 @@ public readonly record struct FrameRange(Frame Start, Frame End)
 
     ///  <inheritdoc cref="WithDuration(int)"/>
     public FrameRange WithDuration(FrameSpan duration) => WithDuration(duration.Frames);
+
+    /// <summary>
+    /// Returns true if is a backward range
+    /// </summary>
+    public bool IsBackward => End < Start;
+
+    ///  <inheritdoc />
+    public int Count => Duration.Frames;
+
+    ///  <inheritdoc />
+    public Frame this[int index]
+    {
+        get
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(index);
+            Frame result;
+            if (IsBackward)
+            {
+                result = Start - index;
+                ArgumentOutOfRangeException.ThrowIfLessThan(result, End);
+            }
+            else
+            {
+                result = Start + index;
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(result, End);
+            }
+
+            return result;
+        }
+    }
 
     sealed class FrameRangeJsonConverter : JsonConverter<FrameRange>
     {
@@ -133,6 +176,29 @@ public readonly record struct FrameRange(Frame Start, Frame End)
                && writer.Write("]");
     }
 
+    /// <summary>
+    /// Checks if a frame intersects with another range
+    /// </summary>
+    public static bool Intersects(in FrameRange left, in FrameRange right)
+    {
+        var a = left.Normalized();
+        var b = right.Normalized();
+        return a.Start <= b.End && b.Start <= a.End;
+    }
+
+    /// <summary>
+    /// Returns normalized version of the range (sorted components)
+    /// </summary>
+    public static FrameRange Normalize(in FrameRange range) =>
+        range.IsBackward ? Reverse(range) : range;
+
+    /// <summary>
+    /// Returns reversed range
+    /// </summary>
+#pragma warning disable S2234
+    public static FrameRange Reverse(in FrameRange range) => new(range.End, range.Start);
+#pragma warning restore S2234
+
     static int Compare(FrameRange left, FrameRange right) => (left.Start, left.End).CompareTo((right.Start, right.End));
 
     /// <inheritdoc />
@@ -174,4 +240,57 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     /// </summary>
     public static implicit operator FrameRange((Frame Start, FrameSpan Duration) range) =>
         new(range.Start, range.Duration);
+
+    /// <summary>
+    /// Enumerate the frames in range
+    /// </summary>
+    public Enumerator GetEnumerator() => new(this);
+
+    IEnumerator<Frame> IEnumerable<Frame>.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <inheritdoc />
+    /// <inheritdoc cref="FrameRange.Enumerator" />
+    public struct Enumerator(FrameRange range) : IEnumerator<Frame>
+    {
+        readonly bool isBackward = range.IsBackward;
+        readonly Frame last = range.End;
+        readonly Frame start = range.Start;
+        Frame? current;
+
+        /// <inheritdoc />
+        public readonly Frame Current =>
+            current ?? throw new InvalidOperationException("Iterator has not been initialized.");
+
+        readonly object IEnumerator.Current => Current;
+
+        /// <inheritdoc />
+        public bool MoveNext()
+        {
+            if (!current.HasValue)
+            {
+                current = start;
+                return true;
+            }
+
+            if (isBackward)
+            {
+                if (Current <= last) return false;
+                current--;
+            }
+            else
+            {
+                if (Current >= last) return false;
+                current++;
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc />
+        public void Reset() => current = start;
+
+        /// <inheritdoc />
+        public readonly void Dispose() { }
+    }
 }
