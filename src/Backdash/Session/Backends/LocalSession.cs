@@ -230,9 +230,9 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
 
     public void AdvanceFrame()
     {
+        SyncListeners();
         CurrentFrame++;
         SaveCurrentFrame();
-        SyncListeners();
         Array.Clear(inputBuffer);
         Array.Clear(syncInputBuffer);
         logger.Write(LogLevel.Trace, $"End of frame({CurrentFrame.Number})");
@@ -241,18 +241,8 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     void SyncListeners()
     {
         if (inputListener is null) return;
-        var frame = CurrentFrame;
-        GameInput<ConfirmedInputs<TInput>> confirmed = new(frame);
-        confirmed.Data.Count = (byte)NumberOfPlayers;
-        confirmed.Frame = frame;
-        GameInput<TInput> current = new();
-
-        for (var playerNumber = 0; playerNumber < NumberOfPlayers; playerNumber++)
-        {
-            if (!inputQueues[playerNumber].GetConfirmedInput(in frame, ref current)) return;
-            confirmed.Data.Inputs[playerNumber] = current.Data;
-            inputListener.OnConfirmed(in confirmed.Frame, in confirmed.Data);
-        }
+        ConfirmedInputs<TInput> confirmed = new(inputBuffer);
+        inputListener.OnConfirmed(CurrentFrame, in confirmed);
     }
 
     void TryDropSavedInputsAfter(Frame newFrame)

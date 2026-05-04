@@ -69,11 +69,20 @@ public class Game1 : Game
         if (session.GetSavedInputs() is not { } listener) return;
         Console.WriteLine($"Confirmed Inputs: {listener.Count}");
 
-        if (!session.TryGetLocalPlayer(out var player))
-            return;
+        string fileName = null;
+        if (session.IsRemote())
+        {
+            if (!session.TryGetLocalPlayer(out var player)) return;
+            fileName = $"player{player.Number}";
+        }
+        else if (session.IsLocal())
+        {
+            fileName = "last_local";
+        }
 
+        if (string.IsNullOrWhiteSpace(fileName)) return;
         var inputs = listener.GetCompressedInputs();
-        File.WriteAllBytes($"player{player.Number}.inputs", inputs);
+        File.WriteAllBytes($"{fileName}.inputs", inputs);
     }
 
     protected override void LoadContent()
@@ -181,12 +190,12 @@ public class Game1 : Game
         if (session.IsOnline())
             return;
 
-        if (keyboard.IsKeyPressed(Keys.S))
+        if (keyboard.IsKeyPressed(Keys.C))
         {
             snapshot = session.GetStateSnapshot();
             session.WriteLog($"Snapshot saved {snapshot?.Frame}");
         }
-        else if (keyboard.IsKeyPressed(Keys.L) && snapshot is not null)
+        else if (keyboard.IsKeyPressed(Keys.V) && snapshot is not null)
         {
             session.LoadSnapshot(snapshot);
             session.WriteLog("Snapshot loaded");
