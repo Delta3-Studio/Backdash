@@ -743,7 +743,7 @@ public readonly struct BinaryBufferWriter(
     /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
     public void WriteNumber<T>(in T value) where T : unmanaged, IBinaryInteger<T>
     {
-        numberSerializer.Write(buffer, in value, out var size);
+        numberSerializer.Write(buffer, value, out var size);
         Advance(size);
     }
 

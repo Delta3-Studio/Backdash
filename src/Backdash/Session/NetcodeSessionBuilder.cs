@@ -661,10 +661,11 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 public sealed class NetcodeSessionBuilder
 {
+    internal delegate IBinarySerializer<T> SerializerFactory<T>(Endianness endianness) where T : unmanaged;
+
     /// <inheritdoc cref="InputTypeSelector" />
     public NetcodeSessionBuilder<T> WithInputType<T>(Func<InputTypeSelector, InputTypeSelected<T>> selector)
-        where T : unmanaged =>
-        new(selector(new()).Serializer);
+        where T : unmanaged => new(selector(new()).Serializer);
 
     /// <inheritdoc cref="InputTypeSelector.Enum{T}" />
     public NetcodeSessionBuilder<T> WithInputType<T>() where T : unmanaged, Enum =>
@@ -678,8 +679,6 @@ public sealed class NetcodeSessionBuilder
         internal readonly SerializerFactory<T> Serializer;
         internal InputTypeSelected(SerializerFactory<T> serializer) => Serializer = serializer;
     }
-
-    internal delegate IBinarySerializer<T> SerializerFactory<T>(Endianness endianness) where T : unmanaged;
 
     /// <summary>
     ///     Selector for <see cref="INetcodeSession{TInput}" /> input type

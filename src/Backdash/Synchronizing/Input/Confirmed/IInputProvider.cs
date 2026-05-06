@@ -1,6 +1,3 @@
-using System.Collections.Immutable;
-using System.IO.Compression;
-
 namespace Backdash.Synchronizing.Input.Confirmed;
 
 /// <summary>
@@ -41,48 +38,22 @@ public sealed class EnumerableInputProvider<TInput>(IEnumerable<ConfirmedInputs<
 /// </remarks>
 public sealed class BinaryInputProvider<TInput> : IInputProvider<TInput> where TInput : unmanaged
 {
-    ImmutableArray<ConfirmedInputs<TInput>>? inputs;
+    IReadOnlyList<ConfirmedInputs<TInput>>? inputs;
     MemoryStream? inputBytes;
 
     /// <summary>
     /// Initializes new binary input provider
     /// </summary>
-    public BinaryInputProvider(ReadOnlySpan<byte> bytes)
-    {
-        inputBytes = new();
-        unsafe
-        {
-            fixed (byte* ptr = bytes)
-            {
-                UnmanagedMemoryStream stream = new(ptr, bytes.Length);
-                using DeflateStream decompressor = new(stream, CompressionMode.Decompress);
-                decompressor.CopyTo(inputBytes);
-            }
-        }
-    }
+    public BinaryInputProvider(ReadOnlySpan<byte> bytes) => inputBytes = InputCompressor<TInput>.DecompressStream(bytes);
 
     /// <inheritdoc />
     public IReadOnlyList<ConfirmedInputs<TInput>> GetInputs(InputContext<TInput> context)
     {
         if (inputs is not null) return inputs;
-        if (inputBytes is null) return [];
-
-        var buffer = new byte[context.ConfirmedInputSize];
-        List<ConfirmedInputs<TInput>> result = [];
-        ConfirmedInputs<TInput> confirmedInput = new();
-
-        inputBytes.Seek(0, SeekOrigin.Begin);
-        while (inputBytes.Read(buffer) > 0)
-        {
-            context.Read(buffer, ref confirmedInput);
-            result.Add(confirmedInput);
-        }
-
-        inputs = [.. result];
-
+        if (inputBytes is null or { Length: 0 }) return [];
+        inputs = InputCompressor<TInput>.Decompress(context, inputBytes);
         inputBytes?.Dispose();
         inputBytes = null;
-
         return inputs;
     }
 

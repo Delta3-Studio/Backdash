@@ -36,14 +36,14 @@ public static class EndiannessSerializer
             return T.ReadBigEndian(buffer[..bytesRead], isUnsigned);
         }
 
-        public bool Write<T>(Span<byte> buffer, in T value, out int size)
+        public bool Write<T>(Span<byte> buffer, T value, out int size)
             where T : unmanaged, IBinaryInteger<T>
         {
             ref var valueRef = ref Unsafe.AsRef(in value);
             return valueRef.TryWriteBigEndian(buffer, out size);
         }
 
-        public bool Write<T>(ArrayBufferWriter<byte> buffer, in T value, out int size)
+        public bool Write<T>(ArrayBufferWriter<byte> buffer, T value, out int size)
             where T : unmanaged, IBinaryInteger<T>
         {
             size = Unsafe.SizeOf<T>();
@@ -67,14 +67,14 @@ public static class EndiannessSerializer
             return T.ReadLittleEndian(buffer[..bytesRead], isUnsigned);
         }
 
-        public bool Write<T>(Span<byte> buffer, in T value, out int size)
+        public bool Write<T>(Span<byte> buffer, T value, out int size)
             where T : unmanaged, IBinaryInteger<T>
         {
             ref var valueRef = ref Unsafe.AsRef(in value);
             return valueRef.TryWriteLittleEndian(buffer, out size);
         }
 
-        public bool Write<T>(ArrayBufferWriter<byte> buffer, in T value, out int size)
+        public bool Write<T>(ArrayBufferWriter<byte> buffer, T value, out int size)
             where T : unmanaged, IBinaryInteger<T>
         {
             size = Unsafe.SizeOf<T>();
@@ -95,11 +95,19 @@ public static class EndiannessSerializer
         bool NeedsReverse { get; }
 
         /// <summary>Write a number into a buffer</summary>
-        bool Write<T>(Span<byte> buffer, in T value, out int size) where T : unmanaged, IBinaryInteger<T>;
+        bool Write<T>(Span<byte> buffer, T value, out int size) where T : unmanaged, IBinaryInteger<T>;
 
         /// <summary>Write a number into an array buffer</summary>
-        bool Write<T>(ArrayBufferWriter<byte> buffer, in T value, out int size)
+        bool Write<T>(ArrayBufferWriter<byte> buffer, T value, out int size)
             where T : unmanaged, IBinaryInteger<T>;
+
+        /// <summary>Write a number into a byte buffer <see cref="ArrayBufferWriter{T}"/></summary>
+        int Write<T>(ArrayBufferWriter<byte> buffer, T value) where T : unmanaged, IBinaryInteger<T>
+        {
+            var span = buffer.GetSpan(Unsafe.SizeOf<T>());
+            Write(span, value, out int size);
+            return size;
+        }
 
         /// <summary>Reads number from the buffer</summary>
         T Read<T>(ReadOnlySpan<byte> buffer, bool isUnsigned, out int bytesRead) where T : unmanaged, IBinaryInteger<T>;

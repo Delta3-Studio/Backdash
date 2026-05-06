@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Backdash.Network;
 using Backdash.Options;
 using Backdash.Serialization;
+using Backdash.Serialization.Internal;
 
 namespace Backdash.Synchronizing.Input.Confirmed;
 
@@ -22,6 +23,13 @@ public sealed class InputContext<TInput> where TInput : unmanaged
     /// <see cref="IBinarySerializer{T}"/> serializer implementation for a confirmed (all-players) <typeparamref name="TInput" />
     /// </summary>
     public IBinarySerializer<ConfirmedInputs<TInput>> Serializer { get; }
+
+    /// <summary>
+    /// Number serializer for current session state endianness
+    /// <seealso cref="NetcodeOptions.StateSerializationEndianness"/>
+    /// <seealso cref="Backdash.Network.Endianness"/>
+    /// </summary>
+    public EndiannessSerializer.INumberSerializer NumberSerializer { get; }
 
     /// <summary>
     /// Struct size of <typeparamref name="TInput" />
@@ -44,7 +52,8 @@ public sealed class InputContext<TInput> where TInput : unmanaged
     /// </summary>
     public TypeCode InputTypeCode { get; }
 
-    internal InputContext(NetcodeOptions options,
+    internal InputContext(
+        NetcodeOptions options,
         IBinarySerializer<TInput> inputSerializer,
         IBinarySerializer<ConfirmedInputs<TInput>> serializer
     )
@@ -55,6 +64,7 @@ public sealed class InputContext<TInput> where TInput : unmanaged
         InputTypeCode = Type.GetTypeCode(typeof(TInput));
         PlayerInputSize = Unsafe.SizeOf<TInput>();
         ConfirmedInputSize = Unsafe.SizeOf<ConfirmedInputs<TInput>>();
+        NumberSerializer = options.GetEndiannessNumberStateSerializer();
     }
 
     /// <summary>
