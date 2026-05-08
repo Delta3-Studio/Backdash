@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Net.NetworkInformation;
 
 namespace Backdash.Network;
 
@@ -48,4 +49,17 @@ public static class NetUtils
 
         return null;
     }
+
+    /// <summary>
+    ///     Checks if the current connection is wireless
+    /// </summary>
+    public static bool IsWireless() => NetworkInterface
+        .GetAllNetworkInterfaces().Any(n => n is
+        {
+            OperationalStatus: OperationalStatus.Up,
+            NetworkInterfaceType: NetworkInterfaceType.Wireless80211,
+        });
+
+    /// <inheritdoc cref="NetworkInterface.GetIsNetworkAvailable"/>
+    public static bool IsNetworkAvailable() => NetworkInterface.GetIsNetworkAvailable();
 }
