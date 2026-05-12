@@ -23,7 +23,7 @@ public class MathITests
     [PropertyTest]
     public bool ShouldRawSumArrayOfInt(int[] values)
     {
-        var sut = MathI.SumRaw(values);
+        var sut = MathI.SumSimple(values);
         var native = values.Sum();
         return sut == native;
     }
@@ -31,7 +31,7 @@ public class MathITests
     [PropertyTest]
     public bool ShouldRawSumArrayOfUInt(uint[] values)
     {
-        var sut = MathI.SumRaw(values);
+        var sut = MathI.SumSimple(values);
         var native = values.Aggregate<uint, uint>(0, (acc, value) => acc + value);
         return sut == native;
     }

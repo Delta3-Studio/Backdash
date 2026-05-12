@@ -41,7 +41,7 @@ public sealed class XorShiftRandom<TInput> : IDeterministicRandom<TInput> where 
         unchecked
         {
             var offset = currentFrame.Number % 31;
-            var inputSeed = MathI.SumRaw(MemoryMarshal.Cast<TInput, uint>(inputs)) << offset;
+            var inputSeed = MathI.SumSimple(MemoryMarshal.Cast<TInput, uint>(inputs)) << offset;
             var newSeed = InitialSeed + (uint)currentFrame.Number + inputSeed + extraState + 1;
             if (BitConverter.IsLittleEndian)
                 newSeed = BinaryPrimitives.ReverseEndianness(newSeed);
