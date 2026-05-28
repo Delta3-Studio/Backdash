@@ -1141,9 +1141,6 @@ public readonly ref struct BinaryBufferReader
     }
 
     /// <inheritdoc cref="ReadAsInt64{T}()" />
-    public void ReadEnum64<T>(ref T? value) where T : unmanaged, Enum => Read(ref Unsafe.As<T?, long?>(ref value));
-
-    /// <inheritdoc cref="ReadAsInt64{T}()" />
     public T? ReadAsNullableInt64<T>() where T : unmanaged
     {
         if (ReadBoolean())
@@ -1156,7 +1153,10 @@ public readonly ref struct BinaryBufferReader
     }
 
     /// <inheritdoc cref="ReadAsInt64{T}()" />
-    public T? ReadAsNullableEnum64<T>() where T : unmanaged, Enum
+    public void ReadEnum64<T>(ref T? value) where T : unmanaged, Enum => Read(ref Unsafe.As<T?, long?>(ref value));
+
+    /// <inheritdoc cref="ReadAsInt64{T}()" />
+    public T? ReadNullableEnum64<T>() where T : unmanaged, Enum
     {
         var value = ReadNullableInt64();
         return Unsafe.As<long?, T?>(ref value);

@@ -813,7 +813,7 @@ public class BinaryBufferReadWriteNullableValues
             reader.ReadCount.Should().Be(size);
 
             ResetRead();
-            var otherRead = reader.ReadAsNullableEnum64<Int64Enum>();
+            var otherRead = reader.ReadNullableEnum64<Int64Enum>();
             reader.ReadCount.Should().Be(size);
             otherRead.Should().Be(read);
 
