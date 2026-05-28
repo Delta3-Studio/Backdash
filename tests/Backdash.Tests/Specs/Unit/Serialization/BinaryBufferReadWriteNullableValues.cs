@@ -873,6 +873,25 @@ public class BinaryBufferReadWriteNullableValues
 
             return value == read;
         }
+
+        [PropertyTest]
+        public void TestBagInt64Ref(Bag.S8? value, Bag.S8? read, Endianness endianness)
+        {
+            var size = Setup(value, endianness, out var writer);
+            writer.WriteAsInt64(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadAsInt64(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            Bag.S8? otherRead = null;
+            reader.ReadAsInt64(ref otherRead);
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            value.Should().BeEquivalentTo(read);
+        }
     }
 
     public static int Setup<T>(T? value, Endianness endianness, out BinaryBufferWriter writer) where T : unmanaged

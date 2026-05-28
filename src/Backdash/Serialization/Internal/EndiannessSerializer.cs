@@ -36,6 +36,14 @@ public static class EndiannessSerializer
             return T.ReadBigEndian(buffer[..bytesRead], isUnsigned);
         }
 
+        public void Read<T>(ref T value, ReadOnlySpan<byte> buffer, bool isUnsigned, out int bytesRead)
+            where T : unmanaged, IBinaryInteger<T>
+        {
+            bytesRead = Unsafe.SizeOf<T>();
+            if (!T.TryReadBigEndian(buffer[..bytesRead], isUnsigned, out value))
+                throw new OverflowException();
+        }
+
         public bool Write<T>(Span<byte> buffer, T value, out int size)
             where T : unmanaged, IBinaryInteger<T>
         {
@@ -65,6 +73,14 @@ public static class EndiannessSerializer
         {
             bytesRead = Unsafe.SizeOf<T>();
             return T.ReadLittleEndian(buffer[..bytesRead], isUnsigned);
+        }
+
+        public void Read<T>(ref T value, ReadOnlySpan<byte> buffer, bool isUnsigned, out int bytesRead)
+            where T : unmanaged, IBinaryInteger<T>
+        {
+            bytesRead = Unsafe.SizeOf<T>();
+            if (!T.TryReadLittleEndian(buffer[..bytesRead], isUnsigned, out value))
+                throw new OverflowException();
         }
 
         public bool Write<T>(Span<byte> buffer, T value, out int size)
@@ -111,6 +127,10 @@ public static class EndiannessSerializer
 
         /// <summary>Reads number from the buffer</summary>
         T Read<T>(ReadOnlySpan<byte> buffer, bool isUnsigned, out int bytesRead) where T : unmanaged, IBinaryInteger<T>;
+
+        /// <summary>Reads number from the buffer</summary>
+        void Read<T>(ref T value, ReadOnlySpan<byte> buffer, bool isUnsigned, out int bytesRead)
+            where T : unmanaged, IBinaryInteger<T>;
 
         /// <inheritdoc cref="Read{T}(System.ReadOnlySpan{byte},bool,out int)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

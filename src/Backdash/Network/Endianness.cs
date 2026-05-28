@@ -1,7 +1,7 @@
 namespace Backdash.Network;
 
 /// <summary>
-///     Defines a endianness value
+///     Defines an endianness value
 /// </summary>
 public enum Endianness : byte
 {
