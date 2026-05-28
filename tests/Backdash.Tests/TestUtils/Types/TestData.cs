@@ -371,3 +371,8 @@ public enum Int64Enum : long
 public record struct Int128Enum(Int128 Value);
 
 public record struct UInt128Enum(UInt128 Value);
+
+public static class Bag
+{
+    public record struct PairInt32(int A, int B);
+}

@@ -809,11 +809,11 @@ public class BinaryBufferReadWriteNullableValues
             writer.WriteAsInt64(in value);
 
             var reader = GetReader(writer);
-            reader.ReadAsInt64(ref read);
+            reader.ReadEnum64(ref read);
             reader.ReadCount.Should().Be(size);
 
             ResetRead();
-            var otherRead = reader.ReadAsNullableInt64<Int64Enum>();
+            var otherRead = reader.ReadAsNullableEnum64<Int64Enum>();
             reader.ReadCount.Should().Be(size);
             otherRead.Should().Be(read);
 
@@ -872,6 +872,43 @@ public class BinaryBufferReadWriteNullableValues
             otherRead.Should().Be(read);
 
             return value == read;
+        }
+
+        [PropertyTest]
+        public void TestBagInt64Ref(Bag.PairInt32? value, Bag.PairInt32? read, Endianness endianness)
+        {
+            var size = Setup(value, endianness, out var writer);
+            writer.WriteAsInt64(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadAsInt64(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            Bag.PairInt32? otherRead = null;
+            reader.ReadAsInt64(ref otherRead);
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            value.Should().BeEquivalentTo(read);
+        }
+
+        [PropertyTest]
+        public void TestBagInt64(Bag.PairInt32? value, Bag.PairInt32? read, Endianness endianness)
+        {
+            var size = Setup(value, endianness, out var writer);
+            writer.WriteAsInt64(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadAsInt64(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            var otherRead = reader.ReadAsNullableInt64<Bag.PairInt32>();
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            value.Should().BeEquivalentTo(read);
         }
     }
 
