@@ -196,16 +196,6 @@ public readonly ref struct BinaryBufferReader
     /// <inheritdoc cref="ReadHalf()" />
     public Half? ReadNullableHalf() => ReadBoolean() ? ReadHalf() : null;
 
-    /// <inheritdoc cref="ReadFloat()" />
-    /// <seealso cref="ReadFloat()" />
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float ReadSingle() => ReadFloat();
-
-    /// <inheritdoc cref="ReadNullableFloat()" />
-    /// <seealso cref="ReadNullableFloat()" />
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float? ReadNullableSingle() => ReadNullableFloat();
-
     /// <summary>Reads float 32 <see cref="float" /> from the buffer.</summary>
     public float ReadFloat() => BitConverter.Int32BitsToSingle(ReadInt32());
 
@@ -353,8 +343,11 @@ public readonly ref struct BinaryBufferReader
     }
 
     /// <inheritdoc cref="ReadNumber{T}(bool)" />
-    public void ReadNumber<T>(ref T value, bool isUnsigned) where T : unmanaged, IBinaryInteger<T> =>
-        value = ReadNumber<T>(isUnsigned);
+    public void ReadNumber<T>(ref T value, bool isUnsigned) where T : unmanaged, IBinaryInteger<T>
+    {
+        numberSerializer.Read(ref value, CurrentBuffer, isUnsigned, out var written);
+        Advance(written);
+    }
 
     /// <inheritdoc cref="ReadNullableNumber{T}(bool)" />
     public void ReadNumber<T>(ref T? value, bool isUnsigned) where T : unmanaged, IBinaryInteger<T> =>
@@ -595,13 +588,13 @@ public readonly ref struct BinaryBufferReader
     public void Read(ref bool? value) => value = ReadNullableBoolean();
 
     /// <inheritdoc cref="ReadInt16()" />
-    public void Read(ref short value) => value = ReadInt16();
+    public void Read(ref short value) => ReadNumber(ref value, false);
 
     /// <inheritdoc cref="ReadInt16()" />
     public void Read(ref short? value) => value = ReadNullableInt16();
 
     /// <inheritdoc cref="ReadInt16()" />
-    public void Read(ref ushort value) => value = ReadUInt16();
+    public void Read(ref ushort value) => ReadNumber(ref value, true);
 
     /// <inheritdoc cref="ReadInt16()" />
     public void Read(ref ushort? value) => value = ReadNullableUInt16();
@@ -613,37 +606,37 @@ public readonly ref struct BinaryBufferReader
     public void Read(ref char? value) => value = ReadNullableChar();
 
     /// <inheritdoc cref="ReadInt32()" />
-    public void Read(ref int value) => value = ReadInt32();
+    public void Read(ref int value) => ReadNumber(ref value, false);
 
     /// <inheritdoc cref="ReadInt32()" />
     public void Read(ref int? value) => value = ReadNullableInt32();
 
     /// <inheritdoc cref="ReadUInt32()" />
-    public void Read(ref uint value) => value = ReadUInt32();
+    public void Read(ref uint value) => ReadNumber(ref value, true);
 
     /// <inheritdoc cref="ReadUInt32()" />
     public void Read(ref uint? value) => value = ReadNullableUInt32();
 
     /// <inheritdoc cref="ReadInt64()" />
-    public void Read(ref long value) => value = ReadInt64();
+    public void Read(ref long value) => ReadNumber(ref value, false);
 
     /// <inheritdoc cref="ReadInt64()" />
     public void Read(ref long? value) => value = ReadNullableInt64();
 
     /// <inheritdoc cref="ReadUInt64()" />
-    public void Read(ref ulong value) => value = ReadUInt64();
+    public void Read(ref ulong value) => ReadNumber(ref value, true);
 
     /// <inheritdoc cref="ReadUInt64()" />
     public void Read(ref ulong? value) => value = ReadNullableUInt64();
 
     /// <inheritdoc cref="ReadInt128()" />
-    public void Read(ref Int128 value) => value = ReadInt128();
+    public void Read(ref Int128 value) => ReadNumber(ref value, false);
 
     /// <inheritdoc cref="ReadInt128()" />
     public void Read(ref Int128? value) => value = ReadNullableInt128();
 
     /// <inheritdoc cref="ReadUInt128()" />
-    public void Read(ref UInt128 value) => value = ReadUInt128();
+    public void Read(ref UInt128 value) => ReadNumber(ref value, true);
 
     /// <inheritdoc cref="ReadUInt128()" />
     public void Read(ref UInt128? value) => value = ReadNullableUInt128();

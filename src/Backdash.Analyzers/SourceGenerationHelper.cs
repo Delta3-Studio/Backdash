@@ -82,10 +82,11 @@ static class SourceGenerationHelper
                 );
 
                 reads.Append(tab2);
+
                 reads.AppendLine(
                     member.Type is INamedTypeSymbol { EnumUnderlyingType: { } underTypeRead }
-                        ? $"result.{member.Name} = ({member.Type.Name})binaryReader.Read{underTypeRead.Name}();"
-                        : $"result.{member.Name} = binaryReader.Read{member.Type.Name}();"
+                        ? $"result.{member.Name} = ({member.Type.Name})binaryReader.Read{GetMethodSuffix(underTypeRead)}();"
+                        : $"result.{member.Name} = binaryReader.Read{GetMethodSuffix(member.Type)}();"
                 );
             }
         }
@@ -145,8 +146,8 @@ static class SourceGenerationHelper
                     reads.Append(tab3);
                     reads.AppendLine(
                         itemType is INamedTypeSymbol { EnumUnderlyingType: { } underTypeRead }
-                            ? $"result.{member.Name}[i] = ({itemType.Name})binaryReader.Read{underTypeRead.Name}();"
-                            : $"result.{member.Name}[i] = binaryReader.Read{itemType.Name}();"
+                            ? $"result.{member.Name}[i] = ({itemType.Name})binaryReader.Read{GetMethodSuffix(underTypeRead)}();"
+                            : $"result.{member.Name}[i] = binaryReader.Read{GetMethodSuffix(itemType)}();"
                     );
                 }
 
@@ -156,6 +157,14 @@ static class SourceGenerationHelper
                 reads.AppendLine("}");
             }
         }
+    }
+
+    static string GetMethodSuffix(ITypeSymbol type)
+    {
+        if (type.Name is "Single")
+            return "Float";
+
+        return type.Name;
     }
 
     static bool IsArrayLike(ITypeSymbol memberType, out ITypeSymbol elementType)
