@@ -1121,6 +1121,12 @@ public readonly ref struct BinaryBufferReader
     public void ReadAsInt64<T>(ref T value) where T : unmanaged => Read(ref Unsafe.As<T, long>(ref value));
 
     /// <inheritdoc cref="ReadAsInt64{T}()" />
+    public void ReadAsInt64<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, long>(values));
+
+    /// <inheritdoc cref="ReadAsInt64{T}()" />
+    public void ReadAsInt64<T>(in List<T> values) where T : unmanaged => ReadAsInt64(GetListSpan(in values));
+
+    /// <inheritdoc cref="ReadAsInt64{T}()" />
     public void ReadAsInt64<T>(ref T? value) where T : unmanaged
     {
         if (ReadBoolean())
@@ -1133,12 +1139,6 @@ public readonly ref struct BinaryBufferReader
 
         value = null;
     }
-
-    /// <inheritdoc cref="ReadAsInt64{T}()" />
-    public void ReadAsInt64<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, long>(values));
-
-    /// <inheritdoc cref="ReadAsInt64{T}()" />
-    public void ReadAsInt64<T>(in List<T> values) where T : unmanaged => ReadAsInt64(GetListSpan(in values));
 
     /// <inheritdoc cref="ReadAsInt64{T}()" />
     public void ReadEnum64<T>(ref T? value) where T : unmanaged, Enum => Read(ref Unsafe.As<T?, long?>(ref value));
