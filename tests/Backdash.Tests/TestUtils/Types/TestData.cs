@@ -374,5 +374,5 @@ public record struct UInt128Enum(UInt128 Value);
 
 public static class Bag
 {
-    public record struct PairInt32(int A, int B);
+    public record struct S8(int A, int B);
 }
