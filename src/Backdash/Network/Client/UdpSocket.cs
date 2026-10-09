@@ -90,18 +90,7 @@ public sealed class UdpSocket : IPeerSocket
 
     /// <inheritdoc />
     public UdpSocket(string bindHost, int port, AddressFamily addressFamily = AddressFamily.InterNetwork)
-        : this(GetDnsIpAddress(bindHost, addressFamily), port) { }
-
-    /// <summary>
-    ///     Returns the Internet Protocol (IP) addresses for the specified host and <see cref="AddressFamily" />.
-    /// </summary>
-    /// <exception cref="NetcodeException"></exception>
-    public static IPAddress GetDnsIpAddress(string host, AddressFamily addressFamily = AddressFamily.InterNetwork)
-    {
-        var address = Dns.GetHostAddresses(host, addressFamily).FirstOrDefault()
-                      ?? throw new NetcodeException($"Unable to retrieve IP Address from host {host}");
-        return address;
-    }
+        : this(NetUtils.GetDnsIpAddress(bindHost, addressFamily), port) { }
 
     /// <summary>
     ///     Receives a datagram into the data buffer, using the specified SocketFlags, and stores the endpoint.

@@ -29,6 +29,26 @@ public static class NetUtils
     }
 
     /// <summary>
+    ///     Returns the Internet Protocol (IP) addresses for the specified host and <see cref="AddressFamily" />.
+    /// </summary>
+    public static IPAddress? FindDnsIpAddress(string host, AddressFamily addressFamily = AddressFamily.InterNetwork) =>
+        Dns.GetHostAddresses(host, addressFamily).FirstOrDefault();
+
+    /// <inheritdoc cref="FindDnsIpAddress(string, AddressFamily)"/>
+    public static IPAddress? FindDnsIpAddress(Uri uri, AddressFamily addressFamily = AddressFamily.InterNetwork) =>
+        FindDnsIpAddress(uri.DnsSafeHost, addressFamily);
+
+    /// <inheritdoc cref="FindDnsIpAddress(string, AddressFamily)"/>
+    /// <exception cref="InvalidOperationException">When not found</exception>
+    public static IPAddress GetDnsIpAddress(string host, AddressFamily addressFamily = AddressFamily.InterNetwork) =>
+        FindDnsIpAddress(host, addressFamily)
+        ?? throw new InvalidOperationException($"Unable to retrieve IP Address from host {host}");
+
+    /// <inheritdoc cref="GetDnsIpAddress(string, AddressFamily)" />
+    public static IPAddress GetDnsIpAddress(Uri uri, AddressFamily addressFamily = AddressFamily.InterNetwork) =>
+        GetDnsIpAddress(uri.DnsSafeHost, addressFamily);
+
+    /// <summary>
     ///     Finds the current network IPAddress
     /// </summary>
     public static async ValueTask<IPAddress?> FindNetworkIPAddress(

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Backdash.Network;
 using Backdash.Network.Client;
 using SpaceWar.Models;
 
@@ -17,7 +18,7 @@ public sealed class LobbyUdpClient : IDisposable
 
     public LobbyUdpClient(int localPort, Uri serverUrl, int serverPort)
     {
-        var serverAddress = UdpSocket.GetDnsIpAddress(serverUrl.DnsSafeHost);
+        var serverAddress = NetUtils.GetDnsIpAddress(serverUrl);
         serverEndpoint = new(serverAddress, serverPort);
         socket = new(localPort);
 
