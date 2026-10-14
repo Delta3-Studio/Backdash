@@ -12,7 +12,7 @@
     <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="FakeItEasy" Version="9.0.1" />
     <PackageReference Include="FakeItEasy.AutoFakeIt" Version="2.0.0"/>
-    <PackageReference Include="FluentAssertions" Version="[7.2.0]"/>
+    <PackageReference Include="FluentAssertions" Version="[7.2.2]" />
     <PackageReference Include="FsCheck.Xunit" Version="3.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageReference Include="ObjectLayoutInspector" Version="0.2.0" />
