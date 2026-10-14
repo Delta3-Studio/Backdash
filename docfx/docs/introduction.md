@@ -1,40 +1,36 @@
 # Introduction
 
-[Backdash](https://github.com/Delta3-Studio/Backdash) is a multiplayer network SDK to help you
-implement [Rollback Netcode](https://words.infil.net/w02-netcode.html) on your game.
+[Backdash](https://github.com/Delta3-Studio/Backdash) is a multiplayer networking SDK that helps you add
+[rollback netcode](https://words.infil.net/w02-netcode.html) to a game.
 
-It started as [.NET](https://dotnet.microsoft.com) port of the first rollback netcode
-SDK [GGPO](https://github.com/pond3r/ggpo) (_written in C++_)
-to be used in any game engine that
-uses [C#](https://dotnet.microsoft.com/en-us/languages/csharp), [F#](https://dotnet.microsoft.com/en-us/languages/fsharp)
-or any [.NET](https://dotnet.microsoft.com) dialect as scripting
-language ([Godot](https://godotengine.org/), [Monogame](https://monogame.net/), [Stride3D](https://www.stride3d.net),
-etc). Dispensing with the need to create native
-builds and native binds to the _C++_ [GGPO](https://github.com/pond3r/ggpo) code.
+Backdash began as a [.NET](https://dotnet.microsoft.com) port inspired by
+[GGPO](https://github.com/pond3r/ggpo), a rollback netcode SDK written in C++. It can be used with game engines that
+support .NET languages such as [C#](https://dotnet.microsoft.com/en-us/languages/csharp) and
+[F#](https://dotnet.microsoft.com/en-us/languages/fsharp), including [Godot](https://godotengine.org/),
+[MonoGame](https://monogame.net/), and [Stride](https://www.stride3d.net). This avoids the need to bind the game to
+GGPO's native C++ library.
 
-And also adding more options
-for [configuration](https://delta3-studio.github.io/Backdash/api/Backdash.NetcodeOptions.html)
-and [extensibility](https://delta3-studio.github.io/Backdash/api/Backdash.SessionServices-2.html).
+Backdash also provides configurable session options and extension points through
+[`NetcodeOptions`](https://delta3-studio.github.io/Backdash/api/Backdash.NetcodeOptions.html) and
+[`SessionServices`](https://delta3-studio.github.io/Backdash/api/Backdash.SessionServices-2.html).
 
-> [!WARNING]
-> ⚠️ This library is not able to run on [Unity](https://unity.com/) until they
-> finish [the CoreCLR port](https://blog.unity.com/engine-platform/porting-unity-to-coreclr), check:
-> - [🔗 CoreCLR and .NET Modernization - Unite 2024](https://discussions.unity.com/t/coreclr-and-net-modernization-unite-2024/1519272/277)
-> - [🔗 Unity Future .NET Development Status](https://forum.unity.com/threads/unity-future-net-development-status.1092205).
+> [!NOTE]
+> Backdash currently targets .NET 8. Unity 6's documented API compatibility profiles target .NET Standard 2.1 or
+> .NET Framework 4.8, so the Backdash package cannot be assumed to work in a Unity project as-is. Check
+> [Unity's .NET profile support](https://docs.unity3d.com/6000.0/Documentation/Manual/dotnet-profile-support.html)
+> and the requirements of your Unity version and build target.
 
 ## How Does It Work?
 
-Rollback networking is designed to be integrated into a fully deterministic peer-to-peer engine. With full determinism,
-the game is guaranteed to play out the same way on all player's computers if we simply feed them the same inputs. One way
-to achieve this is to exchange inputs for all players over the network, only executing a frame of gameplay logic when
-all players have received all the inputs from their peers. This often results in sluggish, unresponsive gameplay. The
-longer it takes to get inputs over the network, the slower the game becomes.
+Rollback networking works best with a deterministic peer-to-peer game simulation. If every peer starts from the same
+state and processes the same inputs in the same order, each peer should produce the same game state. A traditional
+lockstep approach waits for every peer's input before simulating a frame. Network delay can make that approach feel
+unresponsive.
 
-In rollback networking, the game logic is allowed to proceed with just the inputs from the local player. If the remote
-inputs have not yet arrived when it's time to execute a frame, the networking code will predict what it expects the
-remote players to do based on previously seen inputs. Since there's no waiting, the game feels just as responsive as it
-does offline. When those inputs finally arrive over the network, they can be compared to the ones that were predicted
-earlier. If they differ, the game can be re-simulated from the point of divergence to the current visible frame.
+With rollback, the game can simulate using local inputs and predictions for remote inputs that have not arrived yet.
+When the actual inputs arrive, Backdash compares them with the predictions. If they differ, it restores an earlier game
+state and re-simulates the affected frames. This reduces input delay, although incorrect predictions can cause visible
+corrections and the simulation may still pause when its prediction limit is reached.
 
 Don't worry if that sounds like a headache. [Backdash](https://github.com/Delta3-Studio/Backdash) was designed specifically
 to implement the rollback algorithms and low-level networking logic in a way that's easy to integrate into your existing
@@ -52,4 +48,3 @@ More information about how it works and why it is good:
 - [EVO 2017: GGPO panel](https://www.youtube.com/watch?v=k9JTIn1SVQ4) _(video)_.
 - [Fight the Lag! The Trick Behind GGPO's Low Latency Netcode](https://drive.google.com/file/d/1cV0fY8e_SC1hIFF5E1rT8XRVRzPjU8W9/view)
 - [Cross Counter LIVE feat. Mike Z](https://www.youtube.com/watch?v=Tu2kAdmUCaI&t=41m22s) _(video)_.
-

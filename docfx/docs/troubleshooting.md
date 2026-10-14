@@ -16,11 +16,11 @@ You should isolate **non-game state** from the **game state** as **much as possi
 encapsulating all your game state into a single `class`/`record` type. This both clearly delineates what is
 **game state** and what is not, and makes it trivial to implement the save and load callbacks.
 
-## Define a Fixed Time Quanta for Advancing Your Game State
+## Advance Your Game State in Fixed Time Steps
 
 [Backdash](https://github.com/Delta3-Studio/Backdash) will occasionally need to rollback and single-step your application
-frame by frame. This is difficult to do if your game state advances by a variable tick rate. You should try to make your
-game state advanced by a fixed time quanta per frame, even if your render loop does not.
+frame by frame. This is difficult if the simulation advances by a variable time step. Advance the game state by a fixed
+time step for each simulation frame, even if the render loop runs at a variable rate.
 
 ## Separate Updating Game State from Rendering in Your Game Loop
 
@@ -30,17 +30,17 @@ during the rollback need to be deferred until after the rollback is finished. Th
 separating your game state from your render state. When you're finished, your game loop may look something like this:
 
 ```csharp
-   bool finished = false;
-   GameState state;
-   Inputs inputs;
+bool finished = false;
+GameState state;
+Inputs inputs;
 
-   do {
-      GetControllerInputs(ref inputs);
-      finished = AdvanceGameState(inputs, state);
-      if (!finished) {
-         RenderCurrentFrame(gamestate);
-      }
-   while (!finished);
+do
+{
+    GetControllerInputs(ref inputs);
+    finished = AdvanceGameState(inputs, state);
+    if (!finished)
+        RenderCurrentFrame(state);
+} while (!finished);
 ```
 
 In other words, your game state should be determined solely by the inputs, and your rendering code should be driven by the
@@ -55,11 +55,9 @@ Here are some things that are easy to overlook:
 
 ### Beware of Random Number Generators
 
-Many games use random numbers in the computation of the next game state. If you use one, you must ensure that they are
-fully deterministic, that the seed for the random number generator is the same at frame 0 for both players, and that the
-state/seed of the random number generator is included in your game state. Doing both of these will ensure that the random
-numbers that get generated for a particular frame are always the same, regardless of how many
-times [Backdash](https://github.com/Delta3-Studio/Backdash) needs to rollback to that frame.
+Many games use random numbers when computing the next game state. The random sequence must be identical on every peer
+and repeat correctly after loading an earlier frame. Prefer Backdash's session random generator. If you use your own
+generator, save and restore its state along with the game state.
 
 Luckily, *Backdash* already gives you a deterministic random number generator in the [`INetcodeSession<>`](https://delta3.studio/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_Random) class:
 
@@ -67,19 +65,18 @@ Luckily, *Backdash* already gives you a deterministic random number generator in
 session.Random.NextInt();
 ```
 
-### Beware of External Time Sources (eg. random, clock time)
+### Avoid External Time and Environment Inputs
 
 Be careful if you use the current time of day in your game state calculation. This may be used for an effect on the game
 or to derive another game state (e.g., using the timer as a seed to the random number generator). The time on two
-computers
-Or game consoles are almost never in sync, and using time in your game state calculations can lead to synchronization
+computers or game consoles are almost never in sync, and using time in your game-state calculations can lead to synchronization
 issues. You should either eliminate the use of time in your game state or include the current time for one of the
 players as part of the input to a frame and always use that time in your calculations.
 
 The use of external time sources in **non-game state** calculations is fine (_e.g, computing the duration of effects on
 screen, or the attenuation of audio samples_).
 
-> [!INFORMATION]
+> [!TIP]
 > We provide an implementation of a
 _[Deterministic Random](https://delta3-studio.github.io/Backdash/api/Backdash.Synchronizing.Random.IDeterministicRandom.html)_
 > out of the box
@@ -88,9 +85,8 @@ _[Rollback Session](https://delta3-studio.github.io/Backdash/api/Backdash.INetco
 
 ## Beware of Dangling References
 
-If your game state contains any reference type, be very careful in your `save` and `load` functions to rebase
-your reference pointers as you `save` and `load` your data. When copying data, be sure that you are no copying an object
-reference instead of the values.
+If your game state contains reference types, serialize the values needed to restore the simulation. Do not rely on
+copying object references: mutable objects may be shared between a saved snapshot and the live game state.
 
 ## Beware of Static Variables or Other Hidden State
 
@@ -102,6 +98,9 @@ are examples of this behavior. You need to track down all these locations and co
 a form that can be saved. For example, compare:
 
 ```csharp
+using Backdash.Data;
+using Backdash.Serialization;
+
 // This will totally get you into trouble.
 public record MyGameState
 {
@@ -131,7 +130,12 @@ public class MySessionHandler : INetcodeSessionHandler
 {
     MyGameState currentGameState = new();
 
-    public void LoadState(in Frame frame, ref readonly BinaryBufferReader reader)
+    public void SaveState(Frame frame, ref readonly BinaryBufferWriter writer)
+    {
+        writer.Write(in currentGameState.CurrentCounter);
+    }
+
+    public void LoadState(Frame frame, ref readonly BinaryBufferReader reader)
     {
         currentGameState.CurrentCounter = reader.ReadInt32();
         GlobalState.Counter = currentGameState.CurrentCounter;
@@ -141,11 +145,10 @@ public class MySessionHandler : INetcodeSessionHandler
 }
 ```
 
-## Use the [Backdash](https://github.com/Delta3-Studio/Backdash) SyncTest Feature. A Lot.
+## Use SyncTest to Find Desynchronization
 
-Once you've ported your application to [Backdash](https://github.com/Delta3-Studio/Backdash),
-you can use tool called `SyncTest` to help track down synchronization issues which may be the result of a leaky game
-state.
+Once you've integrated [Backdash](https://github.com/Delta3-Studio/Backdash), use a `SyncTest` session to help find
+simulation state that was omitted from save/load or otherwise causes desynchronization.
 
 To create a sync test session use:
 
@@ -158,9 +161,9 @@ var session = RollbackNetcode
     {
         // ...
     })
-    .ForSyncTest(options => options
+    .ForSyncTest(options =>
     {
-        // ...
+        options.CheckDistance(1);
     })
     .Build();
 ```
@@ -168,12 +171,11 @@ var session = RollbackNetcode
 The sync test session is a special session that is designed to find errors in your simulation's
 determinism.
 
-When running in a **sync-test session**, [Backdash](https://github.com/Delta3-Studio/Backdash) by default will
-execute a 1-frame rollback for every frame of your game. It compares the state of the frame when it was executed the
-first time to the state executed during the rollback, and raises an error if they differ during your game's execution.
-If you set the [`LogLevel`](https://delta3-studio.github.io/Backdash/api/Backdash.Core.LogLevel.html) to at
-least `Information`, the JSON of the states will also be logged, and you can diff the log of the initial frame vs the log of
-the rollback frame to track down errors.
+By default, a **sync-test session** checks each frame by replaying it after a one-frame rollback and comparing the
+resulting state checksum with the original. A mismatch is logged and, by default, throws an exception. When state
+logging is enabled (the default), Backdash logs both state representations at error level. `UseJsonStateParser()` formats
+an object returned by `INetcodeSessionHandler.CreateState` as JSON; if that method returns `null`, the parser falls back
+to a hexadecimal representation of the saved bytes. Use `.LogState(false)` to disable state logging.
 
 By running **sync-test** on developer systems continuously when writing game code, you can identify **desync** causing
 bugs immediately after they're introduced.
@@ -183,12 +185,18 @@ bugs immediately after they're introduced.
 You can configure a wide range of options to help debug your state, like:
 
 ```csharp
-.ForSyncTest(options => options
-    .UseJsonStateParser() // tries to display your state as JSON on desync
-    .UseDesyncHandler<YourDesyncHandler>() // custom handler to deal wih a desync
-    .UseRandomInputProvider() // generate random inputs
-    .CheckDistance(4) // the forced rollback check distance in frames
-)
+using Backdash;
+
+var session = RollbackNetcode
+    .WithInputType<MyGameInput>()
+    .ForSyncTest(options =>
+    {
+        options.UseJsonStateParser();
+        options.UseDesyncHandler<YourDesyncHandler>();
+        options.UseRandomInputProvider();
+        options.CheckDistance(4);
+    })
+    .Build();
 ```
 
 If you need a better, meaningful string representation of your state in the sync-test, it is recommended to implement
@@ -196,14 +204,14 @@ the optional method `INetcodeSessionHandler.CreateState`. This will be used to m
 before passing them to the `DesyncHandler`.
 
 > [!NOTE]
-> The `.UseJsonStateParser()` will only work if `INetcodeSessionHandler.CreateState` returns a JSON serializable object.
+> `.UseJsonStateParser()` produces JSON when `INetcodeSessionHandler.CreateState` returns a JSON-serializable object.
+> If it returns `null`, the parser displays the saved bytes as hexadecimal instead.
 
 #### Implement a DesyncHandler
 
-A `DesyncHandler` will help you handle whenever a desync happens in a `SyncTest` session.
+A desynchronization handler lets you inspect a mismatch in a `SyncTest` session.
 
-For example, a `DesyncHandler` that uses [DiffPlex](https://github.com/mmanela/diffplex) to print on the console
-The state diff when a desync occurs:
+For example, this handler uses [DiffPlex](https://github.com/mmanela/diffplex) to print a state diff to the console:
 
 ```csharp
 using Backdash;
@@ -257,4 +265,3 @@ the [API Docs](https://delta3-studio.github.io/Backdash/docs/introduction.html) 
 the [examples](https://github.com/Delta3-Studio/Backdash/tree/master/samples).
 
 Good luck!
-
