@@ -23,11 +23,8 @@ sealed class SessionServices<TInput> where TInput : unmanaged
     public IDeterministicRandom<TInput> DeterministicRandom { get; }
     public ILatencyStrategy LatencyStrategy { get; }
     public IInputListener<TInput>? InputListener { get; }
-
     public EqualityComparer<TInput> InputComparer { get; }
-
     public INetcodeSessionHandler SessionHandler { get; }
-
     public PluginManager PluginManager { get; }
     public INetcodeJob[] Jobs { get; set; }
 

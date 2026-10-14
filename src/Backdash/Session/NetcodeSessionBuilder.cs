@@ -46,8 +46,8 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         var options = this.options.CloneOptions();
 
         SessionServices<TInput> services = new(
-            serializer.Invoke(options.Protocol.SerializationEndianness),
-            options, sessionServices);
+            serializer.Invoke(options.Protocol.SerializationEndianness), options, sessionServices
+        );
 
         var session = GetSession();
 
@@ -676,6 +676,9 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 public sealed class NetcodeSessionBuilder
 {
+    /// <summary>
+    /// <see cref="IBinarySerializer{T}"/> factory function.
+    /// </summary>
     internal delegate IBinarySerializer<T> SerializerFactory<T>(Endianness endianness) where T : unmanaged;
 
     /// <inheritdoc cref="InputTypeSelector" />
@@ -687,7 +690,7 @@ public sealed class NetcodeSessionBuilder
         WithInputType(x => x.Enum<T>());
 
     /// <summary>
-    ///     Selected input type for <see name="NetcodeSessionBuilder{TInput}" />
+    ///     Selected an input type for <see name="NetcodeSessionBuilder{TInput}" />
     /// </summary>
     public sealed class InputTypeSelected<T> where T : unmanaged
     {
@@ -733,8 +736,23 @@ public sealed class NetcodeSessionBuilder
         /// <summary>
         ///     Choose a custom type and serializer for the input type.
         /// </summary>
-        public InputTypeSelected<T> Custom<T>(IBinarySerializer<T> serializer) where T : unmanaged =>
-            new(_ => serializer);
+        public InputTypeSelected<T> Custom<T>(IBinarySerializer<T> serializer) where T : unmanaged
+        {
+            ArgumentNullException.ThrowIfNull(serializer);
+            return new(_ => serializer);
+        }
+
+        /// <inheritdoc cref="Custom{T}(IBinarySerializer{T})" />
+        public InputTypeSelected<T> Custom<T>(Func<Endianness, IBinarySerializer<T>> factory) where T : unmanaged
+        {
+            ArgumentNullException.ThrowIfNull(factory);
+            return new(e => factory(e));
+        }
+
+        /// <inheritdoc cref="Custom{T}(IBinarySerializer{T})" />
+        public InputTypeSelected<T> Custom<TSerializer, T>()
+            where T : unmanaged where TSerializer : IBinarySerializer<T>, new() =>
+            Custom(new TSerializer());
     }
 }
 

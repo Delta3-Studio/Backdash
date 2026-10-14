@@ -2,7 +2,7 @@ namespace Backdash.Tests.TestUtils.Types;
 
 public sealed class AsyncCounter
 {
-    int currentCount = 0;
+    int currentCount;
     public int Value => currentCount;
     public void Inc() => Interlocked.Increment(ref currentCount);
     public void Dec() => Interlocked.Decrement(ref currentCount);
