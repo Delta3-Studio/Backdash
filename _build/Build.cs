@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
 class MainBuild : NukeBuild
 {
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
@@ -218,7 +220,7 @@ class MainBuild : NukeBuild
         }
         catch (Exception ex)
         {
-            Log.Warning("Failure shutting build server down:{Error}", ex.Message);
+            Log.Warning(ex, "Failure shutting build server down");
         }
     }
 }

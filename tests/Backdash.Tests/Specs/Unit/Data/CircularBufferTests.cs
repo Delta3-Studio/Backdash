@@ -153,7 +153,7 @@ public class CircularBufferTests
     public void ShouldHaveToString()
     {
         CircularBuffer<int> sut = new(3);
-        sut.AddRange([10, 20, 30]);
+        sut.AddRange(10, 20, 30);
         sut.ToString().Should().Be("[10, 20, 30]");
     }
 
@@ -161,8 +161,8 @@ public class CircularBufferTests
     public void ShouldReplaceAlmostAllValuesWhenFull()
     {
         CircularBuffer<int> sut = new(5);
-        sut.AddRange([10, 20, 30, 40, 50]);
-        sut.AddRange([60, 70, 80, 90]);
+        sut.AddRange(10, 20, 30, 40, 50);
+        sut.AddRange(60, 70, 80, 90);
         AssertBuffer(sut, [50, 60, 70, 80, 90]);
     }
 
@@ -170,8 +170,8 @@ public class CircularBufferTests
     public void ShouldReplaceAllValuesWhenFull()
     {
         CircularBuffer<int> sut = new(5);
-        sut.AddRange([10, 20, 30, 40, 50]);
-        sut.AddRange([11, 22, 33, 44, 55]);
+        sut.AddRange(10, 20, 30, 40, 50);
+        sut.AddRange(11, 22, 33, 44, 55);
         AssertBuffer(sut, [11, 22, 33, 44, 55]);
     }
 
@@ -179,9 +179,9 @@ public class CircularBufferTests
     public void ShouldBeEqualByValues()
     {
         CircularBuffer<int> sutLeft = new(3);
-        sutLeft.AddRange([10, 20, 30]);
+        sutLeft.AddRange(10, 20, 30);
         CircularBuffer<int> sutRight = new(3);
-        sutRight.AddRange([10, 20, 30]);
+        sutRight.AddRange(10, 20, 30);
         sutLeft.Should().Equal(sutRight);
     }
 
@@ -189,9 +189,9 @@ public class CircularBufferTests
     public void ShouldHaveSameHashCode()
     {
         CircularBuffer<int> sutLeft = new(3);
-        sutLeft.AddRange([10, 20, 30]);
+        sutLeft.AddRange(10, 20, 30);
         CircularBuffer<int> sutRight = new(3);
-        sutRight.AddRange([10, 20, 30]);
+        sutRight.AddRange(10, 20, 30);
         sutLeft.GetHashCode().Should().Be(sutRight.GetHashCode());
     }
 

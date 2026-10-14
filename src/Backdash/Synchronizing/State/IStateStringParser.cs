@@ -80,7 +80,8 @@ public sealed class JsonStateStringParser : IStateStringParser
     /// </summary>
     public JsonStateStringParser(Action<JsonSerializerOptions> configure,
         IStateStringParser? stateStringFallback = null) :
-        this(CreateDefaultJsonOptions(configure), stateStringFallback) { }
+        this(CreateDefaultJsonOptions(configure), stateStringFallback)
+    { }
 
     /// <summary>
     ///     Create a new JSON string parser of the state.
