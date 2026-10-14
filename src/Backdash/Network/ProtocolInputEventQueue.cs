@@ -35,8 +35,8 @@ sealed class ProtocolInputEventQueue<TInput> : IDisposable, IProtocolInputEventP
 
     public void Dispose()
     {
-        if (disposed) return;
-        disposed = true;
+        if (Interlocked.CompareExchange(ref disposed, true, false))
+            return;
         channel.Writer.Complete();
     }
 }

@@ -79,8 +79,8 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
 
     public void Dispose()
     {
-        if (disposed) return;
-        disposed = true;
+        if (Interlocked.CompareExchange(ref disposed, true, false))
+            return;
         Close();
         logger.Dispose();
     }

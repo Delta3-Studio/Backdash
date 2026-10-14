@@ -148,8 +148,8 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
     public void Dispose()
     {
-        if (disposed) return;
-        disposed = true;
+        if (Interlocked.CompareExchange(ref disposed, true, false))
+            return;
         Close();
         udp.Dispose();
         DisposeInternal();
@@ -157,8 +157,8 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
     public async ValueTask DisposeAsync()
     {
-        if (disposed) return;
-        disposed = true;
+        if (Interlocked.CompareExchange(ref disposed, true, false))
+            return;
         Close();
         await udp.DisposeAsync();
         DisposeInternal();

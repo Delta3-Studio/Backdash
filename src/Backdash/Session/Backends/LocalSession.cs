@@ -76,8 +76,8 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
 
     void DisposeInternal()
     {
-        if (disposed) return;
-        disposed = true;
+        if (Interlocked.CompareExchange(ref disposed, true, false))
+            return;
         Close();
         inputListener?.Dispose();
     }
