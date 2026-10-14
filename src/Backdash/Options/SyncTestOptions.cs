@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Backdash.Synchronizing.Input;
 using Backdash.Synchronizing.State;
 
@@ -76,9 +77,18 @@ public sealed record SyncTestOptions<TInput> where TInput : unmanaged
     /// <summary>
     ///     Use <see cref="JsonStateStringParser" /> as state viewer.
     /// </summary>
+    public SyncTestOptions<TInput> UseJsonStateParser(JsonTypeInfo typeInfo)
+    {
+        StateStringParser = new JsonStateStringParser(typeInfo);
+        return this;
+    }
+
+    /// <summary>
+    ///     Use <see cref="JsonStateStringParser" /> as state viewer.
+    /// </summary>
     public SyncTestOptions<TInput> UseJsonStateParser(JsonSerializerOptions? options = null)
     {
-        StateStringParser = options is null ? JsonStateStringParser.Singleton : new JsonStateStringParser(options);
+        StateStringParser = options is null ? new JsonStateStringParser() : new JsonStateStringParser(options);
         return this;
     }
 

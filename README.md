@@ -67,7 +67,7 @@ to build some samples.
 
 ## Building from source
 
-You need to have installed [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download)
+You need to have installed [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download)
 ![](https://raw.githubusercontent.com/Delta3-Studio/Backdash/site/dotnet_version_badge.svg)
 
 1. Clone this repository.

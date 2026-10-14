@@ -15,7 +15,7 @@ Backdash also provides configurable session options and extension points through
 [`SessionServices`](https://delta3-studio.github.io/Backdash/api/Backdash.SessionServices-2.html).
 
 > [!NOTE]
-> Backdash currently targets .NET 8. Unity 6's documented API compatibility profiles target .NET Standard 2.1 or
+> Backdash currently targets .NET 10. Unity 6's documented API compatibility profiles target .NET Standard 2.1 or
 > .NET Framework 4.8, so the Backdash package cannot be assumed to work in a Unity project as-is. Check
 > [Unity's .NET profile support](https://docs.unity3d.com/6000.0/Documentation/Manual/dotnet-profile-support.html)
 > and the requirements of your Unity version and build target.
