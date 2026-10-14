@@ -144,7 +144,7 @@ public sealed record NetcodeOptions
     public float RollbackFramesSmoothFactor { get; set; } = 0.2f;
 
     /// <summary>
-    ///     Custom meta data
+    ///     Custom metadata
     ///     Useful for <see cref="INetcodePlugin"/> implementations
     /// </summary>
     public Dictionary<string, object> Meta { get; } = [];
@@ -160,7 +160,7 @@ public sealed record NetcodeOptions
         if (SpectatorInputBufferLength <= 0)
             SpectatorInputBufferLength = InputQueueLength;
 
-        if (LocalPort < 0)
+        if (LocalPort <= 0)
             LocalPort = NetUtils.FindFreePort();
     }
 

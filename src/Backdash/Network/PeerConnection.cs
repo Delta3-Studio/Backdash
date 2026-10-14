@@ -74,7 +74,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         timers.Stop();
         DispatchDisconnectEvent();
         timers.KeepAlive.Elapsed -= OnKeepAliveTick;
-        timers.ResendInputs.Elapsed -= OnKeepAliveTick;
+        timers.ResendInputs.Elapsed -= OnResendInputs;
         timers.QualityReport.Elapsed -= OnQualityReportTick;
         timers.NetworkStats.Elapsed -= OnNetworkStatsTick;
         timers.ConsistencyCheck.Elapsed -= OnConsistencyCheck;
@@ -307,7 +307,6 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         void UpdateStats(ref ProtocolState.PackagesStats stats)
         {
             var totalUdpHeaderSize = (ByteSize)(packageHeaderSize * stats.TotalPackets);
-            stats.TotalBytesWithHeaders = stats.TotalBytes + totalUdpHeaderSize;
             stats.TotalBytesWithHeaders = stats.TotalBytes + totalUdpHeaderSize;
             stats.PackagesPerSecond = (float)(stats.TotalPackets * 1000f / elapsed.TotalMilliseconds);
             stats.Bandwidth = stats.TotalBytesWithHeaders / elapsed.TotalSeconds;
