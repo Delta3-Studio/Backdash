@@ -9,15 +9,16 @@ a [middle server](https://github.com/Delta3-Studio/LobbyServer)
 which all clients know.
 The server catches the IP address and port of a client and sends it to the others.
 
-The current server runs almost as a simple HTTP with JSON responses. It keeps the lobby info with sliding expiration
+The current server runs almost as a simple HTTP with JSON responses. It keeps the lobby info with a sliding expiration
 cache.
 
-When a client enters the lobby the server responds with a token of type `Guid`/`UUID`. It is used a very
+When a client enters the lobby, the server responds with a token of type `Guid`/`UUID`. It is used a very
 basic `Authentication` mechanism.
 
 The client uses HTTP pooling to get updated information on each lobby member/peer.
 
-When logged in, every client needs to send a `UDP` package with their token to the server. The server uses the package header metadata
+When logged in, every client needs to send a `UDP` package with their token to the server. The server uses the package
+header metadata
 to keep track of their `IP` and open `Port`.
 
 > ⚠️ UDP Hole punching usually **does not** work with clients behind the same NAT. To mitigate this the server
@@ -35,7 +36,8 @@ to keep track of their `IP` and open `Port`.
 
 **Preparing The server:**
 
-Ensure the server submodule is updated in the [server directory](https://github.com/Delta3-Studio/Backdash/tree/master/samples/LobbyServer)
+Ensure the server submodule is updated in
+the [server directory](https://github.com/Delta3-Studio/Backdash/tree/master/samples/LobbyServer)
 
 ```bash
 git submodule update --init --recursive
