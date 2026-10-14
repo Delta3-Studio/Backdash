@@ -22,7 +22,7 @@ public sealed class LobbyUdpClient : IDisposable
         serverEndpoint = new(serverAddress, serverPort);
         socket = new(localPort);
 
-        Task.Run(() => Receive(cts.Token));
+        Task.Run(() => Receive(cts.Token), cts.Token);
     }
 
     public async Task HandShake(User user, CancellationToken ct = default)

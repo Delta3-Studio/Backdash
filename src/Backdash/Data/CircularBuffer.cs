@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using Backdash.Core;
+using Backdash.Core.Json;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -73,7 +74,7 @@ public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuf
     public ref T Front() => ref array[CurrentIndex];
     public ref T Back() => ref array[tail];
 
-    public void AddRange(ReadOnlySpan<T> values)
+    public void AddRange(params ReadOnlySpan<T> values)
     {
         ref var curr = ref MemoryMarshal.GetReference(values);
         ref var end = ref Unsafe.Add(ref curr, values.Length);

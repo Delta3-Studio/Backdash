@@ -1,9 +1,16 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using Backdash.Data;
 
-namespace Backdash.Core;
+namespace Backdash.Core.Json;
+
+static class JsonAttrMessages
+{
+    public const string DynamicCode =
+        "JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.";
+}
 
 sealed class UnsafeInt32JsonConverter<T> : JsonConverter<T> where T : unmanaged
 {
@@ -33,17 +40,57 @@ sealed class UnsafeInt64JsonConverterAttribute<T>()
     : JsonConverterAttribute(typeof(UnsafeInt64JsonConverter<T>))
     where T : unmanaged;
 
-sealed class CircularBufferJsonConverter<T> : JsonConverter<CircularBuffer<T>>
+/// <summary>
+/// <see cref="CircularBuffer{T}"/> JSON converter.
+/// </summary>
+public sealed class CircularBufferJsonConverter<T> : JsonConverter<CircularBuffer<T>>
 {
-    public override CircularBuffer<T>? Read(ref Utf8JsonReader reader, Type typeToConvert,
-        JsonSerializerOptions options)
+    /// <inheritdoc />
+    public override CircularBuffer<T>? Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options
+    )
     {
-        var array = JsonSerializer.Deserialize<T[]>(ref reader, options);
-        return array is null ? null : CircularBuffer<T>.CreateFrom(array);
+        if (reader.TokenType is JsonTokenType.Null)
+            return null;
+
+        if (reader.TokenType is not JsonTokenType.StartArray)
+            throw new JsonException("Expected a JSON array.");
+
+        if (options.GetTypeInfo(typeof(T)) is not JsonTypeInfo<T> typeInfo)
+            throw new JsonException("Invalid type info.");
+
+        List<T> items = [];
+
+        while (reader.Read() && reader.TokenType is not JsonTokenType.EndArray)
+        {
+            var item = JsonSerializer.Deserialize(ref reader, typeInfo)!;
+            items.Add(item);
+        }
+
+        if (reader.TokenType is not JsonTokenType.EndArray)
+            throw new JsonException("Incomplete JSON array.");
+
+        return CircularBuffer<T>.CreateFrom([.. items]);
     }
 
-    public override void Write(Utf8JsonWriter writer, CircularBuffer<T> value, JsonSerializerOptions options) =>
-        JsonSerializer.Serialize(writer, value.ToArray(), options);
+    /// <inheritdoc />
+    public override void Write(
+        Utf8JsonWriter writer,
+        CircularBuffer<T> value,
+        JsonSerializerOptions options)
+    {
+        if (options.GetTypeInfo(typeof(T)) is not JsonTypeInfo<T> typeInfo)
+            throw new JsonException("Invalid type info.");
+
+        writer.WriteStartArray();
+
+        foreach (var item in value)
+            JsonSerializer.Serialize(writer, item, typeInfo);
+
+        writer.WriteEndArray();
+    }
 }
 
 sealed class CircularBufferJsonConverter : JsonConverterFactory
@@ -54,6 +101,9 @@ sealed class CircularBufferJsonConverter : JsonConverterFactory
 
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
+        if (!RuntimeFeature.IsDynamicCodeSupported)
+            throw new InvalidOperationException(JsonAttrMessages.DynamicCode);
+
         var argType = typeToConvert.GetGenericArguments()[0];
         var converterType = typeof(CircularBufferJsonConverter<>).MakeGenericType(argType);
         return Activator.CreateInstance(converterType) as JsonConverter;

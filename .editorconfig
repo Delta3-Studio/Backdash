@@ -155,6 +155,8 @@ dotnet_diagnostic.S3877.severity = silent # Remove this 'throw' expression.
 dotnet_diagnostic.S2699.severity = silent # add assert to test (not working with FsCheck)
 dotnet_diagnostic.S1117.severity = silent # hiding field
 dotnet_diagnostic.S6640.severity = silent # Avoid using this unsafe code block.
+dotnet_diagnostic.S8969.severity = silent # Remove this null-forgiving operator; the compiler already knows this expression is not null here.
+dotnet_diagnostic.S6444.severity = silent # Pass a timeout to limit the execution time
 
 ## AsyncFixer
 dotnet_diagnostic.AsyncFixer01.severity = suggestion # The method dont needs async

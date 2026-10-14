@@ -10,11 +10,11 @@ public struct TestInputBuffer
 {
     byte element0;
     public TestInputBuffer(ReadOnlySpan<byte> bits) => bits.CopyTo(this);
-
-    public readonly string ToString(bool trimZeros) =>
-        Mem.GetBitString(this, trimRightZeros: trimZeros);
-
+    public readonly string ToString(bool trimZeros) => Mem.GetBitString(this, trimRightZeros: trimZeros);
     public override readonly string ToString() => ToString(trimZeros: true);
+    public override readonly int GetHashCode() => Mem.GetHashCode<byte>(this);
+    public readonly bool Equals(TestInputBuffer other) => this[..].SequenceEqual(other);
+    public override readonly bool Equals(object? obj) => obj is TestInputBuffer other && Equals(other);
 }
 
 [Serializable]

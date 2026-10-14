@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Backdash.Core;
+using Backdash.Core.Json;
 
 namespace Backdash;
 

@@ -1,17 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <RootNamespace></RootNamespace>
-        <NoWarn>$(NoWarn);CS0649;CS0169;CS1591;CS1573</NoWarn>
+        <NoWarn>$(NoWarn);CS0649;CS0169;CA1050;CA1822;CA2211;IDE1006;CS0649;CS0169;CS1591;CS1573;NU1901;NU1902;NU1903</NoWarn>
         <Nullable>disable</Nullable>
         <IsPackable>false</IsPackable>
+        <InvariantGlobalization>true</InvariantGlobalization>
         <NukeTelemetryVersion>1</NukeTelemetryVersion>
         <NukeRootDirectory>..</NukeRootDirectory>
         <NukeScriptDirectory>..</NukeScriptDirectory>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Nuke.Common" Version="9.0.4" />
-        <PackageReference Include="NukePlus" Version="2.0.7" />
+        <PackageReference Include="NuGet.Frameworks" Version="7.9.0"/>
+        <PackageReference Include="Nuke.Common" Version="10.1.0" />
+        <PackageReference Include="NukePlus" Version="3.0.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="..\.nuke\temp\*.log"/>
+        <Folder Include="logs\"/>
     </ItemGroup>
 </Project>

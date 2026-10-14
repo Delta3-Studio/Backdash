@@ -19,7 +19,7 @@ public sealed class JsonIPAddressConverter : JsonConverter<IPAddress>
     public override IPAddress Read(ref Utf8JsonReader reader,
         Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType != JsonTokenType.String)
+        if (reader.TokenType is not JsonTokenType.String)
             throw new JsonException(
                 $"The JSON value could not be converted to {typeof(IPAddress)}");
 

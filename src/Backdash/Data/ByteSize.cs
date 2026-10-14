@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Backdash.Core;
+using Backdash.Core.Json;
 
 namespace Backdash.Data;
 

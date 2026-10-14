@@ -67,7 +67,7 @@ to build some samples.
 
 ## Building from source
 
-You need to have installed [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download)
+You need to have installed [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download)
 ![](https://raw.githubusercontent.com/Delta3-Studio/Backdash/site/dotnet_version_badge.svg)
 
 1. Clone this repository.
@@ -75,9 +75,9 @@ You need to have installed [.NET 8 SDK](https://dotnet.microsoft.com/en-us/downl
     - On the root directory run: `dotnet tool restore`
 3. Building Library (_root directory_)
     - SDK only: `dotnet nuke build --configuration Release`
-        - Alternatively, open the solution file `Backdash.sln` on your IDE.
+        - Alternatively, open the solution file `Backdash.slnx` on your IDE.
     - SDK and samples `dotnet nuke build-samples --configuration Release`.
-        - Alternatively, open the solution file `Samples/Backdash.Samples.sln` on your IDE.
+        - Alternatively, open the solution file `Samples/Backdash.Samples.slnx` on your IDE.
 
 ## Licensing
 

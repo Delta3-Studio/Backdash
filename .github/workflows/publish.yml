@@ -83,15 +83,20 @@ jobs:
         if: github.event.inputs.release_nuget == 'true' && github.ref == 'refs/heads/master' # && needs.build.outputs.IsNewVersion
         needs: build
         steps:
+            -   name: NuGet login
+                uses: NuGet/login@v1
+                id: login
+                with:
+                    user: ${{ secrets.NUGET_USER }}
+
             -   name: Download lib nuget package artifact
                 uses: actions/download-artifact@v4
                 with:
                     name: buildArtifacts
                     path: ./build_artifacts
 
-            -   name: Push package to Nuget
-                run: |
-                    dotnet nuget push build_artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+            -   name: Release Nuget package
+                run: dotnet nuget push build_artifacts/*.nupkg --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
             -   name: Create Release
                 uses: ncipollo/release-action@v1

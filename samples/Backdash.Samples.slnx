@@ -1,0 +1,34 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="../benchmarks/Backdash.Benchmarks.Ping/Backdash.Benchmarks.Ping.csproj" />
+    <Project Path="../benchmarks/Backdash.Benchmarks/Backdash.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="ConsoleGame/ConsoleGame.csproj" />
+    <Project Path="LobbyServer/src/LobbyServer/LobbyServer.csproj" />
+    <Project Path="SpaceWar.Lobby/SpaceWar.Lobby.csproj" />
+    <Project Path="SpaceWar.Shared/SpaceWar.Shared.csproj" />
+    <Project Path="SpaceWar/SpaceWar.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="../src/Backdash.Analyzers/Backdash.Analyzers.csproj" />
+    <Project Path="../src/Backdash/Backdash.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="../tests/Backdash.Tests/Backdash.Tests.csproj" />
+  </Folder>
+  <Folder Name="/_files/">
+    <File Path="../.config/dotnet-tools.json" />
+    <File Path="../.editorconfig" />
+    <File Path="../.gitattributes" />
+    <File Path="../.gitignore" />
+    <File Path="../Backdash.sln.DotSettings" />
+    <File Path="../Directory.Build.props" />
+    <File Path="../GitVersion.yml" />
+    <File Path="../global.json" />
+  </Folder>
+  <Folder Name="/_files/samples/">
+    <File Path=".editorconfig" />
+    <File Path="SpaceWar.Shared/.config/dotnet-tools.json" />
+  </Folder>
+</Solution>

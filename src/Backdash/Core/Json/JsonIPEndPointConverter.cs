@@ -19,7 +19,7 @@ public sealed class JsonIPEndPointConverter : JsonConverter<IPEndPoint>
     public override IPEndPoint Read(ref Utf8JsonReader reader, Type typeToConvert,
         JsonSerializerOptions options)
     {
-        if (reader.TokenType != JsonTokenType.String)
+        if (reader.TokenType is not JsonTokenType.String)
             throw new JsonException(
                 $"The JSON value could not be converted to {typeof(IPEndPoint)}");
 
@@ -38,7 +38,7 @@ public sealed class JsonIPEndPointConverter : JsonConverter<IPEndPoint>
     public override void Write(Utf8JsonWriter writer, IPEndPoint value,
         JsonSerializerOptions options)
     {
-        var isIpv6 = value.AddressFamily == AddressFamily.InterNetworkV6;
+        var isIpv6 = value.AddressFamily is AddressFamily.InterNetworkV6;
         var data = isIpv6
             ? stackalloc char[MaxIPv6StringLength]
             : stackalloc char[MaxIPv4StringLength];

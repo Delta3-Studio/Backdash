@@ -118,8 +118,7 @@ sealed class SpectatorSession<TInput> :
 
     public void Dispose()
     {
-        if (disposed) return;
-        disposed = true;
+        if (Interlocked.CompareExchange(ref disposed, true, false)) return;
         Close();
         udp.Dispose();
         DisposeInternal();
@@ -127,8 +126,7 @@ sealed class SpectatorSession<TInput> :
 
     public async ValueTask DisposeAsync()
     {
-        if (disposed) return;
-        disposed = true;
+        if (Interlocked.CompareExchange(ref disposed, true, false)) return;
         Close();
         await udp.DisposeAsync();
         DisposeInternal();
@@ -282,14 +280,14 @@ sealed class SpectatorSession<TInput> :
 
         if (input.Frame.Number < CurrentFrame.Number)
         {
-            // Haven't received the input from the host yet.  Wait
+            // Haven't received the input from the host yet.
             return ResultCode.NotReady;
         }
 
         if (input.Frame.Number > CurrentFrame.Number)
         {
-            // The host is way way way far ahead of the spectator.  How'd this
-            // happen?  Anyway, the input we need is gone forever.
+            // The host is way far ahead of the spectator.
+            // This should not happen. The input will be dropped.
             return ResultCode.InputDropped;
         }
 
