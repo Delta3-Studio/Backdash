@@ -1,0 +1,33 @@
+<Solution>
+  <Folder Name="/files/">
+    <File Path=".config/dotnet-tools.json" />
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/files/github/">
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/workflows/ci.yml" />
+    <File Path=".github/workflows/publish.yml" />
+    <File Path=".github/workflows/pull_request.yml" />
+    <File Path="GitVersion.yml" />
+  </Folder>
+  <Folder Name="/files/github/scripts/">
+    <File Path=".github/scripts/GitHub.fsx" />
+    <File Path=".github/scripts/prunePrivatePackages.fsx" />
+    <File Path=".github/scripts/utils.fsx" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Backdash.Analyzers/Backdash.Analyzers.csproj" />
+    <Project Path="src/Backdash/Backdash.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Backdash.Tests/Backdash.Tests.csproj" />
+  </Folder>
+  <Project Path="_build/_build.csproj">
+    <Build Project="false" />
+  </Project>
+</Solution>

@@ -57,7 +57,7 @@ class MainBuild : NukeBuild
         .Description("Builds SDK and Samples")
         .Executes(() =>
         {
-            var sampleSln = RootDirectory / "Samples" / "Backdash.Samples.sln";
+            var sampleSln = RootDirectory / "Samples" / "Backdash.Samples.slnx";
             DotNetRestore(s => s.SetProjectFile(sampleSln));
             BuildProj(sampleSln, Configuration);
         });

@@ -54,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Analysers" Condition="'$(IsCSharp)'=='true'">
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.402">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

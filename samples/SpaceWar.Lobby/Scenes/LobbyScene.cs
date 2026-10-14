@@ -308,14 +308,14 @@ public sealed class LobbyScene(PlayerMode mode) : Scene
         if (await client.GetLobby(cts.Token) is not { } lobby)
         {
             SetError("Can't find Lobby...");
-            await Task.Delay(TimeSpan.FromSeconds(1.5));
+            await Task.Delay(TimeSpan.FromSeconds(1.5), cts.Token);
             lobbyInfo = null;
             LoadScene(new ChooseLobbyScene());
             return;
         }
 
         lobbyInfo = lobby;
-        await lobbyUdpClient.HandShake(user);
+        await lobbyUdpClient.HandShake(user, cts.Token);
 
         if (connected) return;
         connected = lobbyInfo.Players.SingleOrDefault(x => x.PeerId == user.PeerId) is { Connected: true };
