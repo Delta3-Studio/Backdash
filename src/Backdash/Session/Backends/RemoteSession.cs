@@ -460,7 +460,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
     public void SetFrameDelay(NetcodePlayer player, int delayInFrames)
     {
-        ThrowIf.ArgumentOutOfBounds(player.Index, 0, addedPlayers.Count);
+        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         ArgumentOutOfRangeException.ThrowIfNegative(delayInFrames);
         synchronizer.SetFrameDelay(player, delayInFrames);
     }
@@ -473,7 +473,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
     public int GetFrameDelay(NetcodePlayer player)
     {
-        ThrowIf.ArgumentOutOfBounds(player.Index, 0, addedPlayers.Count);
+        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         return synchronizer.GetFrameDelay(player);
     }
 

@@ -29,7 +29,7 @@ static class Gen
         );
     }
 
-    public static GameInput GameInput(int frame, byte[] input)
+    public static GameInput GameInput(int frame, ReadOnlySpan<byte> input)
     {
         if (input.Length > Max.CompressedBytes)
             throw new ArgumentOutOfRangeException(nameof(input));
@@ -44,19 +44,18 @@ static class Gen
     public static GameInput[] GameInputRange(int count, int firstFrame = 0)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(count);
-        return Generator().ToArray();
+        var result = new GameInput[count];
 
-        IEnumerable<GameInput> Generator()
+        for (var i = 0; i < count; i++)
         {
-            for (var i = 0; i < count; i++)
-            {
-                var bytes = Random.ArrayElement(GoodInputBytes);
-                yield return GameInput(firstFrame + i, [bytes]);
-            }
+            var bytes = Random.ArrayElement(goodInputBytes);
+            result[i] = GameInput(firstFrame + i, [bytes]);
         }
+
+        return result;
     }
 
-    public static readonly byte[] GoodInputBytes =
+    static readonly byte[] goodInputBytes =
     [
         1 << 0,
         1 << 1,

@@ -1,3 +1,4 @@
+using Backdash.Core;
 using Backdash.Network;
 using Backdash.Network.Client;
 using Backdash.Serialization.Internal;
@@ -56,7 +57,7 @@ public sealed record NetcodeOptions
     public int InputQueueLength { get; set; } = 128;
 
     /// <summary>
-    ///     Max length for spectators input queues.
+    ///     Max length for spectator input queues.
     /// </summary>
     /// <value>Defaults to <see cref="InputQueueLength" /></value>
     public int SpectatorInputBufferLength { get; set; }
@@ -77,7 +78,7 @@ public sealed record NetcodeOptions
     public int PredictionFramesOffset { get; set; } = 2;
 
     /// <summary>
-    ///     Amount of frames to delay local input.
+    ///     Number of frames to delay local input.
     /// </summary>
     /// <value>Defaults to <c>2</c></value>
     public int InputDelayFrames { get; set; } = 2;
@@ -138,7 +139,7 @@ public sealed record NetcodeOptions
     /// <value>Defaults to <c>true</c></value>
     public bool UseBackgroundThread { get; set; } = true;
 
-    /// <summary>Smooth factor for session rollback frames counter.</summary>
+    /// <summary>Smooth factor for the session rollback frames counter, clamped to the inclusive range from 0 to 1.</summary>
     /// <seealso cref="INetcodeSessionInfo.RollbackFrames"/>
     /// <value>Defaults to <c>0.2f</c></value>
     public float RollbackFramesSmoothFactor { get; set; } = 0.2f;
@@ -151,17 +152,43 @@ public sealed record NetcodeOptions
 
     internal void EnsureDefaults()
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(NumberOfPlayers);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(NumberOfPlayers, Max.NumberOfPlayers);
+        ArgumentNullException.ThrowIfNull(Protocol);
+        ArgumentNullException.ThrowIfNull(TimeSync);
+        ArgumentNullException.ThrowIfNull(Logger);
+        ThrowIf.NotDefined(Logger.EnabledLevel);
+        ThrowIf.NotDefined(StateSerializationEndianness);
+        ThrowIf.NotInRange(NumberOfPlayers, 1, Max.NumberOfPlayers);
+        ThrowIf.Negative(LocalPort);
+        ThrowIf.NotPositive(SynchronizationInterval);
+        ThrowIf.NotPositive(InputQueueLength);
+        ThrowIf.NotPositive(PredictionFrames);
+        ThrowIf.Negative(PredictionFramesOffset);
+        ThrowIf.NotPositive(InputDelayFrames);
+        ThrowIf.Negative(SaveStateCount);
+        ThrowIf.NotPositive(StateSizeHint);
+        ThrowIf.NotPositive(FrameRate);
 
-        if (Protocol.UdpPacketBufferSize <= 0)
+        RollbackFramesSmoothFactor = Math.Clamp(RollbackFramesSmoothFactor, 0f, 1f);
+
+        if ((long)PredictionFrames + PredictionFramesOffset > int.MaxValue)
+            throw new InvalidOperationException("The total number of saved frames cannot exceed Int32.MaxValue.");
+
+        ThrowIf.Negative(Protocol.UdpPacketBufferSize);
+        if (Protocol.UdpPacketBufferSize is 0)
             Protocol.UdpPacketBufferSize = Max.NumberOfPlayers * Max.CompressedBytes * 2;
 
-        if (SpectatorInputBufferLength <= 0)
+        ThrowIf.Negative(SpectatorInputBufferLength);
+        if (SpectatorInputBufferLength is 0)
             SpectatorInputBufferLength = InputQueueLength;
 
-        if (LocalPort <= 0)
+        ThrowIf.NotPositive(SpectatorInputBufferLength);
+        if (LocalPort is 0)
             LocalPort = NetUtils.FindFreePort();
+
+        ThrowIf.NotInRange(LocalPort, 1, ushort.MaxValue);
+
+        TimeSync.Validate();
+        Protocol.Validate();
     }
 
     internal NetcodeOptions CloneOptions() =>

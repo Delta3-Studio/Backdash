@@ -1,3 +1,4 @@
+using Backdash.Core;
 using Backdash.Network;
 using Backdash.Network.Client;
 
@@ -180,8 +181,8 @@ public sealed record ProtocolOptions
     public int ConsistencyCheckDistance { get; set; } = 8;
 
     /// <summary>
-    ///     The time to wait before send next consistency check (0 to disable).
-    ///     On each interval one peer requests a frame to other peer which must respond
+    ///     The time to wait before send the next consistency check (0 to disable).
+    ///     On each interval one peer requests a frame to another peer which must respond
     ///     with the state checksum of that frame.
     /// </summary>
     /// <value>Defaults to <c>1</c> second</value>
@@ -219,4 +220,35 @@ public sealed record ProtocolOptions
     ///     Custom receive socket address size
     /// </summary>
     public int ReceiveSocketAddressSize { get; set; }
+
+    internal void Validate()
+    {
+        ThrowIf.NotDefined(SerializationEndianness);
+        ThrowIf.NotDefined(LatencyStrategy);
+        ThrowIf.NotPositive(UdpPacketBufferSize);
+        ThrowIf.NotPositive(MaxPendingInputs);
+        ThrowIf.NotPositive(MaxPackageQueue);
+        ThrowIf.NotPositive(NumberOfSyncRoundTrips);
+        ThrowIf.NotPositive(MaxSequenceDistance);
+        ThrowIf.NotPositive(MaxSyncRetries);
+        ThrowIf.NotPositive(ConsistencyCheckStoreSize);
+        ThrowIf.NotPositive(KeepAliveInterval);
+        ThrowIf.NotPositive(QualityReportInterval);
+        ThrowIf.NotPositive(ResendInputInterval);
+        ThrowIf.NotPositive(SyncRetryInterval);
+        ThrowIf.NotPositive(SyncFirstRetryInterval);
+        ThrowIf.Negative(ReceiveSocketAddressSize);
+        ThrowIf.Negative(ConsistencyCheckDistance);
+        ThrowIf.Negative(FixedNetworkLatency);
+        ThrowIf.Negative(NetworkLatency);
+        ThrowIf.Negative(DisconnectNotifyStart);
+        ThrowIf.Negative(DisconnectTimeout);
+        ThrowIf.Negative(ShutdownTime);
+        ThrowIf.Negative(NetworkPackageStatsInterval);
+        ThrowIf.Negative(ConsistencyCheckInterval);
+        ThrowIf.Negative(ConsistencyCheckTimeout);
+
+        if (DisconnectTimeoutEnabled && DisconnectTimeout > TimeSpan.Zero && DisconnectNotifyStart > DisconnectTimeout)
+            throw new InvalidOperationException("Disconnect notification must start before the disconnect timeout.");
+    }
 }

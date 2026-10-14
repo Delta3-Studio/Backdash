@@ -41,7 +41,7 @@ public class NetcodePlayer :
 
     internal NetcodePlayer(sbyte queueIndex, PlayerType type, EndPoint? endPoint = null, Guid? id = null)
     {
-        ThrowIf.InvalidEnum(type);
+        ThrowIf.NotDefined(type);
         if (id is not null && id == Guid.Empty)
             throw new ArgumentException("Player id cannot be empty", nameof(id));
 

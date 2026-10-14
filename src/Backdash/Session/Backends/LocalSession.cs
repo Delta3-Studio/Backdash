@@ -343,7 +343,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public void SetFrameDelay(NetcodePlayer player, int delayInFrames)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(delayInFrames);
-        ThrowIf.ArgumentOutOfBounds(player.Index, 0, addedPlayers.Count);
+        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         if (!player.IsLocal()) return;
         inputQueues[player.Index].LocalFrameDelay = delayInFrames;
     }
@@ -356,7 +356,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
 
     public int GetFrameDelay(NetcodePlayer player)
     {
-        ThrowIf.ArgumentOutOfBounds(player.Index, 0, addedPlayers.Count);
+        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         return inputQueues[player.Index].LocalFrameDelay;
     }
 

@@ -1,3 +1,5 @@
+using Backdash.Core;
+
 namespace Backdash.Options;
 
 /// <summary>
@@ -38,4 +40,13 @@ public sealed record TimeSyncOptions
     /// </summary>
     /// <value>Defaults to <see langword="false" /></value>
     public bool RequireIdleInput { get; set; }
+
+    internal void Validate()
+    {
+        ThrowIf.NotPositive(FrameWindowSize);
+        ThrowIf.NotPositive(MinUniqueFrames);
+        ThrowIf.Negative(MinFrameAdvantage);
+        ThrowIf.NotPositive(MaxFrameAdvantage);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(MinFrameAdvantage, MaxFrameAdvantage);
+    }
 }

@@ -433,7 +433,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 
     public void SetFrameDelay(NetcodePlayer player, int delayInFrames)
     {
-        ThrowIf.ArgumentOutOfBounds(player.Index, 0, addedPlayers.Count);
+        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         ArgumentOutOfRangeException.ThrowIfNegative(delayInFrames);
         synchronizer.SetFrameDelay(player, delayInFrames);
     }
@@ -446,7 +446,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 
     public int GetFrameDelay(NetcodePlayer player)
     {
-        ThrowIf.ArgumentOutOfBounds(player.Index, 0, addedPlayers.Count);
+        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         return synchronizer.GetFrameDelay(player);
     }
 
