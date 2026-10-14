@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using Backdash.Core;
+using Backdash.Core.Json;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -14,7 +15,7 @@ namespace Backdash.Data;
 ///     A collection data structure that uses a single fixed-size buffer as if it were connected end-to-end.
 /// </summary>
 [DebuggerDisplay("Size = {count}")]
-[JsonConverter(typeof(CircularBufferJsonConverter<>))]
+[JsonConverter(typeof(CircularBufferJsonConverter))]
 public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuffer<T>>
 {
     readonly T[] array;
