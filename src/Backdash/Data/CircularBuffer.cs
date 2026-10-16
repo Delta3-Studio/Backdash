@@ -23,10 +23,14 @@ public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuf
     int count;
 
     /// <inheritdoc cref="CircularBuffer{T}"/>
-    public CircularBuffer(T[] buffer) => array = buffer;
+    public CircularBuffer(T[] buffer)
+    {
+        ArgumentNullException.ThrowIfNull(buffer);
+        array = buffer.Length is 0 ? new T[1] : buffer;
+    }
 
     /// <inheritdoc cref="CircularBuffer{T}"/>
-    public CircularBuffer(int capacity) : this(new T[capacity]) { }
+    public CircularBuffer(int capacity) => array = new T[Math.Max(1, capacity)];
 
     public int Size => count;
     public int LastIndex => tail;
@@ -123,12 +127,13 @@ public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuf
     T IReadOnlyList<T>.this[int index] => At(index);
     int IReadOnlyCollection<T>.Count => count;
 
-    public override string ToString() => $"[{string.Join(", ", array)}]";
+    public override string ToString() => $"[{string.Join(", ", this)}]";
 
     static bool Equals(in CircularBuffer<T>? a, in CircularBuffer<T>? b, EqualityComparer<T>? comparer = null)
     {
         if (ReferenceEquals(a, b)) return true;
         if (a is null || b is null) return false;
+        if (a.count != b.count) return false;
 
         comparer ??= EqualityComparer<T>.Default;
         for (var i = 0; i < a.count; i++)
@@ -237,6 +242,7 @@ public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuf
 
     public Span<T> GetResetSpan(int size, bool clearArray = false)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(size);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(size, array.Length);
         if (array.Length is 0) return [];
 
@@ -272,6 +278,7 @@ public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuf
         readonly CircularBuffer<T> buffer;
         int index;
         T? current;
+        bool currentValid;
 
         internal Enumerator(CircularBuffer<T> buffer) =>
             this.buffer = buffer;
@@ -286,31 +293,28 @@ public sealed class CircularBuffer<T> : IReadOnlyList<T>, IEquatable<CircularBuf
             {
                 current = buffer[index];
                 index++;
+                currentValid = true;
                 return true;
             }
 
             current = default;
+            currentValid = false;
             return false;
         }
 
         /// <inheritdoc />
-        public readonly T Current => current!;
+        public readonly T Current =>
+            !currentValid
+                ? throw new InvalidOperationException("Enumerator is not positioned on an element")
+                : current!;
 
-        readonly object? IEnumerator.Current
-        {
-            get
-            {
-                if (index > buffer.count)
-                    throw new InvalidOperationException("Index out of range");
-
-                return Current;
-            }
-        }
+        readonly object? IEnumerator.Current => Current;
 
         void IEnumerator.Reset()
         {
             index = 0;
             current = default;
+            currentValid = false;
         }
     }
 

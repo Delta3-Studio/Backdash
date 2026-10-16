@@ -32,7 +32,7 @@ public sealed record LoggerOptions
     public bool AppendTimestamps { get; set; } = true;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether level name should be prepended to logs.
+    ///     Gets or sets a value indicating whether a level name should be prepended to logs.
     ///     <value>Defaults to <see langword="true" /></value>
     /// </summary>
     public bool AppendLevel { get; set; } = true;

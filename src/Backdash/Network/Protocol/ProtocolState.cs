@@ -88,20 +88,17 @@ sealed class ProtocolState(
 
     public sealed class SyncState
     {
-        public readonly object Locker = new();
-        int remainingRoundTrips;
-        ushort currentRandom;
-        TimeSpan totalRoundTripsPing;
+        public readonly Lock Locker = new();
 
         public ushort CurrentRandom
         {
             get
             {
-                lock (Locker) return currentRandom;
+                lock (Locker) return field;
             }
             set
             {
-                lock (Locker) currentRandom = value;
+                lock (Locker) field = value;
             }
         }
 
@@ -109,11 +106,11 @@ sealed class ProtocolState(
         {
             get
             {
-                lock (Locker) return totalRoundTripsPing;
+                lock (Locker) return field;
             }
             set
             {
-                lock (Locker) totalRoundTripsPing = value;
+                lock (Locker) field = value;
             }
         }
 
@@ -121,11 +118,11 @@ sealed class ProtocolState(
         {
             get
             {
-                lock (Locker) return remainingRoundTrips;
+                lock (Locker) return field;
             }
             set
             {
-                lock (Locker) remainingRoundTrips = value;
+                lock (Locker) field = value;
             }
         }
     }

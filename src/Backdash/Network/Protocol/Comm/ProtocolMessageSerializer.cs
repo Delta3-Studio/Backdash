@@ -1,6 +1,5 @@
 using Backdash.Network.Messages;
 using Backdash.Serialization;
-using Backdash.Serialization.Internal;
 
 namespace Backdash.Network.Protocol.Comm;
 

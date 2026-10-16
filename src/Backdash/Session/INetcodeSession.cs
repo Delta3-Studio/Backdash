@@ -150,7 +150,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     bool UpdateNetworkStats(NetcodePlayer player);
 
     /// <summary>
-    ///     Reads number of delay frames for local player input.
+    ///     Reads a number of delay frames for local player input.
     /// </summary>
     /// <param name="player"></param>
     int GetFrameDelay(NetcodePlayer player);
@@ -262,7 +262,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     ResultCode AddPlayer(NetcodePlayer player);
 
     /// <summary>
-    ///     Find player by unique ID
+    ///     Find a player by unique ID
     /// </summary>
     /// <seealso cref="NetcodePlayer.Id"/>
     NetcodePlayer? GetPlayer(Guid id);
@@ -390,7 +390,7 @@ public interface INetcodeSession<TInput> : INetcodeSession where TInput : unmana
     void GetInputs(Span<TInput> buffer) => CurrentInputs.CopyTo(buffer);
 
     /// <summary>
-    ///     Return all saved inputs for current session.
+    ///     Return all saved inputs for the current session.
     ///     Requires <see cref="NetcodeOptions.SaveConfirmedInputHistory"/> to be <c>true</c>.
     /// </summary>
     IInputCollection<TInput>? GetSavedInputs() => null;

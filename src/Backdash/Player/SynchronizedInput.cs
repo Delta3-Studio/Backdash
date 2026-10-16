@@ -4,10 +4,9 @@ namespace Backdash;
 ///     Synchronized input result
 /// </summary>
 /// <param name="Input">The input value</param>
-/// <param name="Disconnected">Is <see langword="true" /> if input owner is disconnected</param>
+/// <param name="Disconnected">Is <see langword="true" /> if an input owner is disconnected</param>
 /// <typeparam name="T">Type of the Input</typeparam>
 [Serializable]
-
 public readonly record struct SynchronizedInput<T>(T Input, bool Disconnected) where T : unmanaged
 {
     /// <summary>
@@ -16,7 +15,7 @@ public readonly record struct SynchronizedInput<T>(T Input, bool Disconnected) w
     public readonly T Input = Input;
 
     /// <summary>
-    ///     Is <see langword="true" /> if input owner is disconnected
+    ///     Is <see langword="true" /> if an input owner is disconnected
     /// </summary>
     public readonly bool Disconnected = Disconnected;
 

@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Backdash.Backends;
 using Backdash.Core;
+using Backdash.Core.Logging;
 using Backdash.Data;
 using Backdash.Network;
 using Backdash.Network.Client;
@@ -140,7 +141,7 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         ConfigureSyncTest(config);
 
     /// <summary>
-    ///     Set the <see cref="SessionMode" /> for the <see cref="INetcodeSession{TInput}" /> to be build.
+    ///     Set the <see cref="SessionMode" /> for the <see cref="INetcodeSession{TInput}" /> to be built.
     /// </summary>
     /// <value>Defaults to <see cref="SessionMode.Remote" /></value>
     public NetcodeSessionBuilder<TInput> WithMode(SessionMode mode)

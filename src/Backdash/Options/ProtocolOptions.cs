@@ -32,13 +32,13 @@ public sealed record ProtocolOptions
 
     /// <summary>
     ///     Max allowed pending UDP output messages.
-    ///     When reached, removes and ignores the oldest package in the queue in order to make room for the new package.
+    ///     When reached, removes and ignores the oldest package in the queue to make room for the new package.
     /// </summary>
     /// <value>Defaults to <c>64</c></value>
     public int MaxPackageQueue { get; set; } = 64;
 
     /// <summary>
-    ///     Number of synchronization roundtrips to consider two clients synchronized.
+    ///     Number of synchronization round trips to consider two clients synchronized.
     /// </summary>
     /// <value>Defaults to <c>10</c></value>
     public int NumberOfSyncRoundTrips { get; set; } = 10;
@@ -51,7 +51,7 @@ public sealed record ProtocolOptions
 
     /// <summary>
     ///     Total number of synchronization request retries.
-    ///     When reached, session will dispatch the <see cref="PeerEvent.SynchronizationFailure" /> event.
+    ///     When reached, the session will dispatch the <see cref="PeerEvent.SynchronizationFailure" /> event.
     /// </summary>
     /// <value>Defaults to <c>64</c></value>
     public int MaxSyncRetries { get; set; } = 64;
@@ -124,7 +124,7 @@ public sealed record ProtocolOptions
     public TimeSpan SyncFirstRetryInterval { get; set; } = TimeSpan.FromMilliseconds(500);
 
     /// <summary>
-    ///     When the time from the last send package until now is greater than this, sends a keep alive packets.
+    ///     When the time from the last sent package until now is greater than this, sends a keep alive packet.
     /// </summary>
     /// <value>Defaults to <c>200</c> milliseconds</value>
     public TimeSpan KeepAliveInterval { get; set; } = TimeSpan.FromMilliseconds(200);
@@ -144,7 +144,7 @@ public sealed record ProtocolOptions
     public TimeSpan NetworkPackageStatsInterval { get; set; } = TimeSpan.FromMilliseconds(1000);
 
     /// <summary>
-    ///     When true, session will use calculate packages stats.
+    ///     When true, the session will use calculating packages stats.
     /// </summary>
     /// <seealso cref="NetworkPackageStatsInterval"/>
     /// <seealso cref="PeerNetworkStats.PackagesInfo"/>
@@ -166,7 +166,7 @@ public sealed record ProtocolOptions
     public bool CalculateRemotePlayerStats { get; set; } = true;
 
     /// <summary>
-    ///     When the time from the last send input until now is greater than this, resends pending inputs.
+    ///     When the time from the last sent input until now is greater than this, resends pending inputs.
     /// </summary>
     /// <value>Defaults to <c>200</c> milliseconds</value>
     public TimeSpan ResendInputInterval { get; set; } = TimeSpan.FromMilliseconds(200);

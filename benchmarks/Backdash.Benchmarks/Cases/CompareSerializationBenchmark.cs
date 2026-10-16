@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using Backdash.Data;
 using Backdash.Network;
 using Backdash.Serialization;
-using Backdash.Serialization.Internal;
 using MemoryPack;
 
 namespace Backdash.Benchmarks.Cases;

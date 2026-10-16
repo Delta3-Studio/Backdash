@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Backdash.Core.Logging;
 using Backdash.Options;
 
 namespace Backdash.Core;
@@ -89,12 +90,12 @@ sealed class Logger(
 
     public bool IsEnabledFor(in LogLevel level) => level >= EnabledLevel;
 
-    public static Logger CreateConsoleLogger(LogLevel level, ILogWriter? writer = null) => new(
+    public static Logger Create(LogLevel level, ILogWriter? writer = null) => new(
         new()
         {
             EnabledLevel = level,
         },
-        writer ?? new ConsoleTextLogWriter()
+        writer ?? (level is LogLevel.None ? new EmptyLogWriter() : new ConsoleTextLogWriter())
     );
 
     public void AppendTimestamp(ref LogInterpolatedStringHandler builder)

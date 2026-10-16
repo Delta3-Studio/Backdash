@@ -11,7 +11,7 @@ namespace Backdash;
 public interface INetcodeSessionHandler
 {
     /// <summary>
-    ///     Called at start of a game session, when all the clients have synchronized.
+    ///     Called at the start of a game session, when all the clients have synchronized.
     ///     You may begin sending inputs with.
     /// </summary>
     void OnSessionStart();
@@ -79,7 +79,7 @@ public interface INetcodeSessionHandler
     void EndRollback(Frame frame) { }
 
     /// <summary>
-    ///     Called when a replay session run all inputs
+    ///     Called when a replay session runs all inputs
     /// </summary>
     /// <seealso cref="SessionMode.Replay" />
     /// <seealso cref="NetcodeSessionBuilder{TInput}.ForReplay" />

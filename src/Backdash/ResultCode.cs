@@ -16,7 +16,7 @@ public enum ResultCode : short
     /// <summary>When <see cref="NetcodePlayer.Index" /> was not known by session.</summary>
     PlayerOutOfRange,
 
-    /// <summary>When emulator reached prediction barrier.</summary>
+    /// <summary>When the emulator reached the prediction barrier.</summary>
     /// <seealso cref="NetcodeOptions.PredictionFrames" />
     /// <seealso cref="INetcodeSession{TInput}.AddLocalInput(Backdash.NetcodePlayer, in TInput)" />
     PredictionThreshold,
@@ -24,7 +24,7 @@ public enum ResultCode : short
     /// <summary>The synchronization with peer was not finished.</summary>
     NotSynchronized,
 
-    /// <summary>Session is in rollback state.</summary>
+    /// <summary>Session is in a rollback state.</summary>
     InRollback,
 
     /// <summary>Unable to send input.</summary>
@@ -42,14 +42,14 @@ public enum ResultCode : short
     /// <inheritdoc cref="Max.NumberOfPlayers" />
     TooManyPlayers,
 
-    /// <summary>The operations need to requested before synchronization starts.</summary>
+    /// <summary>The operations need to request before synchronization starts.</summary>
     /// <seealso cref="INetcodeSession.Start" />
     AlreadySynchronized,
 
     /// <summary>The <see cref="NetcodePlayer" /> is already added to the session.</summary>
     DuplicatedPlayer,
 
-    /// <summary>The current session type not support the requested operation.</summary>
+    /// <summary>The current session type doesn't support the requested operation.</summary>
     NotSupported,
 
     /// <summary>The value is not ready to be ready.</summary>

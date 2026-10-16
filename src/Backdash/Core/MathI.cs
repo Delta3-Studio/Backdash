@@ -147,7 +147,7 @@ public static class MathI
         };
 
     /// <summary>
-    ///    Returns each power of 2 component from the value
+    ///    Returns each power of 2 components from the value
     /// </summary>
     public static IEnumerable<int> DecomposePowerOfTwo(int value)
     {

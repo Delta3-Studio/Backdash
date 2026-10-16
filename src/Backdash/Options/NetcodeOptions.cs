@@ -1,7 +1,7 @@
 using Backdash.Core;
 using Backdash.Network;
 using Backdash.Network.Client;
-using Backdash.Serialization.Internal;
+using Backdash.Serialization;
 using Backdash.Synchronizing.State;
 
 namespace Backdash.Options;

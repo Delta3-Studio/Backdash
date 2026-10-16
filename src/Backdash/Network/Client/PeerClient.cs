@@ -13,7 +13,7 @@ namespace Backdash.Network.Client;
 public interface IMessageHandler<T> where T : struct
 {
     /// <summary>
-    ///     Handles messages sent.
+    ///     Handle messages sent.
     /// </summary>
     void AfterSendMessage(int bytesSent);
 

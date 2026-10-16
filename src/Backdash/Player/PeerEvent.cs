@@ -39,7 +39,7 @@ public enum PeerEvent : sbyte
     ///     The network connection on the other end is not responding for <see cref="ProtocolOptions.DisconnectNotifyStart" />.
     ///     The <see cref="ConnectionInterruptedEventInfo.DisconnectTimeout" /> field in the
     ///     <see cref="SynchronizingEventInfo" />
-    ///     struct of the <see cref="PeerEventInfo.ConnectionInterrupted" /> object contains the current connection timeout
+    ///     struct of the <see cref="PeerEventInfo.ConnectionInterrupted" /> object contains the current connection timeout,
     ///     which is the difference between <see cref="ProtocolOptions.DisconnectTimeout" /> and
     ///     <see cref="ProtocolOptions.DisconnectNotifyStart" />.
     /// </summary>

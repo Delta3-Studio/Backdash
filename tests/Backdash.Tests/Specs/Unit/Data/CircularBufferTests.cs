@@ -15,6 +15,32 @@ public class CircularBufferTests
     }
 
     [Fact]
+    public void ShouldUseMinimumCapacityOfOne()
+    {
+        CircularBuffer<int> zero = new(0);
+        CircularBuffer<int> negative = new(-1);
+        CircularBuffer<int> emptyArray = new([]);
+        foreach (var buffer in new[] { zero, negative, emptyArray })
+        {
+            buffer.Capacity.Should().Be(1);
+            buffer.Size.Should().Be(0);
+            buffer.IsEmpty.Should().BeTrue();
+        }
+
+        var nullArray = () => new CircularBuffer<int>((int[])null!);
+        nullArray.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void ShouldReuseConstructorArray()
+    {
+        int[] source = [10, 20];
+        CircularBuffer<int> sut = new(source);
+        source[0] = 99;
+        sut.Next().Should().Be(99);
+    }
+
+    [Fact]
     public void ShouldAddOneItem()
     {
         CircularBuffer<int> sut = new(1);
@@ -183,6 +209,43 @@ public class CircularBufferTests
         CircularBuffer<int> sutRight = new(3);
         sutRight.AddRange(10, 20, 30);
         sutLeft.Should().Equal(sutRight);
+    }
+
+    [Fact]
+    public void ShouldNotBeEqualWhenSizesDiffer()
+    {
+        CircularBuffer<int> shorter = new(3);
+        shorter.Add(10);
+        CircularBuffer<int> longer = new(3);
+        longer.AddRange(10, 20);
+        shorter.Equals(longer).Should().BeFalse();
+        (shorter == longer).Should().BeFalse();
+    }
+
+    [Fact]
+    public void EnumeratorCurrentShouldThrowBeforeStartAndAfterEnd()
+    {
+        CircularBuffer<int> sut = new(2);
+        sut.Add(10);
+        using var enumerator = sut.GetEnumerator();
+        // ReSharper disable once AccessToDisposedClosure
+        var beforeStart = () => enumerator.Current;
+        beforeStart.Should().Throw<InvalidOperationException>();
+        enumerator.MoveNext().Should().BeTrue();
+        enumerator.Current.Should().Be(10);
+        enumerator.MoveNext().Should().BeFalse();
+        // ReSharper disable once AccessToDisposedClosure
+        var afterEnd = () => enumerator.Current;
+        afterEnd.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void ShouldFormatOnlyLogicalContentsInOrder()
+    {
+        CircularBuffer<int> sut = new(3);
+        sut.AddRange(10, 20, 30);
+        sut.Add(40);
+        sut.ToString().Should().Be("[20, 30, 40]");
     }
 
     [Fact]

@@ -44,7 +44,7 @@ public readonly record struct Checksum :
     /// <inheritdoc />
     public bool Equals(uint other) => Value == other;
 
-    /// <summary>Return true if current value is <c>0</c></summary>
+    /// <summary>Return true if the current value is <c>0</c></summary>
     public bool IsEmpty => Value is 0u;
 
     const string DefaultFormat = "x8";

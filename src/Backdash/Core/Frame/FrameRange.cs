@@ -187,7 +187,7 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     }
 
     /// <summary>
-    /// Returns normalized version of the range (sorted components)
+    /// Returns a normalized version of the range (sorted components)
     /// </summary>
     public static FrameRange Normalize(in FrameRange range) =>
         range.IsBackward ? Reverse(range) : range;
@@ -242,7 +242,7 @@ public readonly record struct FrameRange(Frame Start, Frame End)
         new(range.Start, range.Duration);
 
     /// <summary>
-    /// Enumerate the frames in range
+    /// List the frames in range
     /// </summary>
     public Enumerator GetEnumerator() => new(this);
 

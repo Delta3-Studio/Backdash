@@ -35,7 +35,7 @@ public sealed record TimeSyncOptions
     /// <summary>
     ///     Make sure our input had been "idle enough" before recommending
     ///     a sleep. This tries to make the emulator sleep while the
-    ///     user's input isn't sweeping in arcs (e.g. fireball motions in
+    ///     user's input isn't sweeping in arcs (e.g., fireball motions in
     ///     Street Fighter), which could cause the player to miss moves.
     /// </summary>
     /// <value>Defaults to <see langword="false" /></value>

@@ -50,7 +50,7 @@ sealed class TimeSync<TInput>(
         var remoteAdvantage = MathI.Avg(remote);
         var iteration = TimeSyncCounter.Increment();
         // See if someone should take action.  The person furthest ahead needs to slow down so the other user can catch up.
-        // Only do this if both clients agree on who's ahead!.
+        // Only do this if both clients agree on who's ahead.
         if (localAdvantage >= remoteAdvantage)
             return 0;
         // Both clients agree that we're the one ahead.
@@ -63,7 +63,7 @@ sealed class TimeSync<TInput>(
 
         // Make sure our input had been "idle enough" before recommending a sleep.
         // This tries to make the emulator sleep while the user's input isn't sweeping in arcs
-        // (e.g. fireball motions in Street Fighter), which could cause the player to miss moves.
+        // (e.g., fireball motions in Street Fighter), which could cause the player to miss moves.
         if (options.RequireIdleInput)
         {
             SpinWait sw = new();

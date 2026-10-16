@@ -26,7 +26,7 @@ public interface IStateStore
     bool TryGet(Frame frame, [MaybeNullWhen(false)] out SavedState result);
 
     /// <summary>
-    ///     Try set the state pointer to the first <paramref name="frame"/> entry.
+    ///     Try to set the state pointer to the first <paramref name="frame"/> entry.
     /// </summary>
     bool Seek(Frame frame);
 

@@ -8,7 +8,7 @@ namespace Backdash.Synchronizing.State;
 public interface IStateDesyncHandler
 {
     /// <summary>
-    ///     Handles the states binary representations
+    ///     Handles the state binary representations
     /// </summary>
     void Handle(INetcodeSession session, in DesyncState previous, in DesyncState current);
 }

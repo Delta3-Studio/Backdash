@@ -17,7 +17,7 @@ public sealed record SyncTestOptions<TInput> where TInput : unmanaged
     public int CheckDistanceFrames { get; set; } = 1;
 
     /// <summary>
-    ///     If true, throws on state de-synchronization.
+    ///     If true, throws on state desynchronization.
     /// </summary>
     public bool ThrowOnDesync { get; set; } = true;
 

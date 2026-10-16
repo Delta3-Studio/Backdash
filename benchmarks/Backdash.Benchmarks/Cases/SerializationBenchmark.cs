@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using Backdash.Data;
 using Backdash.Network;
 using Backdash.Serialization;
-using Backdash.Serialization.Internal;
 
 namespace Backdash.Benchmarks.Cases;
 

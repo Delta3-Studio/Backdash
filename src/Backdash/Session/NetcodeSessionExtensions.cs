@@ -52,7 +52,7 @@ public static class NetcodeSessionExtensions
     }
 
     /// <summary>
-    ///    Enumerate all valid state saved snapshots in descending order
+    ///    List all valid state saved snapshots in descending order
     /// </summary>
     public static IEnumerable<StateSnapshot> EnumerateSnapshots<T>(this INetcodeSession<T> @this, Frame? frame = null)
         where T : unmanaged
@@ -66,7 +66,7 @@ public static class NetcodeSessionExtensions
     }
 
     /// <summary>
-    ///    Enumerate string representation for all saved states in descending order
+    ///    List string representation for all saved states in descending order
     /// </summary>
     public static IEnumerable<StatePreview> EnumerateStateStrings<T>(
         this INetcodeSession<T> @this, Frame? frame = null, IStateStringParser? parser = null)

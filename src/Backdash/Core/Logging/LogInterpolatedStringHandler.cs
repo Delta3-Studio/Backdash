@@ -135,5 +135,5 @@ struct LogStringBuffer
     public const int Capacity = 256;
 #endif
 
-    byte elemenet0;
+    byte element0;
 }

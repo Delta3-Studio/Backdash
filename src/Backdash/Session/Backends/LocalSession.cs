@@ -7,7 +7,6 @@ using Backdash.Core;
 using Backdash.Network;
 using Backdash.Options;
 using Backdash.Serialization;
-using Backdash.Serialization.Internal;
 using Backdash.Synchronizing.Input;
 using Backdash.Synchronizing.Input.Confirmed;
 using Backdash.Synchronizing.Random;
@@ -76,8 +75,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
 
     void DisposeInternal()
     {
-        if (Interlocked.CompareExchange(ref disposed, true, false))
-            return;
+        if (Interlocked.CompareExchange(ref disposed, true, false)) return;
         Close();
         inputListener?.Dispose();
     }

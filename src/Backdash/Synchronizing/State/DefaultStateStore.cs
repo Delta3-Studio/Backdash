@@ -9,7 +9,7 @@ namespace Backdash.Synchronizing.State;
 /// <summary>
 ///     Binary store for temporary save and restore game states using <see cref="IBinarySerializer{T}" />.
 /// </summary>
-/// <param name="hintSize">initial memory used for infer the state size</param>
+/// <param name="hintSize">initial memory used to infer the state size</param>
 public sealed class DefaultStateStore(int hintSize) : IStateStore
 {
     int head;

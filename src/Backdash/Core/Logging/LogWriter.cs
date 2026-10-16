@@ -1,4 +1,4 @@
-namespace Backdash.Core;
+namespace Backdash.Core.Logging;
 
 /// <summary>
 ///     Defines how and where the log should be written.
@@ -24,15 +24,36 @@ public abstract class TextLogWriter : ILogWriter
     /// </summary>
     protected abstract TextWriter TextWriter { get; }
 
-    readonly object locker = new();
+    readonly Lock locker = new();
     bool disposed;
 
     /// <inheritdoc />
     public void Write(LogLevel level, char[] chars, int size)
     {
-        if (disposed) return;
         lock (locker)
+        {
+            if (disposed) return;
             TextWriter.WriteLine(chars, 0, size);
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        lock (locker)
+        {
+            if (disposed) return;
+            try
+            {
+                Dispose(true);
+            }
+            finally
+            {
+                disposed = true;
+            }
+        }
+
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -44,38 +65,41 @@ public abstract class TextLogWriter : ILogWriter
     /// </param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposing) return;
-        disposed = true;
+        if (disposing)
+            TextWriter.Dispose();
+    }
+}
+
+sealed class DelegateLogWriter(Action<LogLevel, string> action) : ILogWriter
+{
+    readonly Lock locker = new();
+    bool disposed;
+
+    /// <inheritdoc />
+    public void Write(LogLevel level, char[] chars, int size)
+    {
         lock (locker)
         {
-            TextWriter.Close();
-            TextWriter.Dispose();
+            if (disposed) return;
+            action.Invoke(level, new(chars.AsSpan(0, size)));
         }
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        lock (locker)
+            disposed = true;
     }
 }
 
-sealed class DelegateLogWriter(Action<LogLevel, string> action) : ILogWriter
+sealed class EmptyLogWriter : ILogWriter
 {
-    readonly object locker = new();
-    bool disposed;
+    /// <inheritdoc />
+    public void Write(LogLevel level, char[] chars, int size) { }
 
     /// <inheritdoc />
-    public void Write(LogLevel level, char[] chars, int size)
-    {
-        if (disposed) return;
-        lock (locker)
-            action.Invoke(level, new(chars.AsSpan(0, size)));
-    }
-
-    /// <inheritdoc />
-    public void Dispose() => disposed = true;
+    public void Dispose() { }
 }
 
 /// <summary>
@@ -85,36 +109,39 @@ public sealed class ConsoleTextLogWriter : TextLogWriter
 {
     /// <inheritdoc />
     protected override TextWriter TextWriter { get; } = Console.Out;
+
+    /// <inheritdoc />
+    protected override void Dispose(bool disposing)
+    {
+        // Do not close Console.Out
+    }
 }
 
 /// <summary>
 ///     Implementation of <see cref="ILogWriter" /> for logging into a file.
 /// </summary>
-public sealed class FileTextLogWriter : TextLogWriter
+/// <remarks>
+///     Initializes a new instance of the <see cref="FileTextLogWriter" /> class.
+/// </remarks>
+/// <param name="fileName">
+///     Log file name
+///     <remarks>
+///         you can use placeholders for:
+///         - <see cref="Environment.ProcessId" />: <c>"{{proc_id}}"</c>;
+///         - <see cref="DateTime.UtcNow" />: <c>"{{timestamp}}"</c>;
+///     </remarks>
+///     <value>Defaults to <c>"{{proc_id}}_{{timestamp}}.log"</c></value>
+/// </param>
+/// <param name="append">
+///     True to append data to the file; false to overwrite the file. If the specified file does not exist, this parameter
+///     has no effect, and the constructor creates a new file.
+/// </param>
+public sealed class FileTextLogWriter(string? fileName = null, bool append = true) : TextLogWriter
 {
     /// <inheritdoc />
-    protected override TextWriter TextWriter { get; }
+    protected override TextWriter TextWriter { get; } = GetLogFileWriter(fileName, append);
 
     const string DefaultFileName = "{{proc_id}}_{{timestamp}}.log";
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="FileTextLogWriter" /> class.
-    /// </summary>
-    /// <param name="fileName">
-    ///     Log file name
-    ///     <remarks>
-    ///         you can use placeholders for:
-    ///         - <see cref="Environment.ProcessId" />: <c>"{{proc_id}}"</c>;
-    ///         - <see cref="DateTime.UtcNow" />: <c>"{{timestamp}}"</c>;
-    ///     </remarks>
-    ///     <value>Defaults to <c>"{{proc_id}}_{{timestamp}}.log"</c></value>
-    /// </param>
-    /// <param name="append">
-    ///     true to append data to the file; false to overwrite the file. If the specified file does not exist, this parameter
-    ///     has no effect, and the constructor creates a new file.
-    /// </param>
-    public FileTextLogWriter(string? fileName = null, bool append = true) =>
-        TextWriter = GetLogFileWriter(fileName, append);
 
     /// <summary>
     /// Return a log file stream writer

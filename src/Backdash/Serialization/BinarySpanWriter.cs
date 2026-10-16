@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Backdash.Core;
 using Backdash.Network;
-using Backdash.Serialization.Internal;
 
 namespace Backdash.Serialization;
 
@@ -595,7 +594,7 @@ public readonly ref struct BinarySpanWriter
     public void WriteUtf8String(in ReadOnlySpan<char> value) =>
         Advance(System.Text.Encoding.UTF8.GetBytes(value, CurrentBuffer));
 
-    /// <summary>Writes an unmanaged struct into buffer.</summary>
+    /// <summary>Writes an unmanaged struct into a buffer.</summary>
     public void WriteStruct<T>(in T value) where T : unmanaged
     {
         MemoryMarshal.Write(CurrentBuffer, in value);

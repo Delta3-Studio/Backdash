@@ -57,6 +57,10 @@ sealed class InputQueue<TInput> where TInput : unmanaged
             frame = Frame.Min(frame, lastFrameRequested);
         logger.Write(LogLevel.Trace,
             $"Queue {QueueId} => discarding confirmed frames up to {frame} (last add:{lastAddedFrame.Number} len:{inputs.Size} front:{FirstInput.Frame.Number} back:{LastInput.Frame.Number})");
+
+        if (frame < FirstInput.Frame)
+            return;
+
         if (frame.Number >= lastAddedFrame.Number)
             inputs.Clear();
         else
@@ -150,7 +154,7 @@ sealed class InputQueue<TInput> where TInput : unmanaged
 
         if (prediction.Frame.IsNull)
         {
-            // If the frame requested is in our range, fetch it out of the queue and  return it.
+            // If the frame requested is in our range, fetch it out of the queue and return it.
             var offset = requestedFrame.Number - FirstInput.Frame.Number;
             if (offset < inputs.Size)
             {
@@ -200,7 +204,7 @@ sealed class InputQueue<TInput> where TInput : unmanaged
     public void AddInput(ref GameInput<TInput> input)
     {
         logger.Write(LogLevel.Trace, $"Queue {QueueId} => adding input frame number {input.Frame.Number} to queue.");
-        // These next two lines simply verify that inputs are passed in sequentially by the user, regardless of frame delay.
+        // These next two lines simply verify that the user passes in inputs sequentially, regardless of frame delay.
         ThrowIf.Assert(lastUserAddedFrame.IsNull || input.Frame.Number == lastUserAddedFrame.Next().Number);
         lastUserAddedFrame = input.Frame;
         // Move the queue head to the correct point in preparation to input the frame into the queue.
@@ -264,7 +268,7 @@ sealed class InputQueue<TInput> where TInput : unmanaged
         while (expectedFrame < frame)
         {
             // This can occur when the frame delay has been increased since the last time we shoved a frame into the system.
-            // We need to replicate the last frame in the queue several times in order to fill the space left.
+            // We need to replicate the last frame in the queue several times to fill the space left.
             logger.Write(LogLevel.Information,
                 $"Queue {QueueId} => Adding padding frame {expectedFrame.Number} to account for change in frame delay");
 

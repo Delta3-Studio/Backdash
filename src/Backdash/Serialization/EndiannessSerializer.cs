@@ -3,7 +3,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Backdash.Network;
 
-namespace Backdash.Serialization.Internal;
+namespace Backdash.Serialization;
 
 /// <summary>
 /// Get endianness specific number serializer

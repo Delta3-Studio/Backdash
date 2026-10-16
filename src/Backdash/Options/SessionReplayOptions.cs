@@ -9,7 +9,7 @@ namespace Backdash.Options;
 public sealed record SessionReplayOptions<TInput> where TInput : unmanaged
 {
     /// <summary>
-    ///     Controller for replay session.
+    ///     Controller for a replay session.
     /// </summary>
     public SessionReplayControl? ReplayController { get; set; }
 

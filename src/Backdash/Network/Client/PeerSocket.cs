@@ -17,7 +17,7 @@ public interface IPeerSocket : IDisposable
     int Port { get; }
 
     /// <summary>
-    ///     Receive bytes from specified remote host
+    ///     Receive bytes from a specified remote host
     /// </summary>
     ValueTask<int> ReceiveFromAsync(Memory<byte> buffer, SocketAddress address, CancellationToken cancellationToken);
 

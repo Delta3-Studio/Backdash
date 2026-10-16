@@ -9,7 +9,7 @@ var totalDuration = TimeSpan.FromSeconds(10);
 var snapshotInterval = TimeSpan.FromSeconds(0);
 var printSnapshots = false;
 
-var logger = Logger.CreateConsoleLogger(LogLevel.None);
+var logger = Logger.Create(LogLevel.None);
 using NetcodeJobManager jobs = new(logger);
 
 const int bufferSize = Max.CompressedBytes * Max.NumberOfPlayers;

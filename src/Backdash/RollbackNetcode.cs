@@ -2,7 +2,7 @@ namespace Backdash;
 
 /// <summary>
 ///     The session builder entrypoint.
-///     used to create new netcode sessions.
+///     Used to create new netcode sessions.
 /// </summary>
 /// <seealso cref="INetcodeSession{TInput}" />
 /// <seealso cref="NetcodeSessionBuilder{TInput}" />

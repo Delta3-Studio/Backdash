@@ -1,4 +1,5 @@
 using Backdash.Core;
+using Backdash.Core.Logging;
 using Backdash.Network;
 using Backdash.Network.Client;
 using Backdash.Network.Protocol;
