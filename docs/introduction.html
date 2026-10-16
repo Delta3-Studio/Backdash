@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Introduction | Backdash Netcode </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Introduction | Backdash Netcode ">
+      
+      
+      <link rel="icon" href="../docs/images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Delta3-Studio/Backdash/blob/master/docfx/docs/introduction.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../docs/images/logo.png" alt="Backdash">
+            Backdash
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="introduction">Introduction</h1>
+
+<p><a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> is a multiplayer networking SDK that helps you add
+<a href="https://words.infil.net/w02-netcode.html">rollback netcode</a> to a game.</p>
+<p>Backdash began as a <a href="https://dotnet.microsoft.com">.NET</a> port inspired by
+<a href="https://github.com/pond3r/ggpo">GGPO</a>, a rollback netcode SDK written in C++. It can be used with game engines that
+support .NET languages such as <a href="https://dotnet.microsoft.com/en-us/languages/csharp">C#</a> and
+<a href="https://dotnet.microsoft.com/en-us/languages/fsharp">F#</a>, including <a href="https://godotengine.org/">Godot</a>,
+<a href="https://monogame.net/">MonoGame</a>, and <a href="https://www.stride3d.net">Stride</a>. This avoids the need to bind the game to
+GGPO's native C++ library.</p>
+<p>Backdash also provides configurable session options and extension points through
+<a href="https://delta3-studio.github.io/Backdash/api/Backdash.NetcodeOptions.html"><code>NetcodeOptions</code></a> and
+<a href="https://delta3-studio.github.io/Backdash/api/Backdash.SessionServices-2.html"><code>SessionServices</code></a>.</p>
+<div class="NOTE">
+<h5>Note</h5>
+<p>Backdash currently targets .NET 10. Unity 6's documented API compatibility profiles target .NET Standard 2.1 or
+.NET Framework 4.8, so the Backdash package cannot be assumed to work in a Unity project as-is. Check
+<a href="https://docs.unity3d.com/6000.0/Documentation/Manual/dotnet-profile-support.html">Unity's .NET profile support</a>
+and the requirements of your Unity version and build target.</p>
+</div>
+<h2 id="how-does-it-work">How Does It Work?</h2>
+<p>Rollback networking works best with a deterministic peer-to-peer game simulation. If every peer starts from the same
+state and processes the same inputs in the same order, each peer should produce the same game state. A traditional
+lockstep approach waits for every peer's input before simulating a frame. Network delay can make that approach feel
+unresponsive.</p>
+<p>With rollback, the game can simulate using local inputs and predictions for remote inputs that have not arrived yet.
+When the actual inputs arrive, Backdash compares them with the predictions. If they differ, it restores an earlier game
+state and re-simulates the affected frames. This reduces input delay, although incorrect predictions can cause visible
+corrections and the simulation may still pause when its prediction limit is reached.</p>
+<p>Don't worry if that sounds like a headache. <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> was designed specifically
+to implement the rollback algorithms and low-level networking logic in a way that's easy to integrate into your existing
+game loop. If you simply implement the functionality to save your game state, load it back up, and execute a frame of
+game state without rendering its outcome, <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> can take care of the rest.</p>
+<h2 id="learning-resources">Learning resources</h2>
+<p>More information about how it works and why it is good:</p>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=0NLe4IpdS1w">Analysis: Why Rollback Netcode Is Better</a> <em>(video)</em>.</li>
+<li><a href="https://words.infil.net/w02-netcode-p2.html">Infil's Netcode Article</a>.</li>
+<li><a href="https://www.youtube.com/watch?v=1RI5scXYhK0">Talking Rollback Netcode With Adam &quot;Keits&quot; Heart</a> <em>(video)</em>.</li>
+<li><a href="https://www.youtube.com/watch?v=7jb0FOcImdg">GDC Rollback Networking in Mortal Kombat and Injustice 2</a> <em>(video)</em>.</li>
+<li><a href="https://www.youtube.com/watch?v=k9JTIn1SVQ4">EVO 2017: GGPO panel</a> <em>(video)</em>.</li>
+<li><a href="https://drive.google.com/file/d/1cV0fY8e_SC1hIFF5E1rT8XRVRzPjU8W9/view">Fight the Lag! The Trick Behind GGPO's Low Latency Netcode</a></li>
+<li><a href="https://www.youtube.com/watch?v=Tu2kAdmUCaI&amp;t=41m22s">Cross Counter LIVE feat. Mike Z</a> <em>(video)</em>.</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Delta3-Studio/Backdash/blob/master/docfx/docs/introduction.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Developed by <a href="http://delta3.studio/">Delta3</a> and <a href="https://lucasteles.dev/">Lucas Teles</a>.</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

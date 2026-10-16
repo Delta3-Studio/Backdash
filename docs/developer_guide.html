@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title> | Backdash Netcode </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content=" | Backdash Netcode ">
+      
+      
+      <link rel="icon" href="../docs/images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Delta3-Studio/Backdash/blob/master/docfx/docs/developer_guide.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../docs/images/logo.png" alt="Backdash">
+            Backdash
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+
+<h2 id="developer-guide">Developer Guide</h2>
+<div class="NOTE">
+<h5>Note</h5>
+<p>Adapted from the <a href="https://github.com/pond3r/ggpo/blob/master/doc/DeveloperGuide.md">GGPO Developer Guide</a>.</p>
+</div>
+<h3 id="installing">Installing</h3>
+<p><a href="https://www.nuget.org/packages/Backdash">NuGet package</a> available:</p>
+<pre><code class="lang-ps">$ dotnet add package Backdash
+</code></pre>
+<h2 id="game-state-and-inputs">Game State and Inputs</h2>
+<p>Your game probably has many moving parts. <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> only depends on these
+two:</p>
+<ul>
+<li><p><strong>Game State</strong> describes the current state of everything in your game. In a shooter, this would include the position
+of the ship and all the enemies on the screen, the location of all the bullets, how much health each opponent has, the
+current score, etc.</p>
+</li>
+<li><p><strong>Game Inputs</strong> are the set of things that modify the game state. These obviously include the joystick and button
+presses done by the player, but can also include other non-obvious inputs as well. For example, if your game uses the
+current time of day to calculate something in the game, the current time of day at the beginning of a frame is also an
+input.</p>
+</li>
+</ul>
+<p>There are many other things in your game engine that are neither game state nor inputs. For example, your audio and
+video renderers are not game state since they don't affect the outcome of the game. If you have a special
+effects engine that's generating effects that do not have an impact on the game, they can be excluded from the game
+state as well.</p>
+<h2 id="using-state-and-inputs-for-synchronization">Using State and Inputs for Synchronization</h2>
+<p>Each player in a <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> networked game has a complete copy of the game
+running. <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> needs to keep both copies of the
+game state in sync to ensure that both players are experiencing the same game. It would be much too expensive to send an
+entire copy of the game state between players every frame.
+Instead, <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a>
+sends the players' inputs to each other and has
+each player step the game forward. For this to work, your game engine must meet three criteria:</p>
+<ol>
+<li>The game simulation must be fully deterministic. That is, for any given game state and inputs, advancing the game
+state by exactly 1 frame must result in identical game states for all players.</li>
+<li>The game state must be fully encapsulated and serializable.</li>
+<li>Your game engine must be able to load, save, and execute a single simulation frame without rendering the result of
+that frame. <strong>This will be used to implement rollbacks</strong>.</li>
+</ol>
+<h2 id="programming-guide">Programming Guide</h2>
+<p>The following section contains a walk-through for porting your application
+to <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a>.</p>
+<p>For a detailed description of the
+<a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> API, please see
+the <a href="https://delta3-studio.github.io/Backdash/api/Backdash.html">API Reference Docs</a>.</p>
+<h3 id="interfacing-with-backdash">Interfacing with <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a></h3>
+<p><a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> is designed to be easy to interface with new and existing game
+engines. It handles most of the implementation of handling rollbacks by calling out to your application via
+the <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html"><code>INetcodeSessionHandler</code></a>
+hooks.</p>
+<h3 id="creating-the-">Creating the [</h3>
+<p><code>INetcodeSession</code>](<a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html">https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html</a>) Object</p>
+<p>The <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html"><code>INetcodeSession&lt;TInput&gt;</code></a> object is
+your interface to the <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> framework.</p>
+<p>Create one with the <code>RollbackNetcode.WithInputType</code> builder:</p>
+<p>The input type must be unmanaged. A flags enum or a struct made up of unmanaged fields is a common choice.</p>
+<p>For example, giving the user pre-defined types for the <strong>Game State</strong> and <strong>Game Input</strong></p>
+<pre><code class="lang-csharp">public class MyGameState {
+    public MyGameState() {
+        /* initialize state */
+    }
+
+    /* members */
+}
+
+[Flags]
+public enum MyGameInput {
+    /* members */
+}
+</code></pre>
+<p>To create a new session bound to port <code>9001</code>:</p>
+<pre><code class="lang-csharp">using Backdash;
+
+var session = RollbackNetcode
+    .WithInputType&lt;MyGameInput&gt;()
+    .Configure(options =&gt;
+    {
+        options.LocalPort = 9001;
+    })
+    .Build();
+
+</code></pre>
+<div class="TIP">
+<h5>Tip</h5>
+<p>If you want to use an integer type as your input type:</p>
+<p><code>RollbackNetcode.WithInputType(t =&gt; t.Integer&lt;uint&gt;())</code></p>
+</div>
+<p>The session builder can be used to configure the session by setting <a href="https://delta3-studio.github.io/Backdash/api/Backdash.NetcodeOptions.html">
+<code>NetcodeOptions</code></a>:</p>
+<ul>
+<li>passing an instance to <code>.WithOptions(..)</code></li>
+<li>using a delegate function on <code>.Configure(options =&gt; {})</code></li>
+<li>using the fluent API</li>
+</ul>
+<pre><code class="lang-csharp">using Backdash;
+using Backdash.Core;
+
+var session = RollbackNetcode
+    .WithInputType&lt;MyGameInput&gt;()
+    .WithPort(9001)
+    .WithInputDelayFrames(2)
+    .WithLogLevel(LogLevel.Warning)
+    .Build();
+
+</code></pre>
+<h3 id="network-and-protocol-options">Network and protocol options</h3>
+<p>Network-specific settings are grouped under <code>NetcodeOptions.Protocol</code>. You can set them in the <code>Configure</code> callback or
+pass a configured <code>NetcodeOptions</code> to the builder. For example:</p>
+<pre><code class="lang-csharp">using System;
+using Backdash;
+
+var session = RollbackNetcode
+    .WithInputType&lt;MyGameInput&gt;()
+    .Configure(options =&gt;
+    {
+        options.Protocol.DisconnectTimeout = TimeSpan.FromSeconds(5);
+        options.Protocol.ConsistencyCheckEnabled = true;
+        options.Protocol.ConsistencyCheckInterval = TimeSpan.FromSeconds(1);
+    })
+    .Build();
+</code></pre>
+<p>The default protocol configuration sends keep-alives every 200 ms, resends pending inputs after 200 ms without a
+recent input exchange, and checks state consistency every second. Set <code>ConsistencyCheckInterval</code> to <code>TimeSpan.Zero</code> to
+disable periodic consistency checks. <code>MaxPendingInputs</code> limits queued local inputs; when full, adding input can return
+<code>ResultCode.InputDropped</code>. <code>MaxPackageQueue</code> bounds outgoing UDP messages and drops the oldest queued message when it
+fills. Use the <a href="https://delta3-studio.github.io/Backdash/api/Backdash.Options.ProtocolOptions.html">
+<code>ProtocolOptions</code> API reference</a>
+for the complete list of settings.</p>
+<p>You should also define an implementation of
+the <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html"><code>INetcodeSessionHandler</code></a>
+filled in with your game's callback functions for managing game state.</p>
+<pre><code class="lang-csharp">using Backdash.Data;
+using Backdash.Serialization;
+
+public class MySessionHandler : INetcodeSessionHandler
+{
+    public void OnSessionStart() { /* ... */ }
+    public void OnSessionClose() { /* ... */ }
+    public void SaveState(Frame frame, ref readonly BinaryBufferWriter writer) { /* ... */ }
+    public void LoadState(Frame frame, ref readonly BinaryBufferReader reader) { /* ... */ }
+    public void AdvanceFrame() { /* ... */ }
+    public void TimeSync(FrameSpan framesAhead) { /* ... */ }
+    public void OnPeerEvent(NetcodePlayer player, in PeerEventInfo evt) { /* ... */ }
+}
+</code></pre>
+<p>And then, set it into the session:</p>
+<pre><code class="lang-csharp">session.SetHandler(new MySessionHandler());
+</code></pre>
+<p>The <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html"><code>INetcodeSession</code></a> object should only
+be used for a single game session. If you need to connect to another opponent, you must close the existing session
+object using
+<a href="https://learn.microsoft.com/pt-br/dotnet/api/system.idisposable.dispose?view=net-8.0"><code>.Dispose</code></a> method first, and
+then start a new one:</p>
+<pre><code class="lang-csharp">/* Close the current session to start a new one */
+session.Dispose();
+</code></pre>
+<h3 id="setting-players">Setting Players</h3>
+<p>When you created the <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html"><code>INetcodeSession</code></a>,
+you didn't specify any information about the players participating in the game.
+To do so, add a <a href="https://delta3-studio.github.io/Backdash/api/Backdash.NetcodePlayer.html"><code>NetcodePlayer</code></a> for each
+player with <code>AddPlayer</code>, or provide the players to the builder with <code>WithPlayers</code>. The following example shows a
+2-player remote session:</p>
+<pre><code class="lang-csharp">var player1 = NetcodePlayer.CreateLocal(); // local player number 1
+
+var player2Endpoint = IPEndPoint.Parse(&quot;192.168.0.100:8001&quot;); // player 2 ip and port
+var player2 = NetcodePlayer.CreateRemote(player2Endpoint); // remote player number 2
+
+// add players in session builder
+var session = RollbackNetcode
+    .WithInputType&lt;MyGameInput&gt;()
+    .WithPort(9001)
+    .WithPlayers(player1, player2) // player list
+    .ForRemote()
+    .Build();
+
+// ...
+</code></pre>
+<p>You can also add players after building the session and before starting it:</p>
+<pre><code class="lang-csharp">
+var session = RollbackNetcode
+    .WithInputType&lt;MyGameInput&gt;()
+    .WithPort(9001)
+    .ForRemote()
+    .Build();
+
+ResultCode result;
+result = session.AddPlayer(player1);
+// ...
+result = session.AddPlayer(player2);
+// ...
+</code></pre>
+<p>Every instance of <a href="https://delta3.studio/Backdash/api/Backdash.NetcodePlayer"><code>NetcodePlayer</code></a> will have an unique <a href="https://delta3.studio/Backdash/api/Backdash.NetcodePlayer.html#Backdash_NetcodePlayer_Id">**
+<code>Guid</code> Id**</a> <em>(It can be set
+when you are instantiating the player)</em></p>
+<p>When a <a href="https://delta3.studio/Backdash/api/Backdash.NetcodePlayer"><code>NetcodePlayer</code></a> is added to a session, it will
+receive a unique <a href="https://delta3.studio/Backdash/api/Backdash.NetcodePlayer#Backdash_NetcodePlayer_Index"><code>Index</code></a> and <a href="https://delta3.studio/Backdash/api/Backdash.NetcodePlayer#Backdash_NetcodePlayer_Number">
+<code>Number</code></a></p>
+<p><code>CustomId</code> is an application-defined identifier you can use to look up a player. It does not change Backdash's
+session-assigned <code>Index</code> or <code>Number</code>.</p>
+<pre><code class="lang-csharp">var player1 = NetcodePlayer.CreateLocal(); // local player number 1
+player1.CustomId = 10;
+var player2 = NetcodePlayer.CreateRemote(player2Endpoint); // remote player number 2
+player2.CustomId = 20;
+
+if (session.TryGetPlayerByCustomId(20, out var foundPlayer))
+    Console.WriteLine($&quot;Player 20 found: {foundPlayer.Id}&quot;)
+
+// ...
+</code></pre>
+<p>Another useful option is to inherit the class <code>NetcodePlayer</code> and customize it as needed:</p>
+<pre><code class="lang-csharp">public enum PlayerSide
+{
+    Left = -1,
+    Right = 1,
+}
+
+public sealed class SessionPlayer : NetcodePlayer
+{
+    public SessionPlayer(
+        int playerNumber, PlayerSide side,
+        PlayerType type, IPEndPoint? endPoint = null
+    ) : base(type, endPoint)
+    {
+        PlayerSide = side;
+        CustomId = playerNumber;
+    }
+
+    public readonly PlayerSide PlayerSide;
+
+    // ...
+}
+
+</code></pre>
+<blockquote>
+<p>For further, more complex setups, check the <a href="https://github.com/Delta3-Studio/Backdash/tree/master/samples">samples</a>.</p>
+</blockquote>
+<h3 id="starting-session">Starting session</h3>
+<p>After setting up the players, you must call the
+session <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html#Backdash_INetcodeSession_2_Start_System_Threading_CancellationToken_">.Start ()</a>
+method. This will start all the background work, like the socket receiver, input queue, peer synchronization, etc.</p>
+<pre><code class="lang-csharp">session.Start();
+</code></pre>
+<h3 id="synchronizing-local-and-remote-inputs">Synchronizing Local and Remote Inputs</h3>
+<p>Input synchronization happens on
+the <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html">session</a> at the top of each game
+frame.
+This is done by
+calling <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html"><code>AddLocalInput</code></a>
+for each local player
+and <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_SynchronizeInputs">
+<code>SynchronizeInputs</code></a>
+to collect the inputs for all players. Check the return value of <code>SynchronizeInputs</code>. If it is not
+<a href="https://delta3-studio.github.io/Backdash/api/Backdash.ResultCode.html"><code>ResultCode.Ok</code></a>, do not advance the game state.
+For a remote session, this can happen when Backdash reaches its prediction limit while waiting for remote input.</p>
+<p>After synchronizing, read one player's value from <code>CurrentInputs[index]</code>, or copy all values into a caller-provided
+buffer with <code>GetInputs</code>. <code>GetInput(player)</code> returns a <code>SynchronizedInput&lt;TInput&gt;</code>; its <code>Input</code> property contains the
+game input and its <code>Disconnected</code> property indicates the player's connection state.</p>
+<p>For example, if your code looks like this currently for a local game:</p>
+<pre><code class="lang-csharp">MyGameInput player1Input = GetControllerInput(0);
+MyGameInput player2Input = GetControllerInput(1);
+
+/* send p1 and p2 to the game */
+AdvanceGameState(player1Input, player2Input, gameState);
+</code></pre>
+<p>You should change it to read as follows:</p>
+<pre><code class="lang-csharp">
+// Keep the local player's NetcodePlayer reference.
+var localPlayer = player1;
+
+var localInput = GetControllerInput(0); // read the controller
+
+// notify Backdash of the local player's inputs
+var result = session.AddLocalInput(localPlayer, localInput);
+
+if (result is ResultCode.Ok)
+{
+    result = session.SynchronizeInputs();
+    if (result is ResultCode.Ok)
+    {
+        var gameInputs = session.CurrentInputs;
+        AdvanceGameState(gameInputs[0], gameInputs[1], gameState);
+    }
+}
+</code></pre>
+<p>Call <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-2.html"><code>SynchronizeInputs</code></a> every frame,
+including during a rollback. Advance the game with synchronized inputs, not directly with newly read controller values.
+During rollback, Backdash replays the inputs associated with the resimulated frames. If you configure an input delay,
+newly submitted local input is applied to a later frame.</p>
+<h3 id="implementing-your-save-and-load-state-handlers">Implementing your <code>save</code> and <code>load</code> state handlers</h3>
+<p><a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> will call the <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_LoadState_Backdash_Data_Frame___0__">
+<code>LoadState</code></a>
+and <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_SaveState_Backdash_Data_Frame___0__">
+<code>SaveState</code></a>
+callbacks to periodically <em>save</em> and <em>restore</em> the state of your game.</p>
+<p>The <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_SaveState_Backdash_Data_Frame___0__">
+<code>SaveState</code></a>
+callback receives a <code>BinaryBufferWriter</code>. Write each game-state member to it.</p>
+<p>The <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_LoadState_Backdash_Data_Frame___0__">
+<code>LoadState</code></a>
+function should restore the game state from a previously saved binary buffer using the <code>BinaryBufferReader</code>, reading
+each member.</p>
+<div class="IMPORTANT">
+<h5>Important</h5>
+<p><strong>⚠️:</strong> You must read and write members in the <strong>SAME ORDER</strong> and also ensure the same size (like arrays or lists).</p>
+</div>
+<p>For example:</p>
+<pre><code class="lang-csharp">using System.Numerics;
+using Backdash.Data;
+using Backdash.Serialization;
+using Backdash.Serialization.Numerics;
+
+
+public class MyGameState
+{
+    public int Value1;
+    public Vector2 Value2;
+}
+
+public class MySessionHandler : INetcodeSessionHandler
+{
+    MyGameState currentGameState = new();
+
+    public void SaveState(Frame frame, ref readonly BinaryBufferWriter writer)
+    {
+        writer.Write(in currentGameState.Value1);
+        writer.Write(in currentGameState.Value2);
+    }
+
+    public void LoadState(Frame frame, ref readonly BinaryBufferReader reader)
+    {
+        reader.Read(ref currentGameState.Value1);
+        reader.Read(ref currentGameState.Value2);
+
+        /* or also:
+        currentGameState.Value1 = reader.ReadInt32();
+        currentGameState.Value2 = reader.ReadVector2();
+        */
+    }
+
+    /* ... */
+}
+</code></pre>
+<p>The saved <strong>Game State</strong> will have a calculated <a href="https://en.wikipedia.org/wiki/Checksum">checksum</a> based on its binary
+representation. The default implementation is <a href="http://en.wikipedia.org/wiki/Fletcher%27s_checksum">Fletcher 32</a>
+algorithm by the class <code>Fletcher32ChecksumProvider</code>.</p>
+<p>You can also use your own checksum algorithm; for this, just implement the interface <a href="https://delta3-studio.github.io/Backdash/api/Backdash.Sync.State.IChecksumProvider-1.html">
+<code>IChecksumProvider</code></a>.</p>
+<h3 id="custom-state-serializer">Custom State Serializer</h3>
+<p>If you don't want to write/read each member or just need to use another serialization method for the state, you can
+access the <code>IBufferWriter</code> for <em>save</em> and the raw <code>ReadOnlySpan&lt;byte&gt;</code> for <em>load</em>:</p>
+<p>Example for <a href="https://github.com/Cysharp/MemoryPack">MemoryPack</a>;</p>
+<pre><code class="lang-csharp">using System.Numerics;
+using Backdash.Data;
+using Backdash.Serialization;
+using MemoryPack;
+
+[MemoryPackable]
+public partial class MyGameState
+{
+    public int Value1;
+    public Vector2 Value2;
+}
+
+public class MySessionHandler : INetcodeSessionHandler
+{
+    MyGameState currentGameState = new();
+
+    public void SaveState(Frame frame, ref readonly BinaryBufferWriter writer)
+    {
+        MemoryPackSerializer.Serialize(writer.Buffer, currentGameState);
+    }
+
+    public void LoadState(Frame frame, ref readonly BinaryBufferReader reader)
+    {
+        MemoryPackSerializer.Deserialize(reader.Buffer, ref currentGameState!);
+    }
+
+    /* ... */
+}
+
+
+</code></pre>
+<h3 id="advance-frame-callback">Advance Frame Callback</h3>
+<p>This callback is called when a rollback occurs, just after
+the <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html#Backdash_INetcodeSessionHandler_1_SaveState_Backdash_Data_Frame___0__">
+<code>SaveState</code></a>
+here, you must synchronize inputs and advance the state.</p>
+<p>Usually something like:</p>
+<pre><code class="lang-csharp">// ...
+public void AdvanceFrame()
+{
+    session.SynchronizeInputs();
+    var gameInputs = session.CurrentInputs;
+    AdvanceGameState(gameInputs[0], gameInputs[1], gameState);
+}
+// ...
+</code></pre>
+<h3 id="remaining-callbacks">Remaining Callbacks</h3>
+<p>There are other callbacks in
+the <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html"><code>INetcodeSessionHandler</code></a> for
+connection starting/closing the session, peer events, etc.</p>
+<p>Check the
+<strong><a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSessionHandler-1.html">API Docs for more information</a></strong>.</p>
+<h3 id="frame-lifecycle">Frame Lifecycle</h3>
+<p>We're almost done. The last step is notify <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> every time your frame
+starts and every time the <strong>game state</strong> finishes advancing by one frame.</p>
+<p>Just call <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_BeginFrame">
+<code>BeginFrame</code></a>
+method in the session at the beginning of each frame
+and <a href="https://delta3-studio.github.io/Backdash/api/Backdash.INetcodeSession-1.html#Backdash_INetcodeSession_1_AdvanceFrame">
+<code>AdvanceFrame</code></a>
+after you've finished one frame <strong>but before you've started the next</strong>.</p>
+<p>So, the code for each frame should be something close to:</p>
+<pre><code class="lang-csharp">public void Update(){
+    session.BeginFrame();
+
+    var localInput = GetControllerInput(localPlayer.Index);
+    var result = session.AddLocalInput(localPlayer, localInput);
+
+    if (result is not ResultCode.Ok)
+        return;
+
+    result = session.SynchronizeInputs();
+    if (result is not ResultCode.Ok)
+        return;
+
+    var gameInputs = session.CurrentInputs;
+    AdvanceGameState(gameInputs[0], gameInputs[1], gameState);
+
+    session.AdvanceFrame();
+}
+</code></pre>
+<h2 id="input-type-encoding">Input Type Encoding</h2>
+<p>We recommend encoding digital game inputs as an
+<a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/enum"><code>enum</code></a> marked with
+<a href="https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-flagsattribute"><code>FlagsAttribute</code></a>.</p>
+<p><strong>Enum flags</strong> are easy to compose and can represent a large number of inputs in a very low byte count, which is
+important
+because the inputs are what is transmitted over the network to other players.</p>
+<p>For example, a game's digital buttons can be represented using only
+<a href="https://learn.microsoft.com/en-us/dotnet/api/system.int16">a <code>short</code> type</a> (<em>only 2 bytes</em>):</p>
+<pre><code class="lang-csharp">[Flags]
+public enum PadButtonInputs : short
+{
+    None = 0,
+    Select = 1 &lt;&lt; 0,
+    Up = 1 &lt;&lt; 1,
+    Down = 1 &lt;&lt; 2,
+    Left = 1 &lt;&lt; 3,
+    Right = 1 &lt;&lt; 4,
+    X = 1 &lt;&lt; 5,
+    Y = 1 &lt;&lt; 6,
+    A = 1 &lt;&lt; 7,
+    B = 1 &lt;&lt; 8,
+    LeftBumper = 1 &lt;&lt; 9,
+    RightBumper = 1 &lt;&lt; 10,
+    LeftTrigger = 1 &lt;&lt; 11,
+    RightTrigger = 1 &lt;&lt; 12,
+    LeftStickButton = 1 &lt;&lt; 13,
+    RightStickButton = 1 &lt;&lt; 14,
+}
+</code></pre>
+<p>The serialization of enums and mostly of primitive types is automatically handled
+by <a href="https://github.com/Delta3-Studio/Backdash">Backdash</a>.</p>
+<div class="CAUTION">
+<h5>Caution</h5>
+<p>Backdash can serialize unmanaged structs that contain no reference-type fields. This uses their in-memory
+representation, so the struct's fields do not receive per-field endianness conversion. For portable network input,
+provide an explicit serializer.</p>
+</div>
+<h3 id="custom-input-serializer">Custom Input Serializer</h3>
+<p>If you need a custom input layout or explicit endianness handling, implement
+an <a href="https://delta3-studio.github.io/Backdash/api/Backdash.Serialization.IBinarySerializer-1.html">
+<code>IBinarySerializer&lt;TInput&gt;</code></a>
+for your input type.</p>
+<p>Every peer must use a compatible input format and endianness so that the same input bytes decode to the same value.</p>
+<div class="TIP">
+<h5>Tip</h5>
+<p>💡 Backdash provides <code>BinarySpanWriter</code> and <code>BinaryBufferReader</code> to help implement the serializer.</p>
+</div>
+<p><strong>Example:</strong></p>
+<p>Giving an input type composed as:</p>
+<pre><code class="lang-csharp">[Flags]
+public enum PadButtons : short
+{
+    None = 0,
+    Select = 1 &lt;&lt; 0,
+    Up = 1 &lt;&lt; 1,
+    Down = 1 &lt;&lt; 2,
+    Left = 1 &lt;&lt; 3,
+    Right = 1 &lt;&lt; 4,
+    X = 1 &lt;&lt; 5,
+    Y = 1 &lt;&lt; 6,
+    A = 1 &lt;&lt; 7,
+    B = 1 &lt;&lt; 8,
+
+    LeftBumper = 1 &lt;&lt; 9,
+    RightBumper = 1 &lt;&lt; 10,
+    LeftStickButton = 1 &lt;&lt; 11,
+    RightStickButton = 1 &lt;&lt; 12,
+}
+
+public record struct Axis
+{
+    public sbyte X;
+    public sbyte Y;
+}
+
+public record struct MyPadInputs
+{
+    public PadButtons Buttons;
+    public byte LeftTrigger;
+    public byte RightTrigger;
+    public Axis LeftAxis;
+    public Axis RightAxis;
+}
+
+</code></pre>
+<p>You can implement the serializer as:</p>
+<pre><code class="lang-csharp">using Backdash.Network;
+using Backdash.Serialization;
+
+public sealed class MyPadInputsBinarySerializer(Endianness endianness) : IBinarySerializer&lt;MyPadInputs&gt;
+{
+    public Endianness Endianness { get; } = endianness;
+
+    public int Serialize(in MyPadInputs data, Span&lt;byte&gt; buffer)
+    {
+        var offset = 0;
+        BinarySpanWriter writer = new(buffer, ref offset, Endianness);
+        writer.Write((short)data.Buttons);
+        writer.Write(data.LeftTrigger);
+        writer.Write(data.RightTrigger);
+
+        writer.Write(data.LeftAxis.X);
+        writer.Write(data.LeftAxis.Y);
+
+        writer.Write(data.RightAxis.X);
+        writer.Write(data.RightAxis.Y);
+        return writer.WrittenCount;
+    }
+
+    public int Deserialize(ReadOnlySpan&lt;byte&gt; buffer, ref MyPadInputs result)
+    {
+        var offset = 0;
+        BinaryBufferReader reader = new(buffer, ref offset, Endianness);
+        result.Buttons = (PadButtons)reader.ReadInt16();
+        result.LeftTrigger = reader.ReadByte();
+        result.RightTrigger = reader.ReadByte();
+
+        result.LeftAxis.X = reader.ReadSByte();
+        result.LeftAxis.Y = reader.ReadSByte();
+
+        result.RightAxis.X = reader.ReadSByte();
+        result.RightAxis.Y = reader.ReadSByte();
+        return reader.ReadCount;
+    }
+}
+</code></pre>
+<p>To use your custom serializer:</p>
+<pre><code class="lang-csharp">var mySerializer = new MyPadInputsBinarySerializer(Endianness.BigEndian);
+
+var session = RollbackNetcode
+    .WithInputType(t =&gt; t.Custom(mySerializer))
+    .Build();
+
+</code></pre>
+<h2 id="tuning-your-application-input-delay-and-prediction">Tuning Your Application: Input Delay and Prediction</h2>
+<p><a href="https://github.com/Delta3-Studio/Backdash">Backdash</a> lets you configure how many frames to delay local input. If remote
+input takes longer to arrive than this delay covers, Backdash predicts the missing input and may roll back when the
+actual input arrives. You can adjust the delay during a session. The right value depends on how much input latency your
+game can tolerate and how disruptive visible rollbacks are.</p>
+<p>Increasing input delay can reduce the number of predicted frames, but it also adds latency to local controls. Start with
+a low delay and tune it against real network conditions and playtesting. Games with precise timing often need less input
+delay than turn-based or slower-paced games.</p>
+<p>Longer rollbacks can make corrections more noticeable. For effects that should only be presented once, separate their
+presentation from deterministic simulation so rollback re-simulation does not replay sounds, particles, or other visual
+effects multiple times.</p>
+<h2 id="sample-applications">Sample Applications</h2>
+<p>Check the samples on the <a href="https://github.com/Delta3-Studio/Backdash/tree/master/samples">samples</a> directory:</p>
+<p>There are examples for up to 4 players:</p>
+<ul>
+<li><a href="https://github.com/Delta3-Studio/Backdash/tree/master/samples/ConsoleGame">Simple console game</a></li>
+<li><a href="https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar">Monogame SpaceWar</a></li>
+<li><a href="https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar.Lobby">Monogame SpaceWar with lobby over the internet</a></li>
+<li><a href="https://github.com/Delta3-Studio/BackdashGodotSample">Godot SpaceWar with lobby over the internet</a></li>
+</ul>
+<blockquote>
+<p>See the <code>.cmd</code>/<code>.sh</code> files in the <code>scripts</code> directory for examples on how to start 2, 3, and 4-player games.</p>
+</blockquote>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Delta3-Studio/Backdash/blob/master/docfx/docs/developer_guide.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Developed by <a href="http://delta3.studio/">Delta3</a> and <a href="https://lucasteles.dev/">Lucas Teles</a>.</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
