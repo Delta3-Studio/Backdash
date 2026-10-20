@@ -49,7 +49,7 @@ struct InputMessage : IEquatable<InputMessage>, IUtf8SpanFormattable
 
         writer.Write(in InputSize);
         writer.Write(in NumBits);
-        writer.Write(Bits[..ByteSize.BytesToBits(NumBits)]);
+        writer.Write(Bits[..ByteSize.BitsToBytes(NumBits)]);
     }
 
     public void Deserialize(in BinaryBufferReader reader)
@@ -70,7 +70,7 @@ struct InputMessage : IEquatable<InputMessage>, IUtf8SpanFormattable
 
         InputSize = reader.ReadByte();
         NumBits = reader.ReadUInt16();
-        reader.Read(Bits[..ByteSize.BytesToBits(NumBits)]);
+        reader.Read(Bits[..ByteSize.BitsToBytes(NumBits)]);
     }
 
     public readonly bool TryFormat(
@@ -106,7 +106,6 @@ struct InputMessage : IEquatable<InputMessage>, IUtf8SpanFormattable
 }
 
 [Serializable]
-
 [InlineArray(Max.NumberOfPlayers)]
 struct PeerStatusBuffer : IEquatable<PeerStatusBuffer>
 {

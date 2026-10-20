@@ -29,30 +29,65 @@ public readonly record struct ByteSize(long TotalBytes)
     /// <summary>Gets the byte value <c>0</c>.</summary>
     public static ByteSize Zero { get; } = new(0);
 
-    internal const ushort ByteToBits = 8;
-    const double BytesToKibiByte = 1_024;
-    const double BytesToMebiByte = 1_048_576;
-    const double BytesToGibiByte = 1_073_741_824;
-    const double BytesToKiloByte = 1_000;
-    const double BytesToMegaByte = 1_000_000;
-    const double BytesToGigaByte = 1_000_000_000;
-    const double BytesToTeraByte = 1_000_000_000_000;
-    const double BytesToTebiByte = 1_099_511_627_776;
-    const string ByteSymbol = "B";
-    const string KibiByteSymbol = "KiB";
-    const string MebiByteSymbol = "MiB";
-    const string GibiByteSymbol = "GiB";
-    const string TebiByteSymbol = "TiB";
-    const string KiloByteSymbol = "KB";
-    const string MegaByteSymbol = "MB";
-    const string GigaByteSymbol = "GB";
-    const string TeraByteSymbol = "TB";
+    /// <summary>Gets the number of bits in one byte.</summary>
+    public const ushort ByteToBits = 8;
+
+    /// <summary>Gets the number of bytes in one kibibyte.</summary>
+    public const double BytesToKibiByte = 1_024;
+
+    /// <summary>Gets the number of bytes in one mebibyte.</summary>
+    public const double BytesToMebiByte = 1_048_576;
+
+    /// <summary>Gets the number of bytes in one gibibyte.</summary>
+    public const double BytesToGibiByte = 1_073_741_824;
+
+    /// <summary>Gets the number of bytes in one kilobyte.</summary>
+    public const double BytesToKiloByte = 1_000;
+
+    /// <summary>Gets the number of bytes in one megabyte.</summary>
+    public const double BytesToMegaByte = 1_000_000;
+
+    /// <summary>Gets the number of bytes in one gigabyte.</summary>
+    public const double BytesToGigaByte = 1_000_000_000;
+
+    /// <summary>Gets the number of bytes in one terabyte.</summary>
+    public const double BytesToTeraByte = 1_000_000_000_000;
+
+    /// <summary>Gets the number of bytes in one tebibyte.</summary>
+    public const double BytesToTebiByte = 1_099_511_627_776;
+
+    /// <summary>Gets the symbol for bytes.</summary>
+    public const string ByteSymbol = "B";
+
+    /// <summary>Gets the symbol for kibibytes.</summary>
+    public const string KibiByteSymbol = "KiB";
+
+    /// <summary>Gets the symbol for mebibytes.</summary>
+    public const string MebiByteSymbol = "MiB";
+
+    /// <summary>Gets the symbol for gibibytes.</summary>
+    public const string GibiByteSymbol = "GiB";
+
+    /// <summary>Gets the symbol for tebibytes.</summary>
+    public const string TebiByteSymbol = "TiB";
+
+    /// <summary>Gets the symbol for kilobytes.</summary>
+    public const string KiloByteSymbol = "KB";
+
+    /// <summary>Gets the symbol for megabytes.</summary>
+    public const string MegaByteSymbol = "MB";
+
+    /// <summary>Gets the symbol for gigabytes.</summary>
+    public const string GigaByteSymbol = "GB";
+
+    /// <summary>Gets the symbol for terabytes.</summary>
+    public const string TeraByteSymbol = "TB";
 
     /// <summary>Gets the <see cref="int"/> clamped number of bytes.</summary>
     public int Bytes
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => int.CreateTruncating(TotalBytes);
+        get => int.CreateSaturating(TotalBytes);
     }
 
     /// <summary>Gets the number of KibiBytes represented by this object.</summary>
@@ -215,7 +250,7 @@ public readonly record struct ByteSize(long TotalBytes)
         IFormatProvider? provider)
     {
         charsWritten = 0;
-        SpanStringBuilder writer = new(in destination, ref charsWritten);
+        SpanStringBuilder writer = new(in destination, ref charsWritten, provider);
         format = format.IsEmpty ? DecimalFormat : format;
         if (format.Equals(BinaryFormat, StringComparison.OrdinalIgnoreCase))
         {
@@ -253,7 +288,7 @@ public readonly record struct ByteSize(long TotalBytes)
     public static explicit operator long(ByteSize size) => size.TotalBytes;
 
     /// <summary>Cast <see cref="ByteSize"/> to <see cref="int"/> byte-count value.</summary>
-    public static explicit operator int(ByteSize size) => (int)size.TotalBytes;
+    public static explicit operator int(ByteSize size) => size.Bytes;
 
     /// <inheritdoc />
     public static bool operator >(ByteSize left, ByteSize right) => left.TotalBytes > right.TotalBytes;
@@ -388,7 +423,13 @@ public readonly record struct ByteSize(long TotalBytes)
     ///     Returns number of bits for <paramref name="byteCount" /> bytes.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int BytesToBits(ushort byteCount) => MathI.CeilDiv(byteCount, ByteToBits);
+    public static int BytesToBits(ushort byteCount) => byteCount * ByteToBits;
+
+    /// <summary>
+    ///     Returns the number of bytes required to store <paramref name="bitCount" /> bits.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int BitsToBytes(ushort bitCount) => MathI.CeilDiv(bitCount, ByteToBits);
 
     /// <summary>
     ///     Returns the size of a value of the given type parameter.
@@ -404,7 +445,7 @@ public readonly record struct ByteSize(long TotalBytes)
     /// <summary>
     ///     Returns the first power of two ByteSize greater than <paramref name="size" /> (in bytes)
     /// </summary>
-    public static ByteSize NextPowerOfTwo(int size) => size <= 0 ? Zero : new(MathI.NextPowerOfTwo((long)size));
+    public static ByteSize NextPowerOfTwo(int size) => size <= 0 ? Zero : new(MathI.NextPowerOfTwo(size));
 
     static Measure SymbolToMeasure(ReadOnlySpan<char> symbol) =>
         symbol switch
