@@ -70,6 +70,17 @@
                 "branch": "master",
                 "apiSpecFolder": "api"
             }
+        },
+        "markdownEngineProperties": {
+            "markdigExtensions": [
+                "TaskLists",
+                "FootNotes",
+                "EmphasisExtras",
+                "MediaLinks",
+                "DefinitionLists",
+                "diagrams",
+                "emojis"
+            ]
         }
     }
 }

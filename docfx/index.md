@@ -1,1 +1,3 @@
-[!include[](../README.md)]
+---
+redirect_url: ./docs/
+---

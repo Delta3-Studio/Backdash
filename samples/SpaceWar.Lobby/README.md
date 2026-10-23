@@ -1,4 +1,4 @@
-﻿# SpaceWar - NetCode Sample with online Lobby
+﻿# SpaceWar – NetCode Sample with online Lobby
 
 This shows a basic example of NAT traversal using [UDP hole punching](https://en.wikipedia.org/wiki/UDP_hole_punching)
 
@@ -21,7 +21,7 @@ When logged in, every client needs to send a `UDP` package with their token to t
 header metadata
 to keep track of their `IP` and open `Port`.
 
-> ⚠️ UDP Hole punching usually **does not** work with clients behind the same NAT. To mitigate this the server
+> ⚠️ UDP Hole punching usually **does not** work with clients behind the same NAT. To mitigate this, the server
 > also tracks the local IP and port on each client to check if the peer is on the same network.
 
 ## Controls
@@ -45,7 +45,7 @@ git submodule update --recursive --remote
 ```
 
 > [!TIP]
-> 💡 You can also, clone the [**LobbyServer Repository**](https://github.com/Delta3-Studio/LobbyServer) directly
+> 💡 You can also clone the [**LobbyServer Repository**](https://github.com/Delta3-Studio/LobbyServer) directly
 
 To start the server run:
 
@@ -67,7 +67,7 @@ On `SpaceWar.Lobby` project directory run
 dotnet run .
 ```
 
-The default client configuration is defined in this [JSON file](/appsettings.json):
+The default client configuration is defined in this [JSON file](appsettings.json):
 
 ```json
 {
@@ -94,9 +94,9 @@ You can also override the server URL and UDP Port configs:
 dotnet run --project .\LobbyClient -ServerUrl "https://lobby-server.fly.dev" -ServerUdpPort 8888
 ```
 
-Check the the [scripts directory](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar.Lobby/scripts)
+Check the [scripts directory](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar.Lobby/scripts)
 to run local instances of the server and clients.
 
-> ⚠️ The default configured server is a remote server. To connect to localhost server
+> ⚠️ The default-configured server is a remote server. To connect to localhost server
 > run: `dotnet run . -ServerUrl "http://localhost:9999"`
 

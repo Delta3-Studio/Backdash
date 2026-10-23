@@ -1,14 +1,11 @@
 ﻿## Developer Guide
 
-> [!NOTE]
-> Adapted from the [GGPO Developer Guide](https://github.com/pond3r/ggpo/blob/master/doc/DeveloperGuide.md).
-
 ### Installing
 
-[NuGet package](https://www.nuget.org/packages/Backdash) available:
+[NuGet package](https://www.nuget.org/packages/Backdash):
 
 ```ps
-$ dotnet add package Backdash
+> dotnet add package Backdash
 ```
 
 ## Game State and Inputs
@@ -692,16 +689,3 @@ delay than turn-based or slower-paced games.
 Longer rollbacks can make corrections more noticeable. For effects that should only be presented once, separate their
 presentation from deterministic simulation so rollback re-simulation does not replay sounds, particles, or other visual
 effects multiple times.
-
-## Sample Applications
-
-Check the samples on the [samples](https://github.com/Delta3-Studio/Backdash/tree/master/samples) directory:
-
-There are examples for up to 4 players:
-
-- [Simple console game](https://github.com/Delta3-Studio/Backdash/tree/master/samples/ConsoleGame)
-- [Monogame SpaceWar](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar)
-- [Monogame SpaceWar with lobby over the internet](https://github.com/Delta3-Studio/Backdash/tree/master/samples/SpaceWar.Lobby)
-- [Godot SpaceWar with lobby over the internet](https://github.com/Delta3-Studio/BackdashGodotSample)
-
-> See the `.cmd`/`.sh` files in the `scripts` directory for examples on how to start 2, 3, and 4-player games.
