@@ -5,7 +5,7 @@ using SpaceWar.Logic;
 
 var session = ParseSessionArgs(args);
 
-using var game = new Game1(session);
+using Game1 game = new(session);
 game.Run();
 
 return;

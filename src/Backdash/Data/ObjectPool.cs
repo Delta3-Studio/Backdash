@@ -97,7 +97,7 @@ public sealed class ObjectPool<T> : IObjectPool<T>, IEnumerable<T>, IDisposable 
     }
 
     /// <summary>
-    /// Ensure object exists, if null rent next value into it.
+    /// Ensure an object exists, if null rent the next value into it.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Ensure([NotNull] ref T? value) =>
@@ -249,14 +249,14 @@ public sealed class ObjectPool<T> : IObjectPool<T>, IEnumerable<T>, IDisposable 
 public static class ObjectPool
 {
     /// <summary>
-    /// Create new instance of object pool for <typeparamref name="T"/> with constructor.
+    /// Create a new instance of the object pool for <typeparamref name="T"/> with constructor.
     /// </summary>
     public static ObjectPool<T> Create<T>(int? capacity = null, Action<T>? returnWith = null)
         where T : class, new() =>
         new(static () => new(), returnWith, capacity);
 
     /// <summary>
-    /// Create new instance of object pool for <typeparamref name="T"/> with constructor.
+    /// Create a new instance of the object pool for <typeparamref name="T"/> with constructor.
     /// </summary>
     public static ObjectPool<T> Create<T>(Action<T> returnWith) where T : class, new() =>
         Create(null, returnWith);
