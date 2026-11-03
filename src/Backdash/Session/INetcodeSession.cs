@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Backdash.Core;
 using Backdash.Data;
 using Backdash.Network;
 using Backdash.Options;
@@ -251,7 +250,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     /// </summary>
     void WriteLog(LogLevel level, string message);
 
-    /// <inheritdoc cref="WriteLog(Backdash.Core.LogLevel,string)"/>
+    /// <inheritdoc cref="WriteLog(Backdash.LogLevel,string)"/>
     void WriteLog(string message, Exception? error = null);
 
     /// <summary>

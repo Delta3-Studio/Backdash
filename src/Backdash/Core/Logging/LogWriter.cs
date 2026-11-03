@@ -1,4 +1,4 @@
-namespace Backdash.Core.Logging;
+namespace Backdash.Core;
 
 /// <summary>
 ///     Defines how and where the log should be written.

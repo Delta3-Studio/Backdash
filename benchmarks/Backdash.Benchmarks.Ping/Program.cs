@@ -1,8 +1,9 @@
 using System.Net;
-using Backdash.Benchmarks.Ping;
+using Backdash;
 using Backdash.Core;
 using Backdash.Network.Client;
 using Backdash.Serialization.Internal;
+using Backdash.Benchmarks.Ping;
 using static Backdash.Core.NetcodeConstants;
 
 var totalDuration = TimeSpan.FromSeconds(10);
@@ -14,8 +15,8 @@ using NetcodeJobManager jobs = new(logger);
 
 const int bufferSize = Max.CompressedBytes * Max.NumberOfPlayers;
 
-using var peer1 = CreateClient(9000);
-using var peer2 = CreateClient(9001);
+await using var peer1 = CreateClient(9000);
+await using var peer2 = CreateClient(9001);
 
 using CancellationTokenSource cts = new();
 cts.CancelAfter(totalDuration);

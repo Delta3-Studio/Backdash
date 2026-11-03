@@ -1,5 +1,4 @@
 using Backdash.Core;
-using Backdash.Core.Logging;
 using Backdash.Network.Client;
 using Backdash.Synchronizing.Input.Confirmed;
 using Backdash.Synchronizing.Random;
