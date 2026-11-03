@@ -4,7 +4,6 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Backdash.Backends;
 using Backdash.Core;
-using Backdash.Core.Logging;
 using Backdash.Data;
 using Backdash.Network;
 using Backdash.Network.Client;

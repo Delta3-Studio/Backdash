@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using Backdash;
-using Backdash.Core.Logging;
+using Backdash.Core;
 using Backdash.Options;
 
 namespace ConsoleGame;

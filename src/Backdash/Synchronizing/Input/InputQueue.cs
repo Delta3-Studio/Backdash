@@ -147,7 +147,8 @@ sealed class InputQueue<TInput> where TInput : unmanaged
         ThrowIf.Assert(firstIncorrectFrame.IsNull);
         // Remember the last requested frame number for later. We'll need this in AddInput() to drop out of prediction mode.
         lastFrameRequested = requestedFrame;
-        if (requestedFrame.Number < FirstInput.Frame.Number)
+        var firstInputFrame = FirstInput.Frame;
+        if (requestedFrame.Number < firstInputFrame.Number)
             throw new NetcodeAssertionException(
                 $"Requested frame ({requestedFrame.Number}) can not be smaller than the first input frame ({FirstInput.Frame.Number})."
             );
@@ -155,7 +156,7 @@ sealed class InputQueue<TInput> where TInput : unmanaged
         if (prediction.Frame.IsNull)
         {
             // If the frame requested is in our range, fetch it out of the queue and return it.
-            var offset = requestedFrame.Number - FirstInput.Frame.Number;
+            var offset = requestedFrame.Number - firstInputFrame.Number;
             if (offset < inputs.Size)
             {
                 ref var next = ref inputs.At(offset);

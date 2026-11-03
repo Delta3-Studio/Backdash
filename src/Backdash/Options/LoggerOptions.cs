@@ -1,5 +1,3 @@
-using Backdash.Core;
-
 namespace Backdash.Options;
 
 /// <summary>
