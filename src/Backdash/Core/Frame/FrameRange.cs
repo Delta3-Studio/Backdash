@@ -35,6 +35,9 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     /// <inheritdoc />
     public FrameRange(Frame start, FrameSpan duration) : this(start, start + (duration.Frames - 1)) { }
 
+    /// <inheritdoc />
+    public FrameRange(FrameSpan duration) : this(Frame.Zero, duration) { }
+
     /// <summary>
     /// Get or set the duration of the range
     /// </summary>
@@ -240,6 +243,12 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     /// </summary>
     public static implicit operator FrameRange((Frame Start, FrameSpan Duration) range) =>
         new(range.Start, range.Duration);
+
+    /// <inheritdoc cref="Duration" />
+    public static explicit operator FrameSpan(FrameRange range) => range.Duration;
+
+    /// <inheritdoc cref="FrameSpan(int)" />
+    public static explicit operator FrameRange(FrameSpan amount) => new(amount);
 
     /// <summary>
     /// List the frames in range

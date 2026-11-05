@@ -31,7 +31,7 @@ public readonly record struct Frame :
 {
     internal const sbyte NullValue = -1;
 
-    /// <summary>Return Null frame value</summary>
+    /// <summary>Return Null frame value (<c>-1</c>)</summary>
     public static readonly Frame Null = new(NullValue);
 
     /// <summary>Return frame value <c>0</c></summary>
@@ -73,7 +73,8 @@ public readonly record struct Frame :
     public Frame Previous(int amount) => new(Number - amount);
 
     /// <summary>
-    ///     Returns <see langword="true" /> if the current frame is a null frame
+    ///     Returns <see langword="true" /> if the current frame is a null frame.
+    ///     <see cref="Null"/>
     /// </summary>
     public bool IsNull => Number is NullValue;
 

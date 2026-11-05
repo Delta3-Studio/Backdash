@@ -67,6 +67,12 @@ public readonly record struct FrameSpan :
     /// <summary>Returns the value for the current frame span as a <see cref="Frame" />.</summary>
     public Frame ToFrame() => new(Frames);
 
+    /// <summary>Returns a <see cref="FrameRange"/> starting at 0 with the current frame span duration.</summary>
+    public FrameRange ToRange() => new(this);
+
+    /// <summary>Returns a <see cref="FrameRange"/> starting at <paramref name="start"/> with the current frame span duration.</summary>
+    public FrameRange ToRange(Frame start) => new(start, this);
+
     /// <summary>
     ///     Returns a frame at the time position in milliseconds
     /// </summary>
@@ -269,4 +275,16 @@ public readonly record struct FrameSpan :
 
     /// <inheritdoc />
     public static FrameRange operator -(FrameSpan left, FrameRange right) => right + left;
+
+    /// <inheritdoc cref="Frames" />
+    public static implicit operator int(FrameSpan frame) => frame.Frames;
+
+    /// <inheritdoc cref="FrameSpan(int)" />
+    public static explicit operator FrameSpan(int frame) => new(frame);
+
+    /// <inheritdoc cref="Frames" />
+    public static explicit operator Frame(FrameSpan frame) => new(frame.Frames);
+
+    /// <inheritdoc cref="FrameSpan(int)" />
+    public static explicit operator FrameSpan(Frame frame) => new(frame.Number);
 }
