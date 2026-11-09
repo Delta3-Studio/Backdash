@@ -95,26 +95,20 @@ sealed class InputQueue<TInput> where TInput : unmanaged
     public void DiscardInputsAfter(in Frame frame)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(frame.Number);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(frame.Number, lastUserAddedFrame.Number);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(frame.Number, lastAddedFrame.Number);
 
-        var offset = lastUserAddedFrame.Number - frame.Number;
-        if (offset < 0) return;
-
+        var offset = lastAddedFrame.Number - frame.Number;
+        if (offset <= 0) return;
         logger.Write(LogLevel.Debug, $"Queue {QueueId} => dropping last {offset} frames.");
         inputs.Advance(-offset);
 
-        lastUserAddedFrame = frame;
-        lastFrameRequested = frame;
-        lastAddedFrame = frame + LocalFrameDelay;
         ResetPrediction();
+        lastUserAddedFrame = frame;
+        lastAddedFrame = frame;
 
-        if (inputs.IsEmpty)
-        {
-            var firstInput = inputs.Front();
-            firstInput.Frame = frame;
-            lastAddedFrame = frame;
-            inputs.Add(firstInput);
-        }
+        if (!inputs.IsEmpty) return;
+        lastAddedFrame = frame.Previous();
+        inputs.Add(new(lastAddedFrame));
     }
 
     public void Reset()
@@ -150,7 +144,7 @@ sealed class InputQueue<TInput> where TInput : unmanaged
         var firstInputFrame = FirstInput.Frame;
         if (requestedFrame.Number < firstInputFrame.Number)
             throw new NetcodeAssertionException(
-                $"Requested frame ({requestedFrame.Number}) can not be smaller than the first input frame ({FirstInput.Frame.Number})."
+                $"Requested frame ({requestedFrame.Number}) in queue {QueueId} can not be smaller than the first input frame ({firstInputFrame.Number})."
             );
 
         if (prediction.Frame.IsNull)

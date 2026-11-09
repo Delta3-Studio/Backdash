@@ -269,13 +269,8 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         if (!stateStore.TryLoad(frame, out var savedFrame))
             return false;
 
-        TryDropSavedInputsAfter(frame);
-        DiscardInputsAfter(frame);
-
-        var offset = 0;
-        BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
-        callbacks.LoadState(frame, ref reader);
-        CurrentFrame = frame;
+        ThrowIf.Assert(savedFrame.Frame == frame);
+        LoadState(savedFrame);
         return true;
     }
 
@@ -284,20 +279,26 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         if (snapshot.Frame > CurrentFrame || snapshot.Frame < Frame.Zero)
             snapshot.Frame = Frame.Max(CurrentFrame.Previous(), Frame.Zero);
 
-        TryDropSavedInputsAfter(snapshot.Frame);
-        DiscardInputsAfter(snapshot.Frame);
-
         stateStore.Clear();
-        ref var stored = ref stateStore.Next();
-        stored.Frame = snapshot.Frame;
-        stored.Checksum = snapshot.Checksum;
-        stored.GameState.Write(snapshot.State);
+        ref var state = ref stateStore.Next();
+        state.Frame = snapshot.Frame;
+        state.Checksum = snapshot.Checksum;
+        state.GameState.Write(snapshot.State);
         stateStore.Advance();
+        LoadState(state);
+    }
+
+    void LoadState(SavedState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        var frame = state.Frame;
+        TryDropSavedInputsAfter(frame);
+        DiscardInputsAfter(frame);
 
         var offset = 0;
-        BinaryBufferReader reader = new(snapshot.State, ref offset, endianness);
-        callbacks.LoadState(snapshot.Frame, ref reader);
-        CurrentFrame = snapshot.Frame;
+        BinaryBufferReader reader = new(state.GameState.WrittenSpan, ref offset, endianness);
+        callbacks.LoadState(frame, ref reader);
+        CurrentFrame = frame;
     }
 
     void DiscardInputsAfter(Frame frame)

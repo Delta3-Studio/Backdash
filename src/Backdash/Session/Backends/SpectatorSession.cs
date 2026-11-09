@@ -338,6 +338,8 @@ sealed class SpectatorSession<TInput> :
         if (!stateStore.TryLoad(frame, out var savedFrame))
             return false;
 
+        ThrowIf.Assert(savedFrame.Frame == frame);
+
         logger.Write(LogLevel.Trace,
             $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum})");
 
