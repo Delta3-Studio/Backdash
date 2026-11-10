@@ -46,7 +46,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         this.checksumStore = checksumStore;
         Store = stateStore;
         inputQueues = new(2);
-        NumberSerializer = options.GetEndiannessNumberStateSerializer();
+        NumberSerializer = options.GetEndiannessStateSerializer();
         var saveBufferSize = options.TotalSavedFramesAllowed;
         stateStore.Initialize(saveBufferSize);
     }
@@ -55,7 +55,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
     public bool InRollback { get; private set; }
     public IStateStore Store { get; }
-    public EndiannessSerializer.INumberSerializer NumberSerializer { get; }
+    public IEndiannessSerializer NumberSerializer { get; }
     public Frame CurrentFrame => currentFrame;
     public Endianness SerializationEndianness => NumberSerializer.Endianness;
     public FrameSpan FramesBehind => new(currentFrame.Number - lastConfirmedFrame.Number);

@@ -18,7 +18,7 @@ public readonly ref struct BinarySpanWriter
 {
     readonly ref int offset;
     readonly Span<byte> buffer;
-    readonly EndiannessSerializer.INumberSerializer numberSerializer;
+    readonly IEndiannessSerializer numberSerializer;
 
     /// <summary>
     ///     Initialize a new <see cref="BinarySpanWriter" /> for <paramref name="buffer" />
@@ -29,7 +29,7 @@ public readonly ref struct BinarySpanWriter
     public BinarySpanWriter(
         scoped in Span<byte> buffer,
         ref int offset,
-        EndiannessSerializer.INumberSerializer numberSerializer
+        IEndiannessSerializer numberSerializer
     )
     {
         ArgumentNullException.ThrowIfNull(numberSerializer);
@@ -73,14 +73,13 @@ public readonly ref struct BinarySpanWriter
     /// <summary>Advance write pointer by <paramref name="count" />.</summary>
     public void Advance(int count) => offset += count;
 
+    /// <summary>
+    ///     Advance and allocates a Span of size <paramref name="size" /> for type <typeparamref name="T" />> in the buffer.
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void WriteSpan<T>(in ReadOnlySpan<T> data) where T : unmanaged => Write(MemoryMarshal.AsBytes(data));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    Span<T> AllocSpan<T>(in ReadOnlySpan<T> value) where T : unmanaged
+    public Span<T> AllocSpan<T>(int size) where T : unmanaged
     {
-        var sizeBytes = Unsafe.SizeOf<T>() * value.Length;
-        var result = MemoryMarshal.Cast<byte, T>(buffer.Slice(offset, sizeBytes));
+        var result = Mem.CastSpan<T>(CurrentBuffer, size, out var sizeBytes);
         Advance(sizeBytes);
         return result;
     }
@@ -94,12 +93,7 @@ public readonly ref struct BinarySpanWriter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    Span<byte> GetSpan(int size)
-    {
-        var result = buffer.Slice(offset, size);
-        Advance(size);
-        return result;
-    }
+    void WriteSpan<T>(in ReadOnlySpan<T> data) where T : unmanaged => Advance(Mem.WriteSpan(CurrentBuffer, data));
 
     /// <summary>Writes single <see cref="byte" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in byte value) => buffer[offset++] = value;
@@ -111,7 +105,7 @@ public readonly ref struct BinarySpanWriter
     public void Write(in bool value)
     {
         if (!BitConverter.TryWriteBytes(CurrentBuffer, value))
-            throw new NetcodeException("Destination is too short");
+            throw new NetcodeException("Unable to write bool into buffer");
         Advance(sizeof(bool));
     }
 
@@ -154,8 +148,9 @@ public readonly ref struct BinarySpanWriter
     /// <summary>Writes single <see cref="Guid" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in Guid value)
     {
-        var span = GetSpan(Unsafe.SizeOf<Guid>());
-        value.TryWriteBytes(span, Endianness is Endianness.BigEndian, out var bytesWritten);
+        if (!numberSerializer.Write(CurrentBuffer, in value, out var bytesWritten))
+            throw new NetcodeException("Unable to write Guid value into buffer");
+
         Advance(bytesWritten);
     }
 
@@ -370,7 +365,7 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<short> value)
     {
         if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
+            BinaryPrimitives.ReverseEndianness(value, AllocSpan<short>(value.Length));
         else
             WriteSpan(in value);
     }
@@ -379,7 +374,7 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<ushort> value)
     {
         if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
+            BinaryPrimitives.ReverseEndianness(value, AllocSpan<ushort>(value.Length));
         else
             WriteSpan(in value);
     }
@@ -391,7 +386,7 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<int> value)
     {
         if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
+            BinaryPrimitives.ReverseEndianness(value, AllocSpan<int>(value.Length));
         else
             WriteSpan(in value);
     }
@@ -400,7 +395,7 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<uint> value)
     {
         if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
+            BinaryPrimitives.ReverseEndianness(value, AllocSpan<uint>(value.Length));
         else
             WriteSpan(in value);
     }
@@ -409,7 +404,7 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<long> value)
     {
         if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
+            BinaryPrimitives.ReverseEndianness(value, AllocSpan<long>(value.Length));
         else
             WriteSpan(in value);
     }
@@ -418,7 +413,7 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<ulong> value)
     {
         if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
+            BinaryPrimitives.ReverseEndianness(value, AllocSpan<ulong>(value.Length));
         else
             WriteSpan(in value);
     }
@@ -427,7 +422,7 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<Int128> value)
     {
         if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
+            BinaryPrimitives.ReverseEndianness(value, AllocSpan<Int128>(value.Length));
         else
             WriteSpan(in value);
     }
@@ -436,7 +431,7 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<UInt128> value)
     {
         if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan(in value));
+            BinaryPrimitives.ReverseEndianness(value, AllocSpan<UInt128>(value.Length));
         else
             WriteSpan(in value);
     }

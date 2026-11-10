@@ -30,7 +30,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
     readonly IDeterministicRandom<TInput> random;
-    readonly EndiannessSerializer.INumberSerializer endianness;
+    readonly IEndiannessSerializer endianness;
     readonly EqualityComparer<TInput> comparer;
     readonly NetcodeOptions options;
 
@@ -52,7 +52,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         checksumProvider = services.ChecksumProvider;
         random = services.DeterministicRandom;
         logger = services.Logger;
-        endianness = options.GetEndiannessNumberStateSerializer();
+        endianness = options.GetEndiannessStateSerializer();
         callbacks = services.SessionHandler;
         comparer = services.InputComparer;
         stateStore.Initialize(options.TotalSavedFramesAllowed);

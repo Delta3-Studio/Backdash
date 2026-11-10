@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Runtime.InteropServices;
 using Backdash.Core;
 
@@ -14,6 +15,23 @@ public static class NetcodeExtensions
         queue.Enqueue(value);
         for (var i = 0; i < count; i++)
             queue.Enqueue(queue.Dequeue());
+    }
+
+    /// <summary>
+    /// Returns a writable <see cref="Span{T}"/> with the specified <paramref name="length"/>.
+    /// </summary>
+    public static Span<T> ReadSpan<T>(this ArrayBufferWriter<T> @this, int length) =>
+        @this.GetSpan(length)[..length];
+
+    /// <summary>
+    /// Advance and returns a <see cref="Span{T}"/> by the specified <paramref name="length"/>.
+    /// </summary>
+    /// <seealso cref="ReadSpan"/>
+    public static Span<T> AllocateSpan<T>(this ArrayBufferWriter<T> @this, int length)
+    {
+        var result = @this.ReadSpan(length);
+        @this.Advance(length);
+        return result;
     }
 
     /// <summary>

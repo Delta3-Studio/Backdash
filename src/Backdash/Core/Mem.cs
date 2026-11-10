@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -89,5 +90,43 @@ static class Mem
         lastNonZero = Math.Max(lastNonZero, lastByteSep);
         var trimmed = builder.Remove(lastNonZero, builder.Length - lastNonZero);
         return trimmed.ToString();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int WriteSpan<T>(Span<byte> buffer, ReadOnlySpan<T> data) where T : unmanaged
+    {
+        var values = MemoryMarshal.AsBytes(data);
+        values.CopyTo(buffer);
+        return values.Length;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteSpan<T>(ArrayBufferWriter<byte> buffer, ReadOnlySpan<T> data) where T : unmanaged =>
+        buffer.Write(MemoryMarshal.AsBytes(data));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int ReadSpan<T>(ReadOnlySpan<byte> buffer, in Span<T> data) where T : unmanaged
+    {
+        var values = MemoryMarshal.AsBytes(data);
+        var length = values.Length;
+        if (length > buffer.Length) length = buffer.Length;
+        buffer[..length].CopyTo(values);
+        return length;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Span<T> CastSpan<T>(Span<byte> buffer, int size, out int sizeBytes)
+        where T : unmanaged
+    {
+        sizeBytes = Unsafe.SizeOf<T>() * size;
+        return MemoryMarshal.Cast<byte, T>(buffer[..sizeBytes]);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Span<T> CastSpan<T>(ArrayBufferWriter<byte> buffer, int size)
+        where T : unmanaged
+    {
+        var sizeBytes = Unsafe.SizeOf<T>() * size;
+        return MemoryMarshal.Cast<byte, T>(buffer.AllocateSpan(sizeBytes));
     }
 }

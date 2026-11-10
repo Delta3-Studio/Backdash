@@ -18,7 +18,7 @@ public readonly ref struct BinaryBufferReader
 {
     readonly ref int offset;
     readonly ReadOnlySpan<byte> buffer;
-    readonly EndiannessSerializer.INumberSerializer numberSerializer;
+    readonly IEndiannessSerializer numberSerializer;
 
     /// <summary>
     ///     Initialize a new <see cref="BinaryBufferReader" /> for <paramref name="buffer" />
@@ -28,7 +28,7 @@ public readonly ref struct BinaryBufferReader
     /// <param name="numberSerializer">Number serializer instance</param>
     public BinaryBufferReader(
         ReadOnlySpan<byte> buffer, ref int offset,
-        EndiannessSerializer.INumberSerializer numberSerializer
+        IEndiannessSerializer numberSerializer
     )
     {
         ArgumentNullException.ThrowIfNull(numberSerializer);
@@ -110,7 +110,7 @@ public readonly ref struct BinaryBufferReader
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void ReadSpan<T>(in Span<T> data) where T : unmanaged => Read(MemoryMarshal.AsBytes(data));
+    void ReadSpan<T>(in Span<T> data) where T : unmanaged => Advance(Mem.ReadSpan(CurrentBuffer, in data));
 
     /// <summary>Reads single <see cref="byte" /> from the buffer.</summary>
     public byte ReadByte() => buffer[offset++];
@@ -210,9 +210,8 @@ public readonly ref struct BinaryBufferReader
     /// <summary>Reads single <see cref="Guid" /> from the buffer.</summary>
     public Guid ReadGuid()
     {
-        var span = CurrentBuffer[..Unsafe.SizeOf<Guid>()];
-        var result = new Guid(span, Endianness is Endianness.BigEndian);
-        Advance(span.Length);
+        var result = numberSerializer.ReadGuid(CurrentBuffer, out int byteSize);
+        Advance(byteSize);
         return result;
     }
 

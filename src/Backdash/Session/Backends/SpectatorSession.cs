@@ -45,7 +45,7 @@ sealed class SpectatorSession<TInput> :
     bool closed;
     readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
-    readonly EndiannessSerializer.INumberSerializer endianness;
+    readonly IEndiannessSerializer endianness;
 
     public SpectatorSession(
         SpectatorOptions spectatorOptions,
@@ -74,7 +74,7 @@ sealed class SpectatorSession<TInput> :
         PeerObserverGroup<ProtocolMessage> peerObservers = new();
         inputs = new GameInput<ConfirmedInputs<TInput>>[options.SpectatorInputBufferLength];
         callbacks = services.SessionHandler;
-        endianness = options.GetEndiannessNumberStateSerializer();
+        endianness = options.GetEndiannessStateSerializer();
         udp = services.PeerClientFactory.CreateClient(options.LocalPort, peerObservers);
         ConfigureJobs(services);
 

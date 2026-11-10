@@ -28,7 +28,7 @@ public sealed class InputContext<TInput> where TInput : unmanaged
     /// <seealso cref="NetcodeOptions.StateSerializationEndianness"/>
     /// <seealso cref="Backdash.Network.Endianness"/>
     /// </summary>
-    public EndiannessSerializer.INumberSerializer NumberSerializer { get; }
+    public IEndiannessSerializer NumberSerializer { get; }
 
     /// <summary>
     /// Struct size of <typeparamref name="TInput" />
@@ -63,7 +63,7 @@ public sealed class InputContext<TInput> where TInput : unmanaged
         InputTypeCode = Type.GetTypeCode(typeof(TInput));
         PlayerInputSize = Unsafe.SizeOf<TInput>();
         ConfirmedInputSize = Unsafe.SizeOf<ConfirmedInputs<TInput>>();
-        NumberSerializer = options.GetEndiannessNumberStateSerializer();
+        NumberSerializer = options.GetEndiannessStateSerializer();
     }
 
     /// <summary>

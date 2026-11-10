@@ -44,11 +44,8 @@ public sealed record NetcodeOptions
     /// <value>Defaults to <see cref="Endianness.LittleEndian" /></value>
     public Endianness? StateSerializationEndianness { get; set; } = Endianness.LittleEndian;
 
-    internal Endianness GetStateSerializationEndianness() =>
-        StateSerializationEndianness ?? Protocol.SerializationEndianness;
-
-    internal EndiannessSerializer.INumberSerializer GetEndiannessNumberStateSerializer() =>
-        EndiannessSerializer.Get(GetStateSerializationEndianness());
+    internal IEndiannessSerializer GetEndiannessStateSerializer() =>
+        EndiannessSerializer.Get(StateSerializationEndianness ?? Protocol.SerializationEndianness);
 
     /// <summary>
     ///     Max length for player input queues.
