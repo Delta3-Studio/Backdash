@@ -662,14 +662,18 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             synchronizer.SetLastConfirmedFrame(minConfirmedFrame);
         }
 
-        if (maxPing > 0)
+
+        if (options.PingToDelayFrame > 0)
         {
-            var newDelay = (FrameSpan)(int)(maxPing / options.PingToDelayFrame);
-            if (newDelay != currentDelayFrames)
-                SetDelay(newDelay);
+            if (maxPing > 0)
+            {
+                var newDelay = (FrameSpan)(int)(maxPing / options.PingToDelayFrame);
+                if (newDelay != currentDelayFrames)
+                    SetDelay(newDelay);
+            }
+            else if (currentDelayFrames.IsPositive)
+                SetDelay(FrameSpan.Zero);
         }
-        else if (currentDelayFrames.IsPositive)
-            SetDelay(FrameSpan.Zero);
 
         // send time sync notifications if now is the proper time
         if (currentFrame.Number <= nextSyncInterval)
