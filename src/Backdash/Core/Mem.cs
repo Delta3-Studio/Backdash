@@ -105,7 +105,7 @@ static class Mem
         buffer.Write(MemoryMarshal.AsBytes(data));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int ReadSpan<T>(ReadOnlySpan<byte> buffer, in Span<T> data) where T : unmanaged
+    public static int ReadSpan<T>(ReadOnlySpan<byte> buffer, Span<T> data) where T : unmanaged
     {
         var values = MemoryMarshal.AsBytes(data);
         buffer[..values.Length].CopyTo(values);
@@ -114,6 +114,14 @@ static class Mem
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Span<T> CastSpan<T>(Span<byte> buffer, int size, out int sizeBytes)
+        where T : unmanaged
+    {
+        sizeBytes = Unsafe.SizeOf<T>() * size;
+        return MemoryMarshal.Cast<byte, T>(buffer[..sizeBytes]);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ReadOnlySpan<T> CastSpan<T>(ReadOnlySpan<byte> buffer, int size, out int sizeBytes)
         where T : unmanaged
     {
         sizeBytes = Unsafe.SizeOf<T>() * size;

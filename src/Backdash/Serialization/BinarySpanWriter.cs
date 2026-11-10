@@ -1,6 +1,5 @@
 // ReSharper disable MemberCanBePrivate.Global
 
-using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -85,15 +84,15 @@ public readonly ref struct BinarySpanWriter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void WriteSpan<T>(in ReadOnlySpan<T> data) where T : unmanaged => Advance(Mem.WriteSpan(CurrentBuffer, data));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     Span<T> GetListSpan<T>(in List<T> values)
     {
         var span = CollectionsMarshal.AsSpan(values);
         Write(span.Length);
         return span;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void WriteSpan<T>(in ReadOnlySpan<T> data) where T : unmanaged => Advance(Mem.WriteSpan(CurrentBuffer, data));
 
     /// <summary>Writes single <see cref="byte" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in byte value) => buffer[offset++] = value;
@@ -137,13 +136,31 @@ public readonly ref struct BinarySpanWriter
     public void Write(in UInt128 value) => WriteNumber(in value);
 
     /// <summary>Writes single <see cref="Half" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in Half value) => Write(BitConverter.HalfToInt16Bits(value));
+    public void Write(in Half value)
+    {
+        if (!numberSerializer.Write(CurrentBuffer, in value, out var size))
+            throw new NetcodeException("Unable to write Half value into buffer");
+
+        Advance(size);
+    }
 
     /// <summary>Writes single <see cref="float" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in float value) => Write(BitConverter.SingleToInt32Bits(value));
+    public void Write(in float value)
+    {
+        if (!numberSerializer.Write(CurrentBuffer, in value, out var size))
+            throw new NetcodeException("Unable to write float value into buffer");
+
+        Advance(size);
+    }
 
     /// <summary>Writes single <see cref="double" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in double value) => Write(BitConverter.DoubleToInt64Bits(value));
+    public void Write(in double value)
+    {
+        if (!numberSerializer.Write(CurrentBuffer, in value, out var size))
+            throw new NetcodeException("Unable to write double value into buffer");
+
+        Advance(size);
+    }
 
     /// <summary>Writes single <see cref="Guid" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in Guid value)
@@ -362,88 +379,40 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<bool> value) => WriteSpan(in value);
 
     /// <summary>Writes a span of <see cref="short" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<short> value)
-    {
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan<short>(value.Length));
-        else
-            WriteSpan(in value);
-    }
+    public void Write(in ReadOnlySpan<short> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="ushort" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<ushort> value)
-    {
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan<ushort>(value.Length));
-        else
-            WriteSpan(in value);
-    }
+    public void Write(in ReadOnlySpan<ushort> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="char" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<char> value) => Write(MemoryMarshal.Cast<char, ushort>(value));
+    public void Write(in ReadOnlySpan<char> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="int" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<int> value)
-    {
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan<int>(value.Length));
-        else
-            WriteSpan(in value);
-    }
+    public void Write(in ReadOnlySpan<int> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="uint" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<uint> value)
-    {
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan<uint>(value.Length));
-        else
-            WriteSpan(in value);
-    }
+    public void Write(in ReadOnlySpan<uint> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="long" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<long> value)
-    {
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan<long>(value.Length));
-        else
-            WriteSpan(in value);
-    }
+    public void Write(in ReadOnlySpan<long> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="ulong" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<ulong> value)
-    {
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan<ulong>(value.Length));
-        else
-            WriteSpan(in value);
-    }
+    public void Write(in ReadOnlySpan<ulong> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="Int128" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<Int128> value)
-    {
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan<Int128>(value.Length));
-        else
-            WriteSpan(in value);
-    }
+    public void Write(in ReadOnlySpan<Int128> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="UInt128" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<UInt128> value)
-    {
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(value, AllocSpan<UInt128>(value.Length));
-        else
-            WriteSpan(in value);
-    }
+    public void Write(in ReadOnlySpan<UInt128> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
-    /// <summary>Writes a span of <see cref="float" /> <paramref name="values" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<float> values) => Write(MemoryMarshal.Cast<float, int>(values));
+    /// <summary>Writes a span of <see cref="float" /> <paramref name="value" /> into buffer.</summary>
+    public void Write(in ReadOnlySpan<float> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
-    /// <summary>Writes a span of <see cref="double" /> <paramref name="values" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<double> values) => Write(MemoryMarshal.Cast<double, long>(values));
+    /// <summary>Writes a span of <see cref="double" /> <paramref name="value" /> into buffer.</summary>
+    public void Write(in ReadOnlySpan<double> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
-    /// <summary>Writes a span of <see cref="Half" /> <paramref name="values" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<Half> values) => Write(MemoryMarshal.Cast<Half, short>(values));
+    /// <summary>Writes a span of <see cref="Half" /> <paramref name="value" /> into buffer.</summary>
+    public void Write(in ReadOnlySpan<Half> value) => Advance(numberSerializer.Span.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="Guid" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<Guid> values)
@@ -609,19 +578,8 @@ public readonly ref struct BinarySpanWriter
     /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
     public void WriteNumber<T>(in T value) where T : unmanaged, IBinaryInteger<T>
     {
-        ref var valueRef = ref Unsafe.AsRef(in value);
-        int size;
-        switch (Endianness)
-        {
-            case Endianness.LittleEndian:
-                valueRef.TryWriteLittleEndian(CurrentBuffer, out size);
-                break;
-            case Endianness.BigEndian:
-                valueRef.TryWriteBigEndian(CurrentBuffer, out size);
-                break;
-            default:
-                return;
-        }
+        if (!numberSerializer.Write(CurrentBuffer, value, out var size))
+            throw new NetcodeException($"Unable to write number type '{typeof(T).Name}' value into buffer");
 
         Advance(size);
     }

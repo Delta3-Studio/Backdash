@@ -1,4 +1,3 @@
-using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -122,7 +121,7 @@ public readonly ref struct BinaryBufferReader
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void ReadSpan<T>(in Span<T> data) where T : unmanaged => Advance(Mem.ReadSpan(CurrentBuffer, in data));
+    void ReadSpan<T>(in Span<T> data) where T : unmanaged => Advance(Mem.ReadSpan(CurrentBuffer, data));
 
     /// <summary>Reads single <see cref="byte" /> from the buffer.</summary>
     public byte ReadByte() => buffer[offset++];
@@ -202,19 +201,34 @@ public readonly ref struct BinaryBufferReader
     public UInt128? ReadNullableUInt128() => ReadBoolean() ? ReadUInt128() : null;
 
     /// <summary>Reads single <see cref="Half" /> from the buffer.</summary>
-    public Half ReadHalf() => BitConverter.Int16BitsToHalf(ReadInt16());
+    public Half ReadHalf()
+    {
+        var result = numberSerializer.ReadHalf(CurrentBuffer, out var size);
+        Advance(size);
+        return result;
+    }
 
     /// <inheritdoc cref="ReadHalf()" />
     public Half? ReadNullableHalf() => ReadBoolean() ? ReadHalf() : null;
 
-    /// <summary>Reads float 32 <see cref="float" /> from the buffer.</summary>
-    public float ReadFloat() => BitConverter.Int32BitsToSingle(ReadInt32());
+    /// <summary>Reads float <see cref="float" /> from the buffer.</summary>
+    public float ReadFloat()
+    {
+        var result = numberSerializer.ReadFloat(CurrentBuffer, out var size);
+        Advance(size);
+        return result;
+    }
 
     /// <inheritdoc cref="ReadFloat()" />
     public float? ReadNullableFloat() => ReadBoolean() ? ReadFloat() : null;
 
     /// <summary>Reads single <see cref="double" /> from the buffer.</summary>
-    public double ReadDouble() => BitConverter.Int64BitsToDouble(ReadInt64());
+    public double ReadDouble()
+    {
+        var result = numberSerializer.ReadDouble(CurrentBuffer, out var size);
+        Advance(size);
+        return result;
+    }
 
     /// <inheritdoc cref="ReadDouble()" />
     public double? ReadNullableDouble() => ReadBoolean() ? ReadDouble() : null;
@@ -773,113 +787,73 @@ public readonly ref struct BinaryBufferReader
     public void Read(in List<bool> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="short" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<short> values)
-    {
-        ReadSpan(values);
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(values, values);
-    }
+    public void Read(in Span<short> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="short" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<short> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="ushort" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<ushort> values)
-    {
-        ReadSpan(values);
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(values, values);
-    }
+    public void Read(in Span<ushort> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="ushort" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<ushort> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="char" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<char> values) => Read(MemoryMarshal.Cast<char, ushort>(values));
+    public void Read(in Span<char> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="char" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<char> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="int" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<int> values)
-    {
-        ReadSpan(values);
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(values, values);
-    }
+    public void Read(in Span<int> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="int" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<int> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="uint" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<uint> values)
-    {
-        ReadSpan(values);
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(values, values);
-    }
+    public void Read(in Span<uint> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="uint" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<uint> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="long" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<long> values)
-    {
-        ReadSpan(values);
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(values, values);
-    }
+    public void Read(in Span<long> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="long" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<long> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="ulong" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<ulong> values)
-    {
-        ReadSpan(values);
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(values, values);
-    }
+    public void Read(in Span<ulong> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="ulong" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<ulong> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="Int128" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<Int128> values)
-    {
-        ReadSpan(values);
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(values, values);
-    }
+    public void Read(in Span<Int128> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="Int128" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<Int128> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="UInt128" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<UInt128> values)
-    {
-        ReadSpan(values);
-        if (numberSerializer.NeedsReverse)
-            BinaryPrimitives.ReverseEndianness(values, values);
-    }
+    public void Read(in Span<UInt128> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="UInt128" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<UInt128> values) => Read(GetListSpan(in values));
 
-    /// <summary>Reads span of Half 32 <see cref="Half" /> from the buffer.</summary>
-    public void Read(in Span<Half> values) => Read(MemoryMarshal.Cast<Half, short>(values));
+    /// <summary>Reads span of <see cref="Half" /> from the buffer.</summary>
+    public void Read(in Span<Half> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="Half" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<Half> values) => Read(GetListSpan(in values));
 
-    /// <summary>Reads span of float 32 <see cref="float" /> from the buffer.</summary>
-    public void Read(in Span<float> values) => Read(MemoryMarshal.Cast<float, int>(values));
+    /// <summary>Reads span of float <see cref="float" /> from the buffer.</summary>
+    public void Read(in Span<float> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="float" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<float> values) => Read(GetListSpan(in values));
 
-    /// <summary>Reads span of double 32 <see cref="double" /> from the buffer.</summary>
-    public void Read(in Span<double> values) => Read(MemoryMarshal.Cast<double, long>(values));
+    /// <summary>Reads span of double<see cref="double" /> from the buffer.</summary>
+    public void Read(in Span<double> values) => Advance(numberSerializer.Span.Read(CurrentBuffer, values));
 
     /// <summary>Reads a list of <see cref="double" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<double> values) => Read(GetListSpan(in values));
