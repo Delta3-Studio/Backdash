@@ -126,6 +126,13 @@ public sealed record NetcodeOptions
     /// <value>Defaults to <c>100</c></value>
     public float PingToDelayFrame { get; set; } = 100;
 
+    /// <summary>
+    ///     Max allowed delay frames
+    /// </summary>
+    /// <seealso cref="PingToDelayFrame"/>
+    /// <value>Defaults to <c>5</c></value>
+    public int MaxDelayFrames { get; set; } = 5;
+
     /// <summary>Time synchronization options.</summary>
     /// <seealso cref="TimeSyncOptions" />
     public TimeSyncOptions TimeSync { get; set; } = new();
@@ -170,6 +177,7 @@ public sealed record NetcodeOptions
         ThrowIf.Negative(SaveStateCount);
         ThrowIf.NotPositive(StateSizeHint);
         ThrowIf.NotPositive(FrameRate);
+        ThrowIf.Negative(MaxDelayFrames);
 
         RollbackFramesSmoothFactor = Math.Clamp(RollbackFramesSmoothFactor, 0f, 1f);
 

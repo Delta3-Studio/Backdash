@@ -174,8 +174,10 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     }
 
     public void UpdateRollbackFrameCounter() =>
-        rollbackFrameCounter = ((1f - options.RollbackFramesSmoothFactor) * rollbackFrameCounter) +
-                               (options.RollbackFramesSmoothFactor * FramesBehind.Frames);
+        rollbackFrameCounter = Math.Max(0,
+            ((1f - options.RollbackFramesSmoothFactor) * rollbackFrameCounter) +
+            (options.RollbackFramesSmoothFactor * FramesBehind.Frames)
+        );
 
     public void AdjustSimulation(Frame seekTo)
     {

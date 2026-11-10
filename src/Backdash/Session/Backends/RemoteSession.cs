@@ -666,7 +666,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         {
             if (maxPing > 0)
             {
-                var newDelay = (FrameSpan)(int)(maxPing / options.PingToDelayFrame);
+                var newDelay = (FrameSpan)Math.Min((int)(maxPing / options.PingToDelayFrame), options.MaxDelayFrames);
                 if (newDelay != currentDelayFrames)
                     SetDelay(newDelay);
             }

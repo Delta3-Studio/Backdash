@@ -259,9 +259,16 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
     }
 
     /// <inheritdoc cref="NetcodeOptions.PingToDelayFrame" />
-    public NetcodeSessionBuilder<TInput> WithDelayForPing(float milliseconds)
+    public NetcodeSessionBuilder<TInput> WithPingToDelayFrame(float milliseconds)
     {
         options.PingToDelayFrame = milliseconds;
+        return this;
+    }
+
+    /// <inheritdoc cref="NetcodeOptions.PingToDelayFrame" />
+    public NetcodeSessionBuilder<TInput> WithMaxDelayFrames(int frames)
+    {
+        options.MaxDelayFrames = frames;
         return this;
     }
 
