@@ -662,7 +662,6 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             synchronizer.SetLastConfirmedFrame(minConfirmedFrame);
         }
 
-
         if (options.PingToDelayFrame > 0)
         {
             if (maxPing > 0)

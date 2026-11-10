@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 
 namespace SpaceWar.Logic;
@@ -256,8 +257,9 @@ public sealed class Renderer(
         }
 
         statsString.Clear();
-        statsString.Append($"ping: {maxPing.TotalMilliseconds:f2} ms  ");
-        statsString.Append($"rollback: {ngs.RollbackFrames.Frames}");
+        statsString.Append(CultureInfo.InvariantCulture, $"ping: {maxPing.TotalMilliseconds:f2}ms  ");
+        statsString.Append($"rollback: {ngs.RollbackFrames.Frames}  ");
+        statsString.Append($"delay: {ngs.TotalDelayFrames.Frames}");
         var statsSize = gameAssets.MainFont.MeasureString(statsString) * statsScale;
         Vector2 statsPos = new(
             (gs.Bounds.Width - statsSize.X) / 2,
@@ -279,7 +281,8 @@ public sealed class Renderer(
         const int statsPadding = 2;
 
         stateInfoString.Clear();
-        stateInfoString.Append($"State: {ngs.StateChecksum} {ngs.StateSize}");
+        stateInfoString.Append(CultureInfo.InvariantCulture, $"State: {ngs.StateChecksum} {ngs.StateSize}");
+
         var size = gameAssets.MainFont.MeasureString(stateInfoString) * statsScale;
 
         Vector2 pos = new((gs.Bounds.Width - size.X) / 2, gs.Bounds.Top - Config.WindowPadding);
