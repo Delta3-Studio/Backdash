@@ -133,7 +133,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     public PeerAddress Address => state.PeerAddress;
 
     // require idle input should be a configuration parameter
-    public int GetRecommendFrameDelay() => timeSync.RecommendFrameWaitDuration();
+    public int GetRecommendWaitFrames() => timeSync.RecommendFrameWaitDuration();
 
     public void SetLocalFrameNumber(Frame localFrame, int fps)
     {

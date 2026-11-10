@@ -678,7 +678,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         var interval = 0;
         for (i = 0; i < eps.Length; i++)
             if (eps[i] is { } endpoint)
-                interval = Math.Max(interval, endpoint.GetRecommendFrameDelay());
+                interval = Math.Max(interval, endpoint.GetRecommendWaitFrames());
 
         if (interval <= 0) return;
         callbacks.TimeSync(new(interval));
