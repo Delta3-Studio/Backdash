@@ -62,7 +62,7 @@ public readonly struct BinaryBufferWriter(
     ///     Advance and allocates a Span of size <paramref name="size" /> for type <typeparamref name="T" />> in the buffer.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Span<T> AllocSpan<T>(int size) where T : unmanaged => Mem.CastSpan<T>(buffer, size);
+    public Span<T> AllocSpan<T>(int size) where T : unmanaged => Mem.AllocateBuffer<T>(buffer, size);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     Span<T> GetListSpan<T>(in List<T> values)
@@ -127,10 +127,8 @@ public readonly struct BinaryBufferWriter(
     /// <summary>Writes single <see cref="Guid" /> <paramref name="value" /> into buffer.</summary>
     public void Write(in Guid value)
     {
-        if (!numberSerializer.Write(buffer, in value, out var bytesWritten))
+        if (!numberSerializer.Write(buffer, in value))
             throw new NetcodeException("Unable to write Guid value into buffer");
-
-        Advance(bytesWritten);
     }
 
     /// <summary>Writes single <see cref="TimeSpan" /> <paramref name="value" /> into buffer.</summary>
@@ -773,8 +771,8 @@ public readonly struct BinaryBufferWriter(
     /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
     public void WriteNumber<T>(in T value) where T : unmanaged, IBinaryInteger<T>
     {
-        numberSerializer.Write(buffer, value, out var size);
-        Advance(size);
+        if (!numberSerializer.Write(buffer, value))
+            throw new NetcodeException($"Unable to write number type '{typeof(T).Name}' value into buffer");
     }
 
     /// <summary>Writes a <see cref="IBinaryInteger{T}" /> <paramref name="value" /> into buffer.</summary>

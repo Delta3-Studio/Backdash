@@ -1,6 +1,9 @@
 using System.Buffers;
+using System.Buffers.Binary;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Backdash.Core;
 using Backdash.Network;
 
 namespace Backdash.Serialization;
@@ -54,20 +57,24 @@ public static class EndiannessSerializer
             where T : unmanaged, IBinaryInteger<T> =>
             value.TryWriteBigEndian(buffer, out size);
 
-        public bool Write<T>(ArrayBufferWriter<byte> buffer, T value, out int size)
+        public bool Write<T>(ArrayBufferWriter<byte> buffer, T value)
             where T : unmanaged, IBinaryInteger<T>
         {
-            size = Unsafe.SizeOf<T>();
-            return value.TryWriteBigEndian(buffer.ReadSpan(size), out size);
+            var size = Unsafe.SizeOf<T>();
+            if (!value.TryWriteBigEndian(buffer.ReadSpan(size), out size)) return false;
+            buffer.Advance(size);
+            return true;
         }
 
         public bool Write(Span<byte> buffer, in Guid value, out int size) =>
             value.TryWriteBytes(buffer, bigEndian: true, out size);
 
-        public bool Write(ArrayBufferWriter<byte> buffer, in Guid value, out int size)
+        public bool Write(ArrayBufferWriter<byte> buffer, in Guid value)
         {
             var span = buffer.ReadSpan(Unsafe.SizeOf<Guid>());
-            return value.TryWriteBytes(span, bigEndian: true, out size);
+            if (!value.TryWriteBytes(span, bigEndian: true, out var size)) return false;
+            buffer.Advance(size);
+            return true;
         }
     }
 
@@ -104,20 +111,24 @@ public static class EndiannessSerializer
             where T : unmanaged, IBinaryInteger<T> =>
             value.TryWriteLittleEndian(buffer, out size);
 
-        public bool Write<T>(ArrayBufferWriter<byte> buffer, T value, out int size)
+        public bool Write<T>(ArrayBufferWriter<byte> buffer, T value)
             where T : unmanaged, IBinaryInteger<T>
         {
-            size = Unsafe.SizeOf<T>();
-            return value.TryWriteLittleEndian(buffer.ReadSpan(size), out size);
+            var size = Unsafe.SizeOf<T>();
+            if (!value.TryWriteLittleEndian(buffer.ReadSpan(size), out size)) return false;
+            buffer.Advance(size);
+            return true;
         }
 
         public bool Write(Span<byte> buffer, in Guid value, out int size) =>
             value.TryWriteBytes(buffer, bigEndian: false, out size);
 
-        public bool Write(ArrayBufferWriter<byte> buffer, in Guid value, out int size)
+        public bool Write(ArrayBufferWriter<byte> buffer, in Guid value)
         {
             var span = buffer.ReadSpan(Unsafe.SizeOf<Guid>());
-            return value.TryWriteBytes(span, bigEndian: false, out size);
+            if (!value.TryWriteBytes(span, bigEndian: false, out var size)) return false;
+            buffer.Advance(size);
+            return true;
         }
     }
 }
@@ -137,14 +148,14 @@ public interface IEndiannessSerializer
     bool Write<T>(Span<byte> buffer, T value, out int size) where T : unmanaged, IBinaryInteger<T>;
 
     /// <summary>Write a number into an array buffer</summary>
-    bool Write<T>(ArrayBufferWriter<byte> buffer, T value, out int size)
+    bool Write<T>(ArrayBufferWriter<byte> buffer, T value)
         where T : unmanaged, IBinaryInteger<T>;
 
     /// <summary>Write a <see cref="Guid"/> into an array buffer</summary>
     bool Write(Span<byte> buffer, in Guid value, out int size);
 
     /// <summary>Write a <see cref="Guid"/> value into an array buffer</summary>
-    bool Write(ArrayBufferWriter<byte> buffer, in Guid value, out int size);
+    bool Write(ArrayBufferWriter<byte> buffer, in Guid value);
 
     /// <summary>Reads number from the buffer</summary>
     T Read<T>(ReadOnlySpan<byte> buffer, bool isUnsigned, out int size) where T : unmanaged, IBinaryInteger<T>;
@@ -167,4 +178,234 @@ public interface IEndiannessSerializer
 
     /// <summary>Reads <see cref="Guid"/> value from the buffer</summary>
     Guid ReadGuid(ReadOnlySpan<byte> buffer, out int size);
+}
+
+/// <summary>
+///  Endianness specific number serializer
+/// </summary>
+public interface IEndiannessSpanSerializer
+{
+    /// <summary>Writes a span of <see cref="short" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    /// <returns>The number of bytes written.</returns>
+    int Write(Span<byte> buffer, in ReadOnlySpan<short> value);
+
+    /// <summary>Writes a span of <see cref="ushort" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    /// <returns>The number of bytes written.</returns>
+    int Write(Span<byte> buffer, in ReadOnlySpan<ushort> value);
+
+    /// <summary>Writes a span of <see cref="char" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    /// <returns>The number of bytes written.</returns>
+    int Write(Span<byte> buffer, in ReadOnlySpan<char> value) =>
+        Write(buffer, MemoryMarshal.Cast<char, ushort>(value));
+
+    /// <summary>Writes a span of <see cref="int" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    /// <returns>The number of bytes written.</returns>
+    int Write(Span<byte> buffer, in ReadOnlySpan<int> value);
+
+    /// <summary>Writes a span of <see cref="uint" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    /// <returns>The number of bytes written.</returns>
+    int Write(Span<byte> buffer, in ReadOnlySpan<uint> value);
+
+    /// <summary>Writes a span of <see cref="long" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    /// <returns>The number of bytes written.</returns>
+    int Write(Span<byte> buffer, in ReadOnlySpan<long> value);
+
+    /// <summary>Writes a span of <see cref="ulong" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    /// <returns>The number of bytes written.</returns>
+    int Write(Span<byte> buffer, in ReadOnlySpan<ulong> value);
+
+    /// <summary>Writes a span of <see cref="Int128" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    /// <returns>The number of bytes written.</returns>
+    int Write(Span<byte> buffer, in ReadOnlySpan<Int128> value);
+
+    /// <summary>Writes a span of <see cref="UInt128" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    /// <returns>The number of bytes written.</returns>
+    int Write(Span<byte> buffer, in ReadOnlySpan<UInt128> value);
+
+    /// <summary>Writes a span of <see cref="short" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<short> value);
+
+    /// <summary>Writes a span of <see cref="ushort" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<ushort> value);
+
+    /// <summary>Writes a span of <see cref="char" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<char> value) =>
+        Write(buffer, MemoryMarshal.Cast<char, ushort>(value));
+
+    /// <summary>Writes a span of <see cref="int" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<int> value);
+
+    /// <summary>Writes a span of <see cref="uint" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<uint> value);
+
+    /// <summary>Writes a span of <see cref="long" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<long> value);
+
+    /// <summary>Writes a span of <see cref="ulong" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<ulong> value);
+
+    /// <summary>Writes a span of <see cref="Int128" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<Int128> value);
+
+    /// <summary>Writes a span of <see cref="UInt128" /> <paramref name="value" /> into <paramref name="buffer" />.</summary>
+    void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<UInt128> value);
+
+    /// <summary>Reads a span of <see cref="short" /> <paramref name="buffer" /> buffer into <paramref name="values" />.</summary>
+    int Read(ReadOnlySpan<byte> buffer, in Span<short> values);
+
+    /// <summary>Reads a span of <see cref="char" /> <paramref name="buffer" /> buffer into <paramref name="values" />.</summary>
+    int Read(ReadOnlySpan<byte> buffer, in Span<char> values) =>
+        Read(buffer, MemoryMarshal.Cast<char, ushort>(values));
+
+    /// <summary>Reads a span of <see cref="ushort" /> <paramref name="buffer" /> buffer into <paramref name="values" />.</summary>
+    int Read(ReadOnlySpan<byte> buffer, in Span<ushort> values);
+
+    /// <summary>Reads a span of <see cref="int" /> <paramref name="buffer" /> buffer into <paramref name="values" />.</summary>
+    int Read(ReadOnlySpan<byte> buffer, in Span<int> values);
+
+    /// <summary>Reads a span of <see cref="uint" /> <paramref name="buffer" /> buffer into <paramref name="values" />.</summary>
+    int Read(ReadOnlySpan<byte> buffer, in Span<uint> values);
+
+    /// <summary>Reads a span of <see cref="long" /> <paramref name="buffer" /> buffer into <paramref name="values" />.</summary>
+    int Read(ReadOnlySpan<byte> buffer, in Span<long> values);
+
+    /// <summary>Reads a span of <see cref="ulong" /> <paramref name="buffer" /> buffer into <paramref name="values" />.</summary>
+    int Read(ReadOnlySpan<byte> buffer, in Span<ulong> values);
+
+    /// <summary>Reads a span of <see cref="Int128" /> <paramref name="buffer" /> buffer into <paramref name="values" />.</summary>
+    int Read(ReadOnlySpan<byte> buffer, in Span<Int128> values);
+
+    /// <summary>Reads a span of <see cref="UInt128" /> <paramref name="buffer" /> buffer into <paramref name="values" />.</summary>
+    int Read(ReadOnlySpan<byte> buffer, in Span<UInt128> values);
+}
+
+sealed class ReverseEndiannessSpanSerializer : IEndiannessSpanSerializer
+{
+    public int Write(Span<byte> buffer, in ReadOnlySpan<short> value)
+    {
+        BinaryPrimitives.ReverseEndianness(value, Mem.CastSpan<short>(buffer, value.Length, out var byteSize));
+        return byteSize;
+    }
+
+    public int Write(Span<byte> buffer, in ReadOnlySpan<ushort> value)
+    {
+        BinaryPrimitives.ReverseEndianness(value, Mem.CastSpan<ushort>(buffer, value.Length, out var byteSize));
+        return byteSize;
+    }
+
+    public int Write(Span<byte> buffer, in ReadOnlySpan<int> value)
+    {
+        BinaryPrimitives.ReverseEndianness(value, Mem.CastSpan<int>(buffer, value.Length, out var byteSize));
+        return byteSize;
+    }
+
+    public int Write(Span<byte> buffer, in ReadOnlySpan<uint> value)
+    {
+        BinaryPrimitives.ReverseEndianness(value, Mem.CastSpan<uint>(buffer, value.Length, out var byteSize));
+        return byteSize;
+    }
+
+    public int Write(Span<byte> buffer, in ReadOnlySpan<long> value)
+    {
+        BinaryPrimitives.ReverseEndianness(value, Mem.CastSpan<long>(buffer, value.Length, out var byteSize));
+        return byteSize;
+    }
+
+    public int Write(Span<byte> buffer, in ReadOnlySpan<ulong> value)
+    {
+        BinaryPrimitives.ReverseEndianness(value, Mem.CastSpan<ulong>(buffer, value.Length, out var byteSize));
+        return byteSize;
+    }
+
+    public int Write(Span<byte> buffer, in ReadOnlySpan<Int128> value)
+    {
+        BinaryPrimitives.ReverseEndianness(value, Mem.CastSpan<Int128>(buffer, value.Length, out var byteSize));
+        return byteSize;
+    }
+
+    public int Write(Span<byte> buffer, in ReadOnlySpan<UInt128> value)
+    {
+        BinaryPrimitives.ReverseEndianness(value, Mem.CastSpan<UInt128>(buffer, value.Length, out var byteSize));
+        return byteSize;
+    }
+
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<short> value)
+    {
+        BinaryPrimitives.ReverseEndianness(value, Mem.AllocateBuffer<short>(buffer, value.Length));
+    }
+
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<ushort> value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<int> value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<uint> value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<long> value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<ulong> value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<Int128> value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<UInt128> value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Read(ReadOnlySpan<byte> buffer, in Span<short> values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Read(ReadOnlySpan<byte> buffer, in Span<ushort> values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Read(ReadOnlySpan<byte> buffer, in Span<int> values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Read(ReadOnlySpan<byte> buffer, in Span<uint> values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Read(ReadOnlySpan<byte> buffer, in Span<long> values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Read(ReadOnlySpan<byte> buffer, in Span<ulong> values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Read(ReadOnlySpan<byte> buffer, in Span<Int128> values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Read(ReadOnlySpan<byte> buffer, in Span<UInt128> values)
+    {
+        throw new NotImplementedException();
+    }
 }

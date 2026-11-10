@@ -121,7 +121,7 @@ static class Mem
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Span<T> CastSpan<T>(ArrayBufferWriter<byte> buffer, int size)
+    public static Span<T> AllocateBuffer<T>(ArrayBufferWriter<byte> buffer, int size)
         where T : unmanaged
     {
         var sizeBytes = Unsafe.SizeOf<T>() * size;
