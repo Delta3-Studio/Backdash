@@ -108,10 +108,8 @@ static class Mem
     public static int ReadSpan<T>(ReadOnlySpan<byte> buffer, in Span<T> data) where T : unmanaged
     {
         var values = MemoryMarshal.AsBytes(data);
-        var length = values.Length;
-        if (length > buffer.Length) length = buffer.Length;
-        buffer[..length].CopyTo(values);
-        return length;
+        buffer[..values.Length].CopyTo(values);
+        return values.Length;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

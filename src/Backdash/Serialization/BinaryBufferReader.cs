@@ -58,13 +58,25 @@ public readonly ref struct BinaryBufferReader
     public Endianness Endianness => numberSerializer.Endianness;
 
     /// <summary>Total read byte count.</summary>
-    public int ReadCount => offset;
+    public int ReadCount
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => offset;
+    }
 
     /// <summary>Total buffer capacity in bytes.</summary>
-    public int Capacity => buffer.Length;
+    public int Capacity
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => buffer.Length;
+    }
 
     /// <summary>Available buffer space in bytes</summary>
-    public int FreeCapacity => Capacity - ReadCount;
+    public int FreeCapacity
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Capacity - ReadCount;
+    }
 
     /// <summary>
     ///     Return full buffer
@@ -737,7 +749,8 @@ public readonly ref struct BinaryBufferReader
     public void Read(in Span<byte> values)
     {
         var length = values.Length;
-        if (length > FreeCapacity) length = FreeCapacity;
+        if (length > FreeCapacity)
+            throw new InvalidOperationException("Not enough buffer capacity to read");
 
         var slice = buffer.Slice(offset, length);
         Advance(length);
