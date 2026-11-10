@@ -107,6 +107,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public SessionMode Mode => SessionMode.Local;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
+    public FrameSpan DelayFrames => FrameSpan.Zero;
     public bool IsInRollback => false;
     public SavedState GetSavedState() => stateStore.Last();
     public SavedState? GetSavedState(Frame frame) => stateStore.Get(frame);

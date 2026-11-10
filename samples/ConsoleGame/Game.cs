@@ -7,7 +7,7 @@ namespace ConsoleGame;
 
 public sealed class Game : INetcodeSessionHandler
 {
-    // Rollback Net-code session callbacks
+    // Rollback Netcode session callbacks
     readonly INetcodeSession<GameInput> session;
 
     readonly CancellationTokenSource cancellation;
@@ -62,10 +62,18 @@ public sealed class Game : INetcodeSessionHandler
     {
         session.BeginFrame();
 
+        if (nonGameState.CurrentDelayFrames > 0)
+        {
+            nonGameState.CurrentDelayFrames--;
+            return;
+        }
+
         if (nonGameState.IsRunning)
             UpdateState();
 
         view.Draw(in currentState, nonGameState);
+
+        nonGameState.CurrentDelayFrames = nonGameState.TotalDelayFrames;
     }
 
     void UpdateState()
@@ -141,6 +149,12 @@ public sealed class Game : INetcodeSessionHandler
         currentState.Score2 = reader.ReadInt32();
         currentState.RandomSeed = reader.ReadUInt32();
         currentState.Target = reader.ReadVector2();
+    }
+
+    public void SetDelay(FrameSpan amount)
+    {
+        nonGameState.TotalDelayFrames = amount;
+        nonGameState.CurrentDelayFrames = amount;
     }
 
     public void TimeSync(FrameSpan framesAhead)

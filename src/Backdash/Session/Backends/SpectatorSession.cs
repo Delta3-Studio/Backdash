@@ -153,6 +153,7 @@ sealed class SpectatorSession<TInput> :
     public int FixedFrameRate => options.FrameRate;
     public Frame CurrentFrame { get; private set; } = Frame.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
+    public FrameSpan DelayFrames => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public bool IsInRollback => false;
     public SavedState GetSavedState() => stateStore.Last();

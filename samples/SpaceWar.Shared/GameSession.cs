@@ -13,14 +13,17 @@ public sealed class GameSession(
 {
     public void Update(TimeSpan deltaTime)
     {
+        session.BeginFrame();
+        UpdateStats();
+
         if (nonGameState.Sleeping)
         {
             nonGameState.SleepTime -= deltaTime;
             return;
         }
 
-        UpdateStats();
-        session.BeginFrame();
+        if (nonGameState.CheckDelay())
+            return;
 
         var keyboard = Keyboard.GetState();
         HandleNoGameInput(keyboard);
@@ -112,6 +115,12 @@ public sealed class GameSession(
     {
         Log($"=> TIME SYNC REQUESTED {framesAhead.Frames}");
         nonGameState.SleepTime = framesAhead.Duration();
+    }
+
+    public void SetDelay(FrameSpan amount)
+    {
+        Log($"=> FRAME DELAY REQUESTED {amount.Frames}");
+        nonGameState.SetDelay(amount);
     }
 
     void UpdateStats()

@@ -120,6 +120,12 @@ public sealed record NetcodeOptions
     /// <value>Defaults to <c>false</c></value>
     public bool SaveConfirmedInputHistory { get; set; }
 
+    /// <summary>
+    ///     The ping amount that should be converted to a single frame delay (in milliseconds).
+    /// </summary>
+    /// <value>Defaults to <c>100</c></value>
+    public float PingToDelayFrame { get; set; } = 100;
+
     /// <summary>Time synchronization options.</summary>
     /// <seealso cref="TimeSyncOptions" />
     public TimeSyncOptions TimeSync { get; set; } = new();

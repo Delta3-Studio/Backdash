@@ -102,6 +102,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     public Endianness StateSerializationEndianness => endianness.Endianness;
     public Frame CurrentFrame { get; private set; } = Frame.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
+    public FrameSpan DelayFrames => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public bool IsInRollback => false;
     public SavedState GetSavedState() => stateStore.Last();

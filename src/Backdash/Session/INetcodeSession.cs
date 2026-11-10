@@ -42,13 +42,16 @@ public interface INetcodeSessionInfo
     /// <summary>
     ///     Returns the number of current rollback frames.
     /// </summary>
-    /// <seealso cref="FrameSpan" />
     FrameSpan RollbackFrames { get; }
+
+    /// <summary>
+    ///     Returns the number of delay frames.
+    /// </summary>
+    FrameSpan DelayFrames { get; }
 
     /// <summary>
     ///     Returns the number of frames the client is behind.
     /// </summary>
-    /// <seealso cref="FrameSpan" />
     FrameSpan FramesBehind { get; }
 
     /// <summary>

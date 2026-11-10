@@ -31,12 +31,32 @@ public class NonGameState(int numberOfPlayers)
     public readonly StringBuilder StatusText = new();
     public NetcodePlayer? LocalPlayer;
     public NetcodePlayer? MirrorPlayer;
+    public int CurrentDelayFrames;
+    public FrameSpan TotalDelayFrames;
     public TimeSpan SleepTime;
     public bool Sleeping => SleepTime > TimeSpan.Zero;
     public int NumberOfPlayers => numberOfPlayers;
     public FrameSpan RollbackFrames;
     public uint StateChecksum;
     public ByteSize StateSize;
+
+    public bool CheckDelay()
+    {
+        if (CurrentDelayFrames <= 0)
+        {
+            CurrentDelayFrames = TotalDelayFrames;
+            return false;
+        }
+
+        CurrentDelayFrames--;
+        return true;
+    }
+
+    public void SetDelay(FrameSpan amount)
+    {
+        TotalDelayFrames = amount;
+        CurrentDelayFrames = amount;
+    }
 
     public bool TryGetPlayer(NetcodePlayer handle, out PlayerInfo state)
     {

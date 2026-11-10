@@ -121,6 +121,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public SessionMode Mode => SessionMode.SyncTest;
     public FrameSpan FramesBehind => synchronizer.FramesBehind;
     public FrameSpan RollbackFrames => synchronizer.RollbackFrames;
+    public FrameSpan DelayFrames => FrameSpan.Zero;
     public int FixedFrameRate => options.FrameRate;
     public Endianness StateSerializationEndianness => endianness.Endianness;
     public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
