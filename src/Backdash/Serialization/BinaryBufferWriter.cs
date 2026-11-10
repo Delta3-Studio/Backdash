@@ -32,7 +32,8 @@ public readonly struct BinaryBufferWriter(
     /// <param name="buffer">Byte buffer to be written</param>
     /// <param name="endianness">Serialization endianness</param>
     public BinaryBufferWriter(ArrayBufferWriter<byte> buffer, Endianness endianness) : this(buffer,
-        EndiannessSerializer.Get(endianness)) { }
+        EndiannessSerializer.Get(endianness))
+    { }
 
     /// <inheritdoc cref="BinaryBufferWriter(System.Buffers.ArrayBufferWriter{byte},Backdash.Network.Endianness)"/>
     public BinaryBufferWriter(ArrayBufferWriter<byte> buffer) : this(buffer, Platform.Endianness) { }
