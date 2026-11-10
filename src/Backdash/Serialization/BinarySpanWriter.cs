@@ -1,3 +1,5 @@
+// ReSharper disable MemberCanBePrivate.Global
+
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Numerics;
@@ -606,7 +608,7 @@ public readonly ref struct BinarySpanWriter
 
     /// <summary>Writes an unmanaged struct span into buffer.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void WriteStruct<T>(in T[] values) where T : unmanaged => WriteStruct<T>(values.AsSpan());
+    public void WriteStruct<T>(in T[] values) where T : unmanaged => WriteStruct(values.AsSpan());
 
     /// <summary>Writes a <see cref="IBinaryInteger{T}" /> <paramref name="value" /> into buffer.</summary>
     /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
@@ -661,7 +663,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsByte((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsByte{T}(in T)" />
-    public void WriteAsByte<T>(in List<T> value) where T : unmanaged => WriteAsByte<T>(GetListSpan(in value));
+    public void WriteAsByte<T>(in List<T> value) where T : unmanaged => WriteAsByte(GetListSpan(in value));
 
     /// <summary>Reinterprets the <paramref name="value" /> as <see cref="sbyte" /> and writes it into buffer.</summary>
     public void WriteAsSByte<T>(in T value) where T : unmanaged =>
@@ -684,7 +686,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsSByte((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsSByte{T}(in T)" />
-    public void WriteAsSByte<T>(in List<T> value) where T : unmanaged => WriteAsSByte<T>(GetListSpan(in value));
+    public void WriteAsSByte<T>(in List<T> value) where T : unmanaged => WriteAsSByte(GetListSpan(in value));
 
     /// <summary>Reinterprets the <paramref name="value" /> as <see cref="short" /> and writes it into buffer.</summary>
     public void WriteAsInt16<T>(in T value) where T : unmanaged =>
@@ -707,7 +709,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsInt16((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsInt16{T}(in T)" />
-    public void WriteAsInt16<T>(in List<T> value) where T : unmanaged => WriteAsInt16<T>(GetListSpan(in value));
+    public void WriteAsInt16<T>(in List<T> value) where T : unmanaged => WriteAsInt16(GetListSpan(in value));
 
     /// <summary>Reinterprets the <paramref name="value" /> as <see cref="ushort" /> and writes it into buffer.</summary>
     public void WriteAsUInt16<T>(in T value) where T : unmanaged =>
@@ -730,7 +732,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsUInt16((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsUInt16{T}(in T)" />
-    public void WriteAsUInt16<T>(in List<T> value) where T : unmanaged => WriteAsUInt16<T>(GetListSpan(in value));
+    public void WriteAsUInt16<T>(in List<T> value) where T : unmanaged => WriteAsUInt16(GetListSpan(in value));
 
     /// <summary>Reinterprets the <paramref name="value" /> as <see cref="int" /> and writes it into buffer.</summary>
     public void WriteAsInt32<T>(in T value) where T : unmanaged =>
@@ -753,7 +755,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsInt32((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsInt32{T}(in T)" />
-    public void WriteAsInt32<T>(in List<T> value) where T : unmanaged => WriteAsInt32<T>(GetListSpan(in value));
+    public void WriteAsInt32<T>(in List<T> value) where T : unmanaged => WriteAsInt32(GetListSpan(in value));
 
     /// <summary>Reinterprets the <paramref name="value" /> as <see cref="uint" /> and writes it into buffer.</summary>
     public void WriteAsUInt32<T>(in T value) where T : unmanaged =>
@@ -776,7 +778,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsUInt32((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsUInt32{T}(in T)" />
-    public void WriteAsUInt32<T>(in List<T> value) where T : unmanaged => WriteAsUInt32<T>(GetListSpan(in value));
+    public void WriteAsUInt32<T>(in List<T> value) where T : unmanaged => WriteAsUInt32(GetListSpan(in value));
 
 
     /// <summary>Reinterprets the <paramref name="value" /> as <see cref="long" /> and writes it into buffer.</summary>
@@ -800,7 +802,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsInt64((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsInt64{T}(in T)" />
-    public void WriteAsInt64<T>(in List<T> value) where T : unmanaged => WriteAsInt64<T>(GetListSpan(in value));
+    public void WriteAsInt64<T>(in List<T> value) where T : unmanaged => WriteAsInt64(GetListSpan(in value));
 
     /// <summary>Reinterprets the <paramref name="value" /> as <see cref="ulong" /> and writes it into buffer.</summary>
     public void WriteAsUInt64<T>(in T value) where T : unmanaged =>
@@ -823,7 +825,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsUInt64((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsUInt64{T}(in T)" />
-    public void WriteAsUInt64<T>(in List<T> value) where T : unmanaged => WriteAsUInt64<T>(GetListSpan(in value));
+    public void WriteAsUInt64<T>(in List<T> value) where T : unmanaged => WriteAsUInt64(GetListSpan(in value));
 
     /// <summary>Reinterprets the <paramref name="value" /> as <see cref="Int128" /> and writes it into buffer.</summary>
     public void WriteAsInt128<T>(in T value) where T : unmanaged =>
@@ -846,7 +848,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsInt128((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsInt128{T}(in T)" />
-    public void WriteAsInt128<T>(in List<T> value) where T : unmanaged => WriteAsInt128<T>(GetListSpan(in value));
+    public void WriteAsInt128<T>(in List<T> value) where T : unmanaged => WriteAsInt128(GetListSpan(in value));
 
     /// <summary>Reinterprets the <paramref name="value" /> as <see cref="UInt128" /> and writes it into buffer.</summary>
     public void WriteAsUInt128<T>(in T value) where T : unmanaged =>
@@ -869,7 +871,7 @@ public readonly ref struct BinarySpanWriter
         WriteAsUInt128((ReadOnlySpan<T>)value);
 
     /// <inheritdoc cref="WriteAsUInt128{T}(in T)" />
-    public void WriteAsUInt128<T>(in List<T> value) where T : unmanaged => WriteAsUInt128<T>(GetListSpan(in value));
+    public void WriteAsUInt128<T>(in List<T> value) where T : unmanaged => WriteAsUInt128(GetListSpan(in value));
 
     #endregion
 }

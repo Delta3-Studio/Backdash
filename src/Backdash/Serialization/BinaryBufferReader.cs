@@ -783,15 +783,7 @@ public readonly ref struct BinaryBufferReader
     public void Read(in List<ushort> values) => Read(GetListSpan(in values));
 
     /// <summary>Reads a span of <see cref="char" /> from buffer into <paramref name="values" />.</summary>
-    public void Read(in Span<char> values)
-    {
-        ReadSpan(values);
-        if (numberSerializer.NeedsReverse)
-        {
-            var ushortSpan = MemoryMarshal.Cast<char, ushort>(values);
-            BinaryPrimitives.ReverseEndianness(ushortSpan, ushortSpan);
-        }
-    }
+    public void Read(in Span<char> values) => Read(MemoryMarshal.Cast<char, ushort>(values));
 
     /// <summary>Reads a list of <see cref="char" /> from buffer into <paramref name="values" />.</summary>
     public void Read(in List<char> values) => Read(GetListSpan(in values));

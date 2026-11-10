@@ -20,7 +20,7 @@ public static class EndiannessSerializer
         _ => throw new ArgumentOutOfRangeException(nameof(endianness), endianness, null),
     };
 
-    internal class BigEndian : INumberSerializer
+    internal sealed class BigEndian : INumberSerializer
     {
         public static readonly BigEndian Instance = new();
         const Endianness BaseEndianness = Endianness.BigEndian;
@@ -60,7 +60,7 @@ public static class EndiannessSerializer
         }
     }
 
-    internal class LittleEndian : INumberSerializer
+    internal sealed class LittleEndian : INumberSerializer
     {
         public static readonly LittleEndian Instance = new();
         const Endianness BaseEndianness = Endianness.LittleEndian;
