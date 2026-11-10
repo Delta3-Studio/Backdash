@@ -47,7 +47,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     readonly IStateStringParser stateParser;
     readonly IInputGenerator<TInput>? inputGenerator;
     readonly IDeterministicRandom<TInput> random;
-    readonly EndiannessSerializer.INumberSerializer endianness;
+    readonly IEndiannessSerializer endianness;
     readonly bool logStateOnDesync;
 
     INetcodeSessionHandler callbacks;
