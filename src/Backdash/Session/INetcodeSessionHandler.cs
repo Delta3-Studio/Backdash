@@ -49,7 +49,7 @@ public interface INetcodeSessionHandler
     /// <summary>
     ///     Notify the handler that the session requires fixed delay frames.
     /// </summary>
-    /// <seealso cref="NetcodeOptions.PingToDelayFrame"/>
+    /// <seealso cref="NetcodeOptions.DynamicInputDelayPing"/>
     /// <param name="amount">Delay frames to apply</param>
     void SetDelay(FrameSpan amount);
 

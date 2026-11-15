@@ -22,7 +22,7 @@ sealed class PeerClientFactory(
             LatencyWaiter.Create(
                 latencyStrategy,
                 options.Protocol.NetworkLatency,
-                options.Protocol.FixedNetworkLatency
+                options.Protocol.NetworkFixedLatency
             ),
             options.Protocol.UdpPacketBufferSize,
             options.Protocol.MaxPackageQueue,

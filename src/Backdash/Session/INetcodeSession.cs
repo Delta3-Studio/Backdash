@@ -147,7 +147,7 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     ///     Gets statistics and information about a player in <see cref="NetcodePlayer.NetworkStats"/>.
     ///     Returns <see langword="false" /> if the request player is not connected or synchronized.
     /// </summary>
-    /// <seealso cref="ProtocolOptions.CalculateRemotePlayerStats"/>
+    /// <seealso cref="ProtocolOptions.RemotePlayerStatsEnabled"/>
     /// <seealso cref="NetcodeSessionBuilder{TInput}.WithPlayerStats"/>
     bool UpdateNetworkStats(NetcodePlayer player);
 

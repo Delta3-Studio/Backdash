@@ -57,14 +57,7 @@ public sealed record ProtocolOptions
     public int MaxSyncRetries { get; set; } = 64;
 
     /// <summary>
-    ///     Base network packet sending latency for the current peer.
-    /// </summary>
-    /// <value>Defaults to <see cref="TimeSpan.Zero" /></value>
-    /// <seealso cref="NetworkLatency" />
-    public TimeSpan FixedNetworkLatency { get; set; }
-
-    /// <summary>
-    ///     Forced network packet sending latency for the current peer.
+    ///     Forced network packet sending dynamic latency for the current peer.
     ///     This value is processed using <see cref="LatencyStrategy" />.
     /// </summary>
     /// <value>Defaults to <see cref="TimeSpan.Zero" /></value>
@@ -73,12 +66,19 @@ public sealed record ProtocolOptions
 
     /// <summary>
     ///     Strategy for applying delay to sending packages, forcing latency.
-    ///     When <see cref="NetworkLatency" /> and <see cref="FixedNetworkLatency"/> are <see cref="TimeSpan.Zero" /> this is ignored.
+    ///     When <see cref="NetworkLatency" /> and <see cref="NetworkFixedLatency"/> are <see cref="TimeSpan.Zero" /> this is ignored.
     /// </summary>
     /// <value>Defaults to <see cref="LatencyStrategy.Gaussian" /></value>
     /// <seealso cref="NetworkLatency" />
     /// <seealso cref="LatencyStrategy" />
     public LatencyStrategy LatencyStrategy { get; set; } = LatencyStrategy.Gaussian;
+
+    /// <summary>
+    ///     Forced constant network latency for the current peer.
+    /// </summary>
+    /// <value>Defaults to <see cref="TimeSpan.Zero" /></value>
+    /// <seealso cref="NetworkLatency" />
+    public TimeSpan NetworkFixedLatency { get; set; }
 
     /// <summary>
     ///     The time to wait before the first <see cref="PeerEvent.ConnectionInterrupted" /> timeout will be sent.
@@ -163,7 +163,7 @@ public sealed record ProtocolOptions
     /// <seealso cref="NetcodePlayer.NetworkStats"/>
     /// <seealso cref="NetworkPackageStatsEnabled"/>
     /// <seealso cref="INetcodeSession.UpdateNetworkStats"/>
-    public bool CalculateRemotePlayerStats { get; set; } = true;
+    public bool RemotePlayerStatsEnabled { get; set; } = true;
 
     /// <summary>
     ///     When the time from the last sent input until now is greater than this, resends pending inputs.
@@ -239,7 +239,7 @@ public sealed record ProtocolOptions
         ThrowIf.NotPositive(SyncFirstRetryInterval);
         ThrowIf.Negative(ReceiveSocketAddressSize);
         ThrowIf.Negative(ConsistencyCheckDistance);
-        ThrowIf.Negative(FixedNetworkLatency);
+        ThrowIf.Negative(NetworkFixedLatency);
         ThrowIf.Negative(NetworkLatency);
         ThrowIf.Negative(DisconnectNotifyStart);
         ThrowIf.Negative(DisconnectTimeout);

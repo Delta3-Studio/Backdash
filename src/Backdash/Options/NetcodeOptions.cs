@@ -14,15 +14,15 @@ namespace Backdash.Options;
 public sealed record NetcodeOptions
 {
     /// <summary>
-    ///     Local Port for UDP connections
+    ///     Local Port for UDP connections.
     /// </summary>
     /// <seealso cref="UdpSocket" />
     /// <value>Defaults to <c>random port</c></value>
     public int LocalPort { get; set; }
 
     /// <summary>
-    ///     Session number of players
-    ///     Can't be greater than <see cref="Max.NumberOfPlayers" />
+    ///     Session number of players. <br/>
+    ///     Can't be greater than <see cref="Max.NumberOfPlayers" />.
     /// </summary>
     /// <value>Defaults to <c>2</c></value>
     public int NumberOfPlayers { get; set; } = 2;
@@ -121,17 +121,18 @@ public sealed record NetcodeOptions
     public bool SaveConfirmedInputHistory { get; set; }
 
     /// <summary>
-    ///     The ping amount that should be converted to a single frame delay (in milliseconds).
+    ///     Defines the amount of ping that should be converted to a single input delay frame (in milliseconds).<br/>
+    ///     Set to <c>0</c> to disable dynamic input delay.
     /// </summary>
     /// <value>Defaults to <c>100</c></value>
-    public float PingToDelayFrame { get; set; } = 100;
+    public float DynamicInputDelayPing { get; set; } = 100;
 
     /// <summary>
-    ///     Max allowed delay frames
+    ///     Max allowed dynamic input delay frames.
     /// </summary>
-    /// <seealso cref="PingToDelayFrame"/>
+    /// <seealso cref="DynamicInputDelayPing"/>
     /// <value>Defaults to <c>5</c></value>
-    public int MaxDelayFrames { get; set; } = 5;
+    public int MaxDynamicInputDelayFrames { get; set; } = 5;
 
     /// <summary>Time synchronization options.</summary>
     /// <seealso cref="TimeSyncOptions" />
@@ -147,7 +148,7 @@ public sealed record NetcodeOptions
 
     /// <summary>Run jobs in a separated thread.</summary>
     /// <value>Defaults to <c>true</c></value>
-    public bool UseBackgroundThread { get; set; } = true;
+    public bool UseBackgroundThreads { get; set; } = true;
 
     /// <summary>Smooth factor for the session rollback frames counter, clamped to the inclusive range from 0 to 1.</summary>
     /// <seealso cref="INetcodeSessionInfo.RollbackFrames"/>
@@ -155,8 +156,8 @@ public sealed record NetcodeOptions
     public float RollbackFramesSmoothFactor { get; set; } = 0.2f;
 
     /// <summary>
-    ///     Custom metadata
-    ///     Useful for <see cref="INetcodePlugin"/> implementations
+    ///     Custom metadata. <br/>
+    ///     Useful for <see cref="INetcodePlugin"/> implementations.
     /// </summary>
     public Dictionary<string, object> Meta { get; } = [];
 
@@ -177,7 +178,7 @@ public sealed record NetcodeOptions
         ThrowIf.Negative(SaveStateCount);
         ThrowIf.NotPositive(StateSizeHint);
         ThrowIf.NotPositive(FrameRate);
-        ThrowIf.Negative(MaxDelayFrames);
+        ThrowIf.Negative(MaxDynamicInputDelayFrames);
 
         RollbackFramesSmoothFactor = Math.Clamp(RollbackFramesSmoothFactor, 0f, 1f);
 

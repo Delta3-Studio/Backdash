@@ -253,7 +253,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         plugins.OnStart(this);
         inputListener?.OnSessionStart(inputContext);
-        backgroundJobTask = jobManager.Start(options.UseBackgroundThread, stoppingToken);
+        backgroundJobTask = jobManager.Start(options.UseBackgroundThreads, stoppingToken);
     }
 
     public async ValueTask WaitUntilFinish(CancellationToken stoppingToken = default)
@@ -662,11 +662,11 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             synchronizer.SetLastConfirmedFrame(minConfirmedFrame);
         }
 
-        if (options.PingToDelayFrame > 0)
+        if (options.DynamicInputDelayPing > 0)
         {
             if (maxPing > 0)
             {
-                var newDelay = (FrameSpan)Math.Min((int)(maxPing / options.PingToDelayFrame), options.MaxDelayFrames);
+                var newDelay = (FrameSpan)Math.Min((int)(maxPing / options.DynamicInputDelayPing), options.MaxDynamicInputDelayFrames);
                 if (newDelay != currentDelayFrames)
                     SetDelay(newDelay);
             }

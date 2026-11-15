@@ -229,7 +229,7 @@ sealed class SpectatorSession<TInput> :
     public void Start(CancellationToken stoppingToken = default)
     {
         plugins.OnStart(this);
-        backgroundJobTask = jobManager.Start(options.UseBackgroundThread, stoppingToken);
+        backgroundJobTask = jobManager.Start(options.UseBackgroundThreads, stoppingToken);
         logger.Write(LogLevel.Information, $"Spectating started on host {hostEndpoint}");
     }
 

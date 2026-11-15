@@ -15,7 +15,7 @@ var session = CreateNetcodeSession(gameArgs);
 // Create the actual game logic / netcode handler
 Game game = new(session, cts);
 
-// set the session callbacks (like save state, load state, network events, etc..)
+// set the session callbacks (like save state, load state, network events, etc...)
 session.SetHandler(game);
 
 // start background worker, like network IO, async messaging
@@ -53,13 +53,8 @@ static INetcodeSession<GameInput> CreateNetcodeSession(Args args)
         .WithLogLevel(LogLevel.Information)
         .UsePlugin<PluginSample>()
         .WithPackageStats()
-        .ConfigureProtocol(options =>
-        {
-            options.NumberOfSyncRoundTrips = 10;
-            // p.NetworkLatency = TimeSpan.FromMilliseconds(300);
-            // p.DelayStrategy = Backdash.Network.DelayStrategy.Constant;
-            // options.DisconnectTimeoutEnabled = false;
-        });
+        // .WithNetworkLatency(TimeSpan.FromMilliseconds(100), Backdash.Network.LatencyStrategy.Constant)
+        .WithDisconnectTimeout(false);
 
 // parse console arguments checking if it is a spectator
     if (args.IsForSpectate(out var hostEndpoint))

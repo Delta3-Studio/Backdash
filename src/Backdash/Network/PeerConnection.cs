@@ -118,7 +118,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
                 break;
             case ProtocolStatus.Running:
                 CheckDisconnection();
-                if (options.CalculateRemotePlayerStats)
+                if (options.RemotePlayerStatsEnabled)
                     GetNetworkStats(ref state.Player.NetworkStats);
                 break;
             case ProtocolStatus.Disconnected:
