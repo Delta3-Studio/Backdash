@@ -117,22 +117,29 @@ public sealed record NetcodeOptions
     /// <summary>
     ///     If true, a <see cref="SessionMode.Remote"/> session will keep all the confirmed inputs in-memory
     /// </summary>
-    /// <value>Defaults to <c>false</c></value>
+    /// <value>Defaults to <see langword="false" /></value>
     public bool SaveConfirmedInputHistory { get; set; }
 
     /// <summary>
+    ///     Enable or disable the ping-based input frame delay.
+    /// </summary>
+    /// <value>Defaults to <see langword="true" /></value>
+    /// <seealso cref="DynamicFrameDelayPing"/>
+    /// <seealso cref="MaxDynamicFrameDelay"/>
+    public bool DynamicFrameDelayEnabled { get; set; } = true;
+
+    /// <summary>
     ///     Defines the amount of ping that should be converted to a single input delay frame (in milliseconds).<br/>
-    ///     Set to <c>0</c> to disable dynamic input delay.
     /// </summary>
     /// <value>Defaults to <c>100</c></value>
-    public float DynamicInputDelayPing { get; set; } = 100;
+    public float DynamicFrameDelayPing { get; set; } = 100;
 
     /// <summary>
     ///     Max allowed dynamic input delay frames.
     /// </summary>
-    /// <seealso cref="DynamicInputDelayPing"/>
+    /// <seealso cref="DynamicFrameDelayPing"/>
     /// <value>Defaults to <c>5</c></value>
-    public int MaxDynamicInputDelayFrames { get; set; } = 5;
+    public int MaxDynamicFrameDelay { get; set; } = 5;
 
     /// <summary>Time synchronization options.</summary>
     /// <seealso cref="TimeSyncOptions" />
@@ -178,7 +185,11 @@ public sealed record NetcodeOptions
         ThrowIf.Negative(SaveStateCount);
         ThrowIf.NotPositive(StateSizeHint);
         ThrowIf.NotPositive(FrameRate);
-        ThrowIf.Negative(MaxDynamicInputDelayFrames);
+        ThrowIf.Negative(MaxDynamicFrameDelay);
+        ThrowIf.Negative(DynamicFrameDelayPing);
+
+        if (MaxDynamicFrameDelay is 0 || DynamicFrameDelayPing is 0)
+            DynamicFrameDelayEnabled = false;
 
         RollbackFramesSmoothFactor = Math.Clamp(RollbackFramesSmoothFactor, 0f, 1f);
 

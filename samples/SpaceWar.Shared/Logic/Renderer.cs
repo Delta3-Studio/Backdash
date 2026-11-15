@@ -259,7 +259,7 @@ public sealed class Renderer(
         statsString.Clear();
         statsString.Append(CultureInfo.InvariantCulture, $"ping: {maxPing.TotalMilliseconds:f2}ms  ");
         statsString.Append($"rollback: {ngs.RollbackFrames.Frames}  ");
-        statsString.Append($"delay: {ngs.TotalDelayFrames.Frames}");
+        statsString.Append($"delay: {ngs.FrameDelay.Frames}");
         var statsSize = gameAssets.MainFont.MeasureString(statsString) * statsScale;
         Vector2 statsPos = new(
             (gs.Bounds.Width - statsSize.X) / 2,

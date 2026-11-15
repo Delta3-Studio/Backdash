@@ -279,21 +279,21 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         return this;
     }
 
-    /// <inheritdoc cref="NetcodeOptions.DynamicInputDelayPing" />
+    /// <inheritdoc cref="NetcodeOptions.DynamicFrameDelayPing" />
     /// <seealso cref="NetcodeOptions"/>
-    /// <seealso cref="NetcodeOptions.DynamicInputDelayPing"/>
-    public NetcodeSessionBuilder<TInput> WithPingToDelayFrame(float milliseconds)
+    /// <seealso cref="NetcodeOptions.DynamicFrameDelayPing"/>
+    public NetcodeSessionBuilder<TInput> WithDynamicFrameDelayPing(float milliseconds)
     {
-        options.DynamicInputDelayPing = milliseconds;
+        options.DynamicFrameDelayPing = milliseconds;
         return this;
     }
 
-    /// <inheritdoc cref="NetcodeOptions.MaxDynamicInputDelayFrames" />
+    /// <inheritdoc cref="NetcodeOptions.MaxDynamicFrameDelay" />
     /// <seealso cref="NetcodeOptions"/>
-    /// <seealso cref="NetcodeOptions.MaxDynamicInputDelayFrames"/>
-    public NetcodeSessionBuilder<TInput> WithMaxDynamicDelayFrames(int frames)
+    /// <seealso cref="NetcodeOptions.MaxDynamicFrameDelay"/>
+    public NetcodeSessionBuilder<TInput> WithMaxDynamicFrameDelay(int frames)
     {
-        options.MaxDynamicInputDelayFrames = frames;
+        options.MaxDynamicFrameDelay = frames;
         return this;
     }
 
@@ -429,6 +429,19 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
             if (enabled.HasValue)
                 o.DisconnectTimeoutEnabled = enabled.Value;
         });
+
+
+    /// <inheritdoc cref="ProtocolOptions.DisconnectNotifyStart" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.DisconnectNotifyStart"/>
+    public NetcodeSessionBuilder<TInput> WithDisconnectNotifyStart(TimeSpan duration) =>
+        ConfigureProtocol(o => o.DisconnectNotifyStart = duration);
+
+    /// <inheritdoc cref="ProtocolOptions.NetworkPackageStatsEnabled" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.NetworkPackageStatsEnabled"/>
+    public NetcodeSessionBuilder<TInput> WithNetworkPackageStats(bool enabled = true) =>
+        ConfigureProtocol(o => o.NetworkPackageStatsEnabled = enabled);
 
     /// <inheritdoc cref="ProtocolOptions.NumberOfSyncRoundTrips" />
     /// <seealso cref="ProtocolOptions"/>

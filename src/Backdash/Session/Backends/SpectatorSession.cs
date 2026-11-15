@@ -153,7 +153,7 @@ sealed class SpectatorSession<TInput> :
     public int FixedFrameRate => options.FrameRate;
     public Frame CurrentFrame { get; private set; } = Frame.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
-    public FrameSpan DelayFrames => FrameSpan.Zero;
+    public FrameSpan DynamicFrameDelay => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public bool IsInRollback => false;
     public SavedState GetSavedState() => stateStore.Last();
@@ -163,6 +163,7 @@ sealed class SpectatorSession<TInput> :
     public int NumberOfPlayers { get; private set; }
     public int NumberOfSpectators => 0;
     public int LocalPort => udp.BindPort;
+    public double MaxPing => host.Ping;
     public Endianness StateSerializationEndianness => endianness.Endianness;
     public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;
@@ -224,7 +225,6 @@ sealed class SpectatorSession<TInput> :
 
     public void SetFrameDelay(NetcodePlayer player, int delayInFrames) { }
     public void SetFrameDelay(int delayInFrames) { }
-    public int GetFrameDelay(NetcodePlayer player) => 0;
 
     public void Start(CancellationToken stoppingToken = default)
     {

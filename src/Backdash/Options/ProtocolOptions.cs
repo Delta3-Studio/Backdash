@@ -95,8 +95,8 @@ public sealed record ProtocolOptions
 
     /// <summary>
     ///     Enable or disable the disconnect timeout check
-    ///     <seealso cref="DisconnectTimeout"/>
     /// </summary>
+    /// <seealso cref="DisconnectTimeout"/>
     /// <value>Defaults to <c>true</c></value>
     public bool DisconnectTimeoutEnabled { get; set; } = true;
 
@@ -150,7 +150,7 @@ public sealed record ProtocolOptions
     /// <seealso cref="PeerNetworkStats.PackagesInfo"/>
     /// <seealso cref="PeerNetworkStats.Send"/>
     /// <seealso cref="PeerNetworkStats.Received"/>
-    /// <value>Defaults to <see lanword="true" /></value>
+    /// <value>Defaults to <see langword="false" /></value>
     public bool NetworkPackageStatsEnabled { get; set; }
 
     internal bool IsNetworkPackageStatsEnabled() =>
@@ -159,7 +159,7 @@ public sealed record ProtocolOptions
     /// <summary>
     ///     When true, the session will calculate the remote player stats on each frame.
     /// </summary>
-    /// <value>Defaults to <see lanword="true" /></value>
+    /// <value>Defaults to <see langword="true" /></value>
     /// <seealso cref="NetcodePlayer.NetworkStats"/>
     /// <seealso cref="NetworkPackageStatsEnabled"/>
     /// <seealso cref="INetcodeSession.UpdateNetworkStats"/>

@@ -22,9 +22,6 @@ public sealed class GameSession(
             return;
         }
 
-        if (nonGameState.CheckDelay())
-            return;
-
         var keyboard = Keyboard.GetState();
         HandleNoGameInput(keyboard);
         var localInput = Inputs.ReadInputs(keyboard);
@@ -117,15 +114,10 @@ public sealed class GameSession(
         nonGameState.SleepTime = framesAhead.Duration();
     }
 
-    public void SetDelay(FrameSpan amount)
-    {
-        Log($"=> FRAME DELAY REQUESTED {amount.Frames}");
-        nonGameState.SetDelay(amount);
-    }
-
     void UpdateStats()
     {
         nonGameState.RollbackFrames = session.RollbackFrames;
+        nonGameState.FrameDelay = session.DynamicFrameDelay;
         var saved = session.GetSavedState();
         nonGameState.StateChecksum = saved.Checksum;
         nonGameState.StateSize = saved.Size;

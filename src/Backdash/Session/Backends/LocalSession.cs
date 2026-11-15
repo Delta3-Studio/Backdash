@@ -94,8 +94,9 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
 
     public int NumberOfPlayers => Math.Max(addedPlayers.Count, 1);
     public int NumberOfSpectators => 0;
-    public int FixedFrameRate => options.FrameRate;
     public int LocalPort => 0;
+    public double MaxPing => 0.0;
+    public int FixedFrameRate => options.FrameRate;
     public Endianness StateSerializationEndianness => endianness.Endianness;
     public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public INetcodeRandom Random => random;
@@ -107,7 +108,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public SessionMode Mode => SessionMode.Local;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
-    public FrameSpan DelayFrames => FrameSpan.Zero;
+    public FrameSpan DynamicFrameDelay => FrameSpan.Zero;
     public bool IsInRollback => false;
     public SavedState GetSavedState() => stateStore.Last();
     public SavedState? GetSavedState(Frame frame) => stateStore.Get(frame);
@@ -342,22 +343,17 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
 
     public void SetFrameDelay(NetcodePlayer player, int delayInFrames)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(delayInFrames);
         ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         if (!player.IsLocal()) return;
+        delayInFrames = Math.Max(delayInFrames, 0);
         inputQueues[player.Index].LocalFrameDelay = delayInFrames;
+        player.InputDelay = player.InputFixedDelay = new(delayInFrames);
     }
 
     public void SetFrameDelay(int delayInFrames)
     {
         foreach (var player in addedPlayers)
             SetFrameDelay(player, delayInFrames);
-    }
-
-    public int GetFrameDelay(NetcodePlayer player)
-    {
-        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
-        return inputQueues[player.Index].LocalFrameDelay;
     }
 
     [MemberNotNull(nameof(callbacks))]

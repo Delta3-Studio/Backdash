@@ -52,7 +52,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
     bool isSynchronizing = true;
     int nextSyncInterval;
-    FrameSpan currentDelayFrames;
+    FrameSpan currentDynamicFrameDelay;
     Frame nextSpectatorFrame = Frame.Zero;
     Frame nextListenerFrame = Frame.Zero;
     INetcodeSessionHandler callbacks;
@@ -66,6 +66,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     bool closed;
 
     public int FixedFrameRate { get; }
+    public double MaxPing { get; private set; }
 
     public RemoteSession(
         NetcodeOptions options,
@@ -204,7 +205,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     public Frame CurrentFrame => synchronizer.CurrentFrame;
     public FrameSpan FramesBehind => synchronizer.FramesBehind;
     public FrameSpan RollbackFrames => synchronizer.RollbackFrames;
-    public FrameSpan DelayFrames => currentDelayFrames;
+    public FrameSpan DynamicFrameDelay => currentDynamicFrameDelay;
     public bool IsInRollback => synchronizer.InRollback;
     public SavedState GetSavedState() => synchronizer.Store.Last();
     public SavedState? GetSavedState(Frame frame) => synchronizer.Store.Get(frame);
@@ -460,23 +461,24 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         synchronizer.Callbacks = handler;
     }
 
+    void SetDynamicFrameDelay(FrameSpan amount)
+    {
+        currentDynamicFrameDelay = amount;
+        foreach (var player in addedPlayers)
+            synchronizer.SetDynamicFrameDelay(player, currentDynamicFrameDelay.Frames);
+    }
+
     public void SetFrameDelay(NetcodePlayer player, int delayInFrames)
     {
         ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         ArgumentOutOfRangeException.ThrowIfNegative(delayInFrames);
-        synchronizer.SetFrameDelay(player, delayInFrames);
+        synchronizer.SetFixedFrameDelay(player, delayInFrames);
     }
 
     public void SetFrameDelay(int delayInFrames)
     {
         foreach (var player in addedPlayers)
             SetFrameDelay(player, delayInFrames);
-    }
-
-    public int GetFrameDelay(NetcodePlayer player)
-    {
-        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
-        return synchronizer.GetFrameDelay(player);
     }
 
     public bool LoadFrame(Frame frame)
@@ -640,13 +642,13 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         // notify all of our endpoints of their local frame number for their next connection quality report
         int i;
-        var maxPing = 0.0;
+        MaxPing = 0.0;
         var currentFrame = synchronizer.CurrentFrame;
         for (i = 0; i < eps.Length; i++)
         {
             if (eps[i] is not { } endpoint) continue;
             endpoint.SetLocalFrameNumber(currentFrame, FixedFrameRate);
-            maxPing = Math.Max(maxPing, endpoint.Player.NetworkStats.Ping.TotalMilliseconds);
+            MaxPing = Math.Max(MaxPing, endpoint.Ping);
         }
 
         var minConfirmedFrame = getMinFramePlayers();
@@ -662,16 +664,17 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             synchronizer.SetLastConfirmedFrame(minConfirmedFrame);
         }
 
-        if (options.DynamicInputDelayPing > 0)
+        if (options.DynamicFrameDelayEnabled)
         {
-            if (maxPing > 0)
+            if (MaxPing > 0)
             {
-                var newDelay = (FrameSpan)Math.Min((int)(maxPing / options.DynamicInputDelayPing), options.MaxDynamicInputDelayFrames);
-                if (newDelay != currentDelayFrames)
-                    SetDelay(newDelay);
+                var newDelay = (FrameSpan)Math.Min((int)(MaxPing / options.DynamicFrameDelayPing),
+                    options.MaxDynamicFrameDelay);
+                if (newDelay != currentDynamicFrameDelay)
+                    SetDynamicFrameDelay(newDelay);
             }
-            else if (currentDelayFrames.IsPositive)
-                SetDelay(FrameSpan.Zero);
+            else if (currentDynamicFrameDelay.IsPositive)
+                SetDynamicFrameDelay(FrameSpan.Zero);
         }
 
         // send time sync notifications if now is the proper time
@@ -686,12 +689,6 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         if (interval <= 0) return;
         callbacks.TimeSync(new(interval));
         nextSyncInterval = currentFrame.Number + options.SynchronizationInterval;
-    }
-
-    void SetDelay(FrameSpan amount)
-    {
-        currentDelayFrames = amount;
-        callbacks.SetDelay(currentDelayFrames);
     }
 
     void SyncListeners(Frame minConfirmedFrame)

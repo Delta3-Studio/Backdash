@@ -1,5 +1,4 @@
 using Backdash.Core;
-using Backdash.Options;
 using Backdash.Serialization;
 using Backdash.Synchronizing.State;
 
@@ -45,13 +44,6 @@ public interface INetcodeSessionHandler
     ///     Backdash that you're finished.
     /// </summary>
     void AdvanceFrame();
-
-    /// <summary>
-    ///     Notify the handler that the session requires fixed delay frames.
-    /// </summary>
-    /// <seealso cref="NetcodeOptions.DynamicInputDelayPing"/>
-    /// <param name="amount">Delay frames to apply</param>
-    void SetDelay(FrameSpan amount);
 
     /// <summary>
     ///     The time synchronization has determined that this client is too far ahead of the other one
@@ -111,10 +103,6 @@ sealed class EmptySessionHandler(Logger logger) : INetcodeSessionHandler
 
     public void AdvanceFrame() =>
         logger.Write(LogLevel.Information, $"{DateTime.UtcNow:o} [Session Handler] {nameof(AdvanceFrame)} called");
-
-    public void SetDelay(FrameSpan amount) =>
-        logger.Write(LogLevel.Information,
-            $"{DateTime.UtcNow:o} [Session Handler] Set Delay: {amount.Frames} frames.");
 
     public void TimeSync(FrameSpan framesAhead) =>
         logger.Write(LogLevel.Information,
