@@ -24,7 +24,12 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     Frame currentFrame = Frame.Zero;
     Frame lastConfirmedFrame = Frame.Zero;
     bool reachedPredictionBarrier;
-    int NumberOfPlayers => players.Count;
+
+    int NumberOfPlayers
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => players.Count;
+    }
 
     public Synchronizer(
         NetcodeOptions options,
