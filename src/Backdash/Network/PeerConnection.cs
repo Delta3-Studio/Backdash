@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Timers;
 using Backdash.Core;
 using Backdash.Data;
@@ -118,7 +119,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
                 break;
             case ProtocolStatus.Running:
                 CheckDisconnection();
-                if (options.CalculateRemotePlayerStats)
+                if (options.RemotePlayerStatsEnabled)
                     GetNetworkStats(ref state.Player.NetworkStats);
                 break;
             case ProtocolStatus.Disconnected:
@@ -132,8 +133,14 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     public NetcodePlayer Player => state.Player;
     public PeerAddress Address => state.PeerAddress;
 
+    public double Ping
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => state.Stats.RoundTripTime.TotalMilliseconds;
+    }
+
     // require idle input should be a configuration parameter
-    public int GetRecommendFrameDelay() => timeSync.RecommendFrameWaitDuration();
+    public int GetRecommendWaitFrames() => timeSync.RecommendFrameWaitDuration();
 
     public void SetLocalFrameNumber(Frame localFrame, int fps)
     {
@@ -142,7 +149,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
          * last frame they gave us plus some delta for the one-way packet
          * trip time.
          */
-        var deltaFrame = FrameSpan.FromMilliseconds(state.Stats.RoundTripTime.TotalMilliseconds, fps);
+        var deltaFrame = FrameSpan.FromMilliseconds(Ping, fps);
         var remoteFrame = inbox.LastReceivedInput.Frame + deltaFrame;
         /*
          * Our frame advantage is how many frames *behind* the other guy

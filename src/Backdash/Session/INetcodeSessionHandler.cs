@@ -106,7 +106,7 @@ sealed class EmptySessionHandler(Logger logger) : INetcodeSessionHandler
 
     public void TimeSync(FrameSpan framesAhead) =>
         logger.Write(LogLevel.Information,
-            $"{DateTime.UtcNow:o} [Session Handler] Need to sync: {framesAhead} frames ahead");
+            $"{DateTime.UtcNow:o} [Session Handler] Need to sync: {framesAhead.Frames} frames ahead");
 
     public void OnPeerEvent(NetcodePlayer player, in PeerEventInfo evt) =>
         logger.Write(LogLevel.Information,

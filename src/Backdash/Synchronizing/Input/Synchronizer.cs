@@ -20,11 +20,17 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     readonly ConnectionsState localConnections;
     readonly EqualityComparer<TInput> inputComparer;
     readonly List<InputQueue<TInput>> inputQueues;
+    readonly List<GameInput<TInput>> lastLocalInputPadding;
     public required INetcodeSessionHandler Callbacks { get; internal set; }
     Frame currentFrame = Frame.Zero;
     Frame lastConfirmedFrame = Frame.Zero;
     bool reachedPredictionBarrier;
-    int NumberOfPlayers => players.Count;
+
+    int NumberOfPlayers
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => players.Count;
+    }
 
     public Synchronizer(
         NetcodeOptions options,
@@ -44,8 +50,9 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         this.localConnections = localConnections;
         this.inputComparer = inputComparer ?? EqualityComparer<TInput>.Default;
         this.checksumStore = checksumStore;
-        Store = stateStore;
+        lastLocalInputPadding = new(options.InputQueueLength / 2);
         inputQueues = new(2);
+        Store = stateStore;
         NumberSerializer = options.GetEndiannessStateSerializer();
         var saveBufferSize = options.TotalSavedFramesAllowed;
         stateStore.Initialize(saveBufferSize);
@@ -60,13 +67,20 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     public Endianness SerializationEndianness => NumberSerializer.Endianness;
     public FrameSpan FramesBehind => new(currentFrame.Number - lastConfirmedFrame.Number);
     public FrameSpan RollbackFrames => new((int)Math.Round(rollbackFrameCounter));
+    public ReadOnlySpan<GameInput<TInput>> LastLocalInputPadding => lastLocalInputPadding.AsSpan();
 
-    public void AddQueue(NetcodePlayer player) => inputQueues.Add(
-        new(player.Index, options.InputQueueLength, logger, inputComparer)
-        {
-            LocalFrameDelay = player.IsLocal() ? Math.Max(options.InputDelayFrames, 0) : 0,
-        }
-    );
+    public void AddQueue(NetcodePlayer player)
+    {
+        player.InputDelay = player.InputFixedDelay =
+            (FrameSpan)(player.IsLocal() ? Math.Max(options.InputDelayFrames, 0) : 0);
+
+        inputQueues.Add(
+            new(player.Index, options.InputQueueLength, logger, inputComparer)
+            {
+                LocalFrameDelay = player.InputFixedDelay.Frames,
+            }
+        );
+    }
 
     public void SetLastConfirmedFrame(Frame frame)
     {
@@ -85,10 +99,10 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         }
     }
 
-    void AddInput(NetcodePlayer queue, ref GameInput<TInput> input) =>
-        inputQueues[queue.Index].AddInput(ref input);
+    void AddInput(NetcodePlayer player, ref GameInput<TInput> input, List<GameInput<TInput>>? paddingInputs = null) =>
+        inputQueues[player.Index].AddInput(ref input, paddingInputs);
 
-    public bool AddLocalInput(NetcodePlayer queue, ref GameInput<TInput> input)
+    public bool AddLocalInput(NetcodePlayer player, ref GameInput<TInput> input)
     {
         if (currentFrame.Number >= options.PredictionFrames && FramesBehind.Frames >= options.PredictionFrames)
         {
@@ -103,10 +117,11 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         if (currentFrame.Number is 0)
             SaveCurrentFrame();
 
-        logger.Write(LogLevel.Trace, $"Sending non-delayed local frame {currentFrame.Number} to queue {queue}");
+        logger.Write(LogLevel.Trace, $"Sending non-delayed local frame {currentFrame.Number} to player {player}");
 
         input.Frame = currentFrame;
-        AddInput(queue, ref input);
+        lastLocalInputPadding.Clear();
+        AddInput(player, ref input, lastLocalInputPadding);
         return true;
     }
 
@@ -131,8 +146,9 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
     public bool GetConfirmedInput(Frame frame, int playerNumber, ref GameInput<TInput> confirmed)
     {
-        if (localConnections[playerNumber].Disconnected && frame > localConnections[playerNumber].LastFrame)
+        if (localConnections[playerNumber].IsDisconnected(frame))
             return false;
+
         confirmed.Frame = frame;
         return inputQueues[playerNumber].GetConfirmedInput(in frame, ref confirmed);
     }
@@ -147,7 +163,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
         for (var i = 0; i < NumberOfPlayers; i++)
         {
-            if (connections[i].Disconnected && currentFrame > connections[i].LastFrame)
+            if (connections[i].IsDisconnected(currentFrame))
             {
                 syncOutput[i] = new(default, true);
                 output[i] = default;
@@ -174,8 +190,10 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     }
 
     public void UpdateRollbackFrameCounter() =>
-        rollbackFrameCounter = ((1f - options.RollbackFramesSmoothFactor) * rollbackFrameCounter) +
-                               (options.RollbackFramesSmoothFactor * FramesBehind.Frames);
+        rollbackFrameCounter = Math.Max(0,
+            ((1f - options.RollbackFramesSmoothFactor) * rollbackFrameCounter) +
+            (options.RollbackFramesSmoothFactor * FramesBehind.Frames)
+        );
 
     public void AdjustSimulation(Frame seekTo)
     {
@@ -286,14 +304,29 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         return false;
     }
 
-    public void SetFrameDelay(NetcodePlayer player, int delay)
+    void SetInputDelayFrames(NetcodePlayer player, int delay)
     {
-        if (player.IsLocal())
-            inputQueues[player.Index].LocalFrameDelay = Math.Max(delay, 0);
+        inputQueues[player.Index].LocalFrameDelay = delay;
+        player.InputDelay = new(delay);
     }
 
-    public int GetFrameDelay(NetcodePlayer player) =>
-        inputQueues[player.Index].LocalFrameDelay;
+    public void SetFixedFrameDelay(NetcodePlayer player, int delay)
+    {
+        if (!player.IsLocal()) return;
+        delay = Math.Max(delay, 0);
+        var total = delay + player.InputDynamicDelay.Frames;
+        SetInputDelayFrames(player, total);
+        player.InputFixedDelay = new(delay);
+    }
+
+    public void SetDynamicFrameDelay(NetcodePlayer player, int delay)
+    {
+        if (!player.IsLocal()) return;
+        delay = Math.Max(delay, 0);
+        var total = delay + player.InputFixedDelay.Frames;
+        SetInputDelayFrames(player, total);
+        player.InputDynamicDelay = new(delay);
+    }
 
     void ResetPrediction(Frame frameNumber)
     {

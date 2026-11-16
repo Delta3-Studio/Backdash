@@ -7,7 +7,7 @@ namespace ConsoleGame;
 
 public sealed class Game : INetcodeSessionHandler
 {
-    // Rollback Net-code session callbacks
+    // Rollback Netcode session callbacks
     readonly INetcodeSession<GameInput> session;
 
     readonly CancellationTokenSource cancellation;

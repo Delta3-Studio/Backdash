@@ -196,14 +196,14 @@ sealed class InputQueue<TInput> where TInput : unmanaged
         return false;
     }
 
-    public void AddInput(ref GameInput<TInput> input)
+    public void AddInput(ref GameInput<TInput> input, List<GameInput<TInput>>? generatedPaddingInputs = null)
     {
         logger.Write(LogLevel.Trace, $"Queue {QueueId} => adding input frame number {input.Frame.Number} to queue.");
         // These next two lines simply verify that the user passes in inputs sequentially, regardless of frame delay.
         ThrowIf.Assert(lastUserAddedFrame.IsNull || input.Frame.Number == lastUserAddedFrame.Next().Number);
         lastUserAddedFrame = input.Frame;
         // Move the queue head to the correct point in preparation to input the frame into the queue.
-        var newFrame = AdvanceQueueHead(input.Frame);
+        var newFrame = AdvanceQueueHead(input.Frame, generatedPaddingInputs);
         if (!newFrame.IsNull)
             AddDelayedInputToQueue(input, in newFrame);
         // Update the frame number for the input.  This will also set the frame to GameInput.NullFrame for frames that get dropped (by design).
@@ -246,7 +246,7 @@ sealed class InputQueue<TInput> where TInput : unmanaged
             prediction.IncrementFrame();
     }
 
-    Frame AdvanceQueueHead(Frame frame)
+    Frame AdvanceQueueHead(Frame frame, List<GameInput<TInput>>? generatedPaddingInputs)
     {
         logger.Write(LogLevel.Trace, $"advancing queue head to frame {frame.Number}.");
         var expectedFrame = firstFrame ? Frame.Zero : LastInput.Frame.Next();
@@ -260,15 +260,22 @@ sealed class InputQueue<TInput> where TInput : unmanaged
             return Frame.Null;
         }
 
-        while (expectedFrame < frame)
+        if (expectedFrame < frame)
         {
             // This can occur when the frame delay has been increased since the last time we shoved a frame into the system.
             // We need to replicate the last frame in the queue several times to fill the space left.
-            logger.Write(LogLevel.Information,
-                $"Queue {QueueId} => Adding padding frame {expectedFrame.Number} to account for change in frame delay");
+            while (expectedFrame < frame)
+            {
+                logger.Write(LogLevel.Information,
+                    $"Queue {QueueId} => Adding padding frame {expectedFrame.Number} to account for change in frame delay");
 
-            AddDelayedInputToQueue(LastInput, in expectedFrame);
-            expectedFrame++;
+                var paddingInput = LastInput;
+                paddingInput.Frame = expectedFrame;
+
+                AddDelayedInputToQueue(paddingInput, in expectedFrame);
+                generatedPaddingInputs?.Add(paddingInput);
+                expectedFrame++;
+            }
         }
 
         ThrowIf.Assert(frame == 0 || frame == LastInput.Frame.Next());
