@@ -40,7 +40,7 @@ public sealed class Measurer : IAsyncDisposable
         watch.Start();
     }
 
-    readonly object lockObj = new();
+    readonly Lock lockObj = new();
 
     public void Snapshot()
     {
