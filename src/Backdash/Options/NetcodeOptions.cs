@@ -102,9 +102,10 @@ public sealed record NetcodeOptions
     public bool UseIPv6 { get; set; }
 
     /// <summary>
-    ///     Base frame rate used to estimate fairness (frame advantage) over peers.
-    ///     <inheritdoc cref="FrameTime.DefaultFrameRate" />
+    ///     Target frame rate for the session. <br />
+    ///     Used to estimate fairness (frame advantage) over peers.
     /// </summary>
+    /// <value>Defaults to <see cref="FrameTime.DefaultFrameRate" /></value>
     /// <seealso cref="FrameTime"/>
     public int FrameRate { get; set; } = FrameTime.DefaultFrameRate;
 

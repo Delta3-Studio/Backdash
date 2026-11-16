@@ -231,7 +231,6 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(fps);
         options.FrameRate = fps;
-
         return this;
     }
 

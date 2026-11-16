@@ -96,7 +96,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public int NumberOfSpectators => 0;
     public int LocalPort => 0;
     public double MaxPing => 0.0;
-    public int FixedFrameRate => options.FrameRate;
+    public int TargetFrameRate => options.FrameRate;
     public Endianness StateSerializationEndianness => endianness.Endianness;
     public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public INetcodeRandom Random => random;

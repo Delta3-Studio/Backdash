@@ -30,7 +30,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     readonly IDeterministicRandom<TInput> random;
     readonly IEndiannessSerializer endianness;
 
-    public int FixedFrameRate { get; }
+    public int TargetFrameRate { get; }
     public SessionReplayControl ReplayController { get; }
 
     public ReplaySession(
@@ -49,7 +49,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         checksumProvider = services.ChecksumProvider;
         random = services.DeterministicRandom;
         NumberOfPlayers = options.NumberOfPlayers;
-        FixedFrameRate = options.FrameRate;
+        TargetFrameRate = options.FrameRate;
         InputSerializationEndianness = options.Protocol.SerializationEndianness;
         endianness = options.GetEndiannessStateSerializer();
         callbacks = services.SessionHandler;

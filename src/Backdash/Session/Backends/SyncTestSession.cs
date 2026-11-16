@@ -123,7 +123,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public FrameSpan FramesBehind => synchronizer.FramesBehind;
     public FrameSpan RollbackFrames => synchronizer.RollbackFrames;
     public FrameSpan DynamicFrameDelay => FrameSpan.Zero;
-    public int FixedFrameRate => options.FrameRate;
+    public int TargetFrameRate => options.FrameRate;
     public Endianness StateSerializationEndianness => endianness.Endianness;
     public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;

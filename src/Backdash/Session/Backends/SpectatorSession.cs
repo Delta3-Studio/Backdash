@@ -150,7 +150,7 @@ sealed class SpectatorSession<TInput> :
         callbacks.OnSessionClose();
     }
 
-    public int FixedFrameRate => options.FrameRate;
+    public int TargetFrameRate => options.FrameRate;
     public Frame CurrentFrame { get; private set; } = Frame.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public FrameSpan DynamicFrameDelay => FrameSpan.Zero;
@@ -359,7 +359,7 @@ sealed class SpectatorSession<TInput> :
         lastReceivedInputTime = Stopwatch.GetTimestamp();
         var (_, input) = evt;
         inputs[input.Frame.Number % inputs.Length] = input;
-        host.SetLocalFrameNumber(input.Frame, FixedFrameRate);
+        host.SetLocalFrameNumber(input.Frame, TargetFrameRate);
         return host.SendInputAck();
     }
 

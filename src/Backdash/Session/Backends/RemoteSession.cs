@@ -65,7 +65,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     bool disposed;
     bool closed;
 
-    public int FixedFrameRate { get; }
+    public int TargetFrameRate { get; }
     public double MaxPing { get; private set; }
 
     public RemoteSession(
@@ -79,7 +79,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(options.FrameRate);
 
         this.options = options;
-        FixedFrameRate = this.options.FrameRate;
+        TargetFrameRate = this.options.FrameRate;
         jobManager = services.JobManager;
         logger = services.Logger;
         inputListener = services.InputListener;
@@ -669,7 +669,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         for (i = 0; i < eps.Length; i++)
         {
             if (eps[i] is not { } endpoint) continue;
-            endpoint.SetLocalFrameNumber(currentFrame, FixedFrameRate);
+            endpoint.SetLocalFrameNumber(currentFrame, TargetFrameRate);
             MaxPing = Math.Max(MaxPing, endpoint.Ping);
         }
 
