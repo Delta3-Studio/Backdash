@@ -152,10 +152,9 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         return this;
     }
 
-    /// <summary>
-    ///     Sets the number of players for the <see cref="INetcodeSession{TInput}" />
-    /// </summary>
-    /// <value>Defaults to <c>2</c></value>
+    /// <inheritdoc cref="NetcodeOptions.NumberOfPlayers"/>
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.NumberOfPlayers"/>
     public NetcodeSessionBuilder<TInput> WithPlayerCount(int count)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
@@ -194,7 +193,19 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         return ConfigureServices(services => services.SessionHandler = handler);
     }
 
-    /// <inheritdoc cref="NetcodeOptions.InputDelayFrames" />
+    /// <summary>
+    ///     Configure <see cref="INetcodeSession{TInput}" /> options
+    /// </summary>
+    /// <seealso cref="NetcodeOptions" />
+    public NetcodeSessionBuilder<TInput> Configure(Action<NetcodeOptions> config)
+    {
+        config.Invoke(options);
+        return this;
+    }
+
+    /// <inheritdoc cref="NetcodeOptions.InputDelayFrames"/>
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.InputDelayFrames"/>
     public NetcodeSessionBuilder<TInput> WithInputDelayFrames(int frames)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(frames);
@@ -203,9 +214,9 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         return this;
     }
 
-    /// <summary>
-    ///     Sets the update factor <see cref="NetcodeOptions.RollbackFramesSmoothFactor"/> for <see cref="INetcodeSessionInfo.RollbackFrames"/>.
-    /// </summary>
+    /// <inheritdoc cref="NetcodeOptions.RollbackFramesSmoothFactor"/>
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.RollbackFramesSmoothFactor"/>
     public NetcodeSessionBuilder<TInput> WithRollbackCounterSmooth(float factor)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(factor);
@@ -213,7 +224,9 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         return this;
     }
 
-    /// <inheritdoc cref="NetcodeOptions.FrameRate" />
+    /// <inheritdoc cref="NetcodeOptions.FrameRate"/>
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.FrameRate"/>
     public NetcodeSessionBuilder<TInput> WithFrameRate(int fps)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(fps);
@@ -222,7 +235,9 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         return this;
     }
 
-    /// <inheritdoc cref="NetcodeOptions.DeterministicRandomInitialSeed" />
+    /// <inheritdoc cref="NetcodeOptions.DeterministicRandomInitialSeed"/>
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.DeterministicRandomInitialSeed"/>
     public NetcodeSessionBuilder<TInput> WithInitialRandomSeed(uint value)
     {
         options.DeterministicRandomInitialSeed = value;
@@ -233,7 +248,9 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
     public NetcodeSessionBuilder<TInput> WithInitialRandomSeed(int value) =>
         WithInitialRandomSeed(unchecked((uint)value));
 
-    /// <inheritdoc cref="NetcodeOptions.LocalPort" />
+    /// <inheritdoc cref="NetcodeOptions.LocalPort"/>
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.LocalPort"/>
     public NetcodeSessionBuilder<TInput> WithPort(int port)
     {
         options.LocalPort = port;
@@ -241,65 +258,121 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
     }
 
     /// <inheritdoc cref="NetcodeOptions.StateSizeHint" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.StateSizeHint"/>
     public NetcodeSessionBuilder<TInput> WithStateSizeHint(int byteSize)
     {
         options.StateSizeHint = int.Max(byteSize, 8);
         return this;
     }
 
-    /// <inheritdoc cref="NetcodeOptions.StateSizeHint" />
+    /// <inheritdoc cref="WithStateSizeHint(int)" />
     public NetcodeSessionBuilder<TInput> WithStateSizeHint(ByteSize size) =>
         WithStateSizeHint(size.Bytes);
 
     /// <inheritdoc cref="NetcodeOptions.SaveStateCount" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.SaveStateCount"/>
     public NetcodeSessionBuilder<TInput> WithSaveStateCount(int count)
     {
         options.SaveStateCount = count;
         return this;
     }
 
-    /// <inheritdoc cref="NetcodeOptions.UseBackgroundThread" />
-    public NetcodeSessionBuilder<TInput> UseBackgroundThread(bool enabled = true)
+    /// <inheritdoc cref="NetcodeOptions.DynamicFrameDelayPing" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.DynamicFrameDelayPing"/>
+    public NetcodeSessionBuilder<TInput> WithDynamicFrameDelayPing(float milliseconds)
     {
-        options.UseBackgroundThread = enabled;
+        options.DynamicFrameDelayPing = milliseconds;
+        return this;
+    }
+
+    /// <inheritdoc cref="NetcodeOptions.MaxDynamicFrameDelay" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.MaxDynamicFrameDelay"/>
+    public NetcodeSessionBuilder<TInput> WithMaxDynamicFrameDelay(int frames)
+    {
+        options.MaxDynamicFrameDelay = frames;
+        return this;
+    }
+
+    /// <inheritdoc cref="NetcodeOptions.UseBackgroundThreads" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.UseBackgroundThreads"/>
+    public NetcodeSessionBuilder<TInput> WithBackgroundThreads(bool enabled = true)
+    {
+        options.UseBackgroundThreads = enabled;
         return this;
     }
 
     /// <inheritdoc cref="NetcodeOptions.SaveConfirmedInputHistory" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.SaveConfirmedInputHistory"/>
     public NetcodeSessionBuilder<TInput> WithConfirmedInputHistory(bool enabled = true)
     {
         options.SaveConfirmedInputHistory = enabled;
         return this;
     }
 
-    /// <summary>
-    ///     Select the input serialization <see cref="Endianness" />
-    /// </summary>
-    /// <value>Defaults to <see cref="Endianness.BigEndian" /></value>
-    /// <seealso cref="Platform" />
-    public NetcodeSessionBuilder<TInput> WithEndianness(Endianness endianness)
+    /// <inheritdoc cref="NetcodeOptions.StateSerializationEndianness" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.StateSerializationEndianness"/>
+    public NetcodeSessionBuilder<TInput> WithStateSerializationEndianness(Endianness endianness)
     {
-        options.Protocol.SerializationEndianness = endianness;
+        options.StateSerializationEndianness = endianness;
         return this;
     }
 
-    /// <summary>
-    ///     If <paramref name="useNetworkEndianness" /> is true,
-    ///     sets the input serialization <see cref="Endianness" /> to <see cref="Endianness.BigEndian" />
-    /// </summary>
-    /// <seealso cref="Platform" />
-    public NetcodeSessionBuilder<TInput> WithNetworkEndianness(bool useNetworkEndianness = true) =>
-        WithEndianness(Platform.GetNetworkEndianness(useNetworkEndianness));
-
-    /// <summary>
-    ///     Configure <see cref="INetcodeSession{TInput}" /> options
-    /// </summary>
-    /// <seealso cref="NetcodeOptions" />
-    public NetcodeSessionBuilder<TInput> Configure(Action<NetcodeOptions> config)
+    /// <inheritdoc cref="NetcodeOptions.PredictionFrames" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.PredictionFrames"/>
+    public NetcodeSessionBuilder<TInput> WithPredictionFrames(int amount)
     {
-        config.Invoke(options);
+        options.PredictionFrames = amount;
         return this;
     }
+
+    /// <inheritdoc cref="NetcodeOptions.PredictionFramesOffset" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.PredictionFramesOffset"/>
+    public NetcodeSessionBuilder<TInput> WithPredictionFramesOffset(int amount)
+    {
+        options.PredictionFramesOffset = amount;
+        return this;
+    }
+
+
+    /// <inheritdoc cref="NetcodeOptions.InputQueueLength" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.InputQueueLength"/>
+    public NetcodeSessionBuilder<TInput> WithInputQueueLength(int amount)
+    {
+        options.InputQueueLength = amount;
+        return this;
+    }
+
+    /// <inheritdoc cref="NetcodeOptions.UseIPv6" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.UseIPv6"/>
+    public NetcodeSessionBuilder<TInput> WithIPv6(bool enabled)
+    {
+        options.UseIPv6 = enabled;
+        return this;
+    }
+
+    /// <inheritdoc cref="NetcodeOptions.SynchronizationInterval" />
+    /// <seealso cref="NetcodeOptions"/>
+    /// <seealso cref="NetcodeOptions.SynchronizationInterval"/>
+    public NetcodeSessionBuilder<TInput> WithSynchronizationInterval(int milliseconds)
+    {
+        options.SynchronizationInterval = milliseconds;
+        return this;
+    }
+
+    /// <inheritdoc cref="WithSynchronizationInterval(int)" />
+    public NetcodeSessionBuilder<TInput> WithSynchronizationInterval(TimeSpan interval) =>
+        WithSynchronizationInterval((int)interval.TotalMilliseconds);
 
     /// <summary>
     ///     Sets <see cref="NetcodeOptions.Logger" /> log level
@@ -312,47 +385,93 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
             o.AppendLevel = appendLevel;
         });
 
-    /// <summary>
-    ///     Sets <see cref="NetcodeOptions.Protocol"/>.<see cref="ProtocolOptions.NetworkPackageStatsEnabled" /> option
-    /// </summary>
+    /// <inheritdoc cref="ProtocolOptions.SerializationEndianness" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.SerializationEndianness"/>
+    public NetcodeSessionBuilder<TInput> WithNetworkEndianness(Endianness endianness) =>
+        ConfigureProtocol(p => p.SerializationEndianness = endianness);
+
+    /// <inheritdoc cref="WithNetworkEndianness(Endianness)" />
+    public NetcodeSessionBuilder<TInput> WithNetworkEndianness(bool useNetworkEndianness = true) =>
+        WithNetworkEndianness(Platform.GetNetworkEndianness(useNetworkEndianness));
+
+    /// <inheritdoc cref="ProtocolOptions.NetworkPackageStatsEnabled" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.NetworkPackageStatsEnabled"/>
     public NetcodeSessionBuilder<TInput> WithPackageStats(bool enabled = true) =>
         ConfigureProtocol(o => o.NetworkPackageStatsEnabled = enabled);
 
-    /// <summary>
-    ///     Sets <see cref="NetcodeOptions.Protocol"/>.<see cref="ProtocolOptions.CalculateRemotePlayerStats" /> option
-    /// </summary>
-    /// <seealso cref="INetcodeSession.UpdateNetworkStats"/>
+    /// <inheritdoc cref="ProtocolOptions.RemotePlayerStatsEnabled" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.RemotePlayerStatsEnabled"/>
     public NetcodeSessionBuilder<TInput> WithPlayerStats(bool enabled = true) =>
-        ConfigureProtocol(o => o.CalculateRemotePlayerStats = enabled);
+        ConfigureProtocol(o => o.RemotePlayerStatsEnabled = enabled);
 
-    /// <summary>
-    ///     Sets <see cref="NetcodeOptions.Protocol"/>.<see cref="ProtocolOptions.ConsistencyCheckEnabled" /> option
-    /// </summary>
+    /// <inheritdoc cref="ProtocolOptions.ConsistencyCheckEnabled" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.ConsistencyCheckEnabled"/>
     public NetcodeSessionBuilder<TInput> WithConsistencyCheck(bool enabled) =>
         ConfigureProtocol(o => o.ConsistencyCheckEnabled = enabled);
 
-    /// <summary>
-    ///     Sets <see cref="NetcodeOptions.Protocol"/>.<see cref="ProtocolOptions.NetworkLatency" /> option.
-    /// </summary>
-    /// <seealso cref="LatencyStrategy" />
-    public NetcodeSessionBuilder<TInput> WithNetworkLatency(
-        TimeSpan latency, LatencyStrategy? strategy = null, TimeSpan? fixedLatency = null
-    ) =>
+    /// <inheritdoc cref="ProtocolOptions.DisconnectTimeoutEnabled" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.DisconnectTimeoutEnabled"/>
+    public NetcodeSessionBuilder<TInput> WithDisconnectTimeout(bool enabled) =>
+        ConfigureProtocol(o => o.DisconnectTimeoutEnabled = enabled);
+
+    /// <inheritdoc cref="ProtocolOptions.DisconnectTimeout" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.DisconnectTimeout"/>
+    public NetcodeSessionBuilder<TInput> WithDisconnectTimeout(TimeSpan duration, bool? enabled = null) =>
+        ConfigureProtocol(o =>
+        {
+            o.DisconnectTimeout = duration;
+            if (enabled.HasValue)
+                o.DisconnectTimeoutEnabled = enabled.Value;
+        });
+
+
+    /// <inheritdoc cref="ProtocolOptions.DisconnectNotifyStart" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.DisconnectNotifyStart"/>
+    public NetcodeSessionBuilder<TInput> WithDisconnectNotifyStart(TimeSpan duration) =>
+        ConfigureProtocol(o => o.DisconnectNotifyStart = duration);
+
+    /// <inheritdoc cref="ProtocolOptions.NetworkPackageStatsEnabled" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.NetworkPackageStatsEnabled"/>
+    public NetcodeSessionBuilder<TInput> WithNetworkPackageStats(bool enabled = true) =>
+        ConfigureProtocol(o => o.NetworkPackageStatsEnabled = enabled);
+
+    /// <inheritdoc cref="ProtocolOptions.NumberOfSyncRoundTrips" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.NumberOfSyncRoundTrips"/>
+    public NetcodeSessionBuilder<TInput> WithSyncRoundTrips(int count) =>
+        ConfigureProtocol(o => o.NumberOfSyncRoundTrips = count);
+
+    /// <inheritdoc cref="ProtocolOptions.NetworkLatency" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.NetworkLatency"/>
+    public NetcodeSessionBuilder<TInput> WithNetworkLatency(TimeSpan latency, LatencyStrategy? strategy = null) =>
         ConfigureProtocol(o =>
         {
             o.NetworkLatency = latency;
             if (strategy.HasValue) o.LatencyStrategy = strategy.Value;
-            if (fixedLatency.HasValue) o.FixedNetworkLatency = fixedLatency.Value;
         });
 
-    /// <inheritdoc cref="WithNetworkLatency(TimeSpan, LatencyStrategy?, TimeSpan?)"/>>
-    public NetcodeSessionBuilder<TInput> WithNetworkLatency(
-        long milliseconds, LatencyStrategy? strategy = null, long? fixedLatency = null
-    ) =>
-        WithNetworkLatency(
-            TimeSpan.FromMilliseconds(milliseconds), strategy,
-            fixedLatency is { } fix ? TimeSpan.FromMilliseconds(fix) : null
-        );
+    /// <inheritdoc cref="WithNetworkLatency(TimeSpan, LatencyStrategy?)"/>>
+    public NetcodeSessionBuilder<TInput> WithNetworkLatency(long milliseconds, LatencyStrategy? strategy = null) =>
+        WithNetworkLatency(TimeSpan.FromMilliseconds(milliseconds), strategy);
+
+    /// <inheritdoc cref="ProtocolOptions.NetworkFixedLatency" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.NetworkFixedLatency"/>
+    public NetcodeSessionBuilder<TInput> WithNetworkFixedLatency(TimeSpan latency) =>
+        ConfigureProtocol(o => o.NetworkFixedLatency = latency);
+
+    /// <inheritdoc cref="WithNetworkFixedLatency(TimeSpan)"/>
+    public NetcodeSessionBuilder<TInput> WithFixedNetworkLatency(long milliseconds) =>
+        WithNetworkFixedLatency(TimeSpan.FromMilliseconds(milliseconds));
 
     /// <summary>
     ///     Set the logger <see cref="ServicesConfig{TInput}.LogWriter" />

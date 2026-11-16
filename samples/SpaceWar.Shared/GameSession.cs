@@ -13,14 +13,14 @@ public sealed class GameSession(
 {
     public void Update(TimeSpan deltaTime)
     {
+        session.BeginFrame();
+        UpdateStats();
+
         if (nonGameState.Sleeping)
         {
             nonGameState.SleepTime -= deltaTime;
             return;
         }
-
-        UpdateStats();
-        session.BeginFrame();
 
         var keyboard = Keyboard.GetState();
         HandleNoGameInput(keyboard);
@@ -117,6 +117,7 @@ public sealed class GameSession(
     void UpdateStats()
     {
         nonGameState.RollbackFrames = session.RollbackFrames;
+        nonGameState.FrameDelay = session.DynamicFrameDelay;
         var saved = session.GetSavedState();
         nonGameState.StateChecksum = saved.Checksum;
         nonGameState.StateSize = saved.Size;

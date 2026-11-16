@@ -52,6 +52,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
     bool isSynchronizing = true;
     int nextSyncInterval;
+    FrameSpan currentDynamicFrameDelay;
     Frame nextSpectatorFrame = Frame.Zero;
     Frame nextListenerFrame = Frame.Zero;
     INetcodeSessionHandler callbacks;
@@ -65,6 +66,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     bool closed;
 
     public int FixedFrameRate { get; }
+    public double MaxPing { get; private set; }
 
     public RemoteSession(
         NetcodeOptions options,
@@ -203,6 +205,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     public Frame CurrentFrame => synchronizer.CurrentFrame;
     public FrameSpan FramesBehind => synchronizer.FramesBehind;
     public FrameSpan RollbackFrames => synchronizer.RollbackFrames;
+    public FrameSpan DynamicFrameDelay => currentDynamicFrameDelay;
     public bool IsInRollback => synchronizer.InRollback;
     public SavedState GetSavedState() => synchronizer.Store.Last();
     public SavedState? GetSavedState(Frame frame) => synchronizer.Store.Get(frame);
@@ -251,7 +254,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         plugins.OnStart(this);
         inputListener?.OnSessionStart(inputContext);
-        backgroundJobTask = jobManager.Start(options.UseBackgroundThread, stoppingToken);
+        backgroundJobTask = jobManager.Start(options.UseBackgroundThreads, stoppingToken);
     }
 
     public async ValueTask WaitUntilFinish(CancellationToken stoppingToken = default)
@@ -406,16 +409,38 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             $"setting local connect status for local queue {player.Index} to {input.Frame}");
         localConnections[player].LastFrame = input.Frame;
 
+        // Read possible input padding caused by frame input delay changes.
+        var inputPadding = synchronizer.LastLocalInputPadding;
+
         // Send the input to all the remote players.
         var sent = true;
         var eps = CollectionsMarshal.AsSpan(endpoints);
         ref var currEp = ref MemoryMarshal.GetReference(eps);
         ref var limitEp = ref Unsafe.Add(ref currEp, eps.Length);
-
         while (Unsafe.IsAddressLessThan(ref currEp, ref limitEp))
         {
             if (currEp is not null)
             {
+                if (inputPadding.Length > 0)
+                {
+                    var paddingOk = true;
+                    foreach (var paddingInput in inputPadding)
+                    {
+                        var paddingResult = currEp.SendInput(in paddingInput);
+                        if (paddingResult is SendInputResult.Ok) continue;
+                        paddingOk = false;
+                        logger.Write(LogLevel.Warning,
+                            $"Unable to send padding input to queue {currEp.Player.Index}, {paddingResult}");
+                        break;
+                    }
+
+                    if (!paddingOk)
+                    {
+                        sent = false;
+                        continue;
+                    }
+                }
+
                 var result = currEp.SendInput(in input);
 
                 if (result is not SendInputResult.Ok)
@@ -458,23 +483,24 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         synchronizer.Callbacks = handler;
     }
 
+    void SetDynamicFrameDelay(FrameSpan amount)
+    {
+        currentDynamicFrameDelay = amount;
+        foreach (var player in addedPlayers)
+            synchronizer.SetDynamicFrameDelay(player, currentDynamicFrameDelay.Frames);
+    }
+
     public void SetFrameDelay(NetcodePlayer player, int delayInFrames)
     {
         ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         ArgumentOutOfRangeException.ThrowIfNegative(delayInFrames);
-        synchronizer.SetFrameDelay(player, delayInFrames);
+        synchronizer.SetFixedFrameDelay(player, delayInFrames);
     }
 
     public void SetFrameDelay(int delayInFrames)
     {
         foreach (var player in addedPlayers)
             SetFrameDelay(player, delayInFrames);
-    }
-
-    public int GetFrameDelay(NetcodePlayer player)
-    {
-        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
-        return synchronizer.GetFrameDelay(player);
     }
 
     public bool LoadFrame(Frame frame)
@@ -638,9 +664,14 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         // notify all of our endpoints of their local frame number for their next connection quality report
         int i;
+        MaxPing = 0.0;
         var currentFrame = synchronizer.CurrentFrame;
         for (i = 0; i < eps.Length; i++)
-            eps[i]?.SetLocalFrameNumber(currentFrame, FixedFrameRate);
+        {
+            if (eps[i] is not { } endpoint) continue;
+            endpoint.SetLocalFrameNumber(currentFrame, FixedFrameRate);
+            MaxPing = Math.Max(MaxPing, endpoint.Ping);
+        }
 
         var minConfirmedFrame = getMinFramePlayers();
         ThrowIf.Assert(minConfirmedFrame != Frame.MaxValue);
@@ -655,6 +686,19 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             synchronizer.SetLastConfirmedFrame(minConfirmedFrame);
         }
 
+        if (options.DynamicFrameDelayEnabled)
+        {
+            if (MaxPing > 0)
+            {
+                var newDelay = (FrameSpan)Math.Min((int)(MaxPing / options.DynamicFrameDelayPing),
+                    options.MaxDynamicFrameDelay);
+                if (newDelay != currentDynamicFrameDelay)
+                    SetDynamicFrameDelay(newDelay);
+            }
+            else if (currentDynamicFrameDelay.IsPositive)
+                SetDynamicFrameDelay(FrameSpan.Zero);
+        }
+
         // send time sync notifications if now is the proper time
         if (currentFrame.Number <= nextSyncInterval)
             return;
@@ -662,7 +706,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         var interval = 0;
         for (i = 0; i < eps.Length; i++)
             if (eps[i] is { } endpoint)
-                interval = Math.Max(interval, endpoint.GetRecommendFrameDelay());
+                interval = Math.Max(interval, endpoint.GetRecommendWaitFrames());
 
         if (interval <= 0) return;
         callbacks.TimeSync(new(interval));

@@ -35,7 +35,8 @@ public class NonGameState(int numberOfPlayers)
     public bool Sleeping => SleepTime > TimeSpan.Zero;
     public int NumberOfPlayers => numberOfPlayers;
     public FrameSpan RollbackFrames;
-    public uint StateChecksum;
+    public FrameSpan FrameDelay;
+    public Checksum StateChecksum;
     public ByteSize StateSize;
 
     public bool TryGetPlayer(NetcodePlayer handle, out PlayerInfo state)

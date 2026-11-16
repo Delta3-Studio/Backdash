@@ -28,14 +28,12 @@ static INetcodeSession<PlayerInputs> ParseSessionArgs(string[] args)
         .WithInputDelayFrames(2)
         .WithLogLevel(LogLevel.Information)
         .WithConfirmedInputHistory()
-        .ConfigureProtocol(options =>
-        {
-            options.NumberOfSyncRoundTrips = 10;
-            options.DisconnectTimeout = TimeSpan.FromSeconds(5);
-            options.DisconnectNotifyStart = TimeSpan.FromSeconds(2);
-            options.NetworkPackageStatsEnabled = false;
-            // options.NetworkLatency = Backdash.Data.FrameSpan.Of(3).Duration();
-        });
+        .WithSyncRoundTrips(20)
+        .WithNetworkPackageStats(false)
+        // .WithNetworkLatency(40)
+        // .WithFixedNetworkLatency(30)
+        .WithDisconnectTimeout(TimeSpan.FromSeconds(5))
+        .WithDisconnectNotifyStart(TimeSpan.FromSeconds(2));
 
     switch (lastArgs)
     {

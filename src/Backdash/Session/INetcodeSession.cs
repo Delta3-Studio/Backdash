@@ -42,14 +42,26 @@ public interface INetcodeSessionInfo
     /// <summary>
     ///     Returns the number of current rollback frames.
     /// </summary>
-    /// <seealso cref="FrameSpan" />
     FrameSpan RollbackFrames { get; }
+
+    /// <summary>
+    ///     Returns the number of delay frames.
+    /// </summary>
+    /// <seealso cref="NetcodeOptions.DynamicFrameDelayPing"/>
+    /// <seealso cref="NetcodeOptions.MaxDynamicFrameDelay"/>
+    FrameSpan DynamicFrameDelay { get; }
 
     /// <summary>
     ///     Returns the number of frames the client is behind.
     /// </summary>
-    /// <seealso cref="FrameSpan" />
     FrameSpan FramesBehind { get; }
+
+    /// <summary>
+    ///     Returns the session players maximum ping.
+    /// </summary>
+    /// <seealso cref="NetcodePlayer.NetworkStats"/>
+    /// <seealso cref="PeerNetworkStats.Ping"/>
+    double MaxPing { get; }
 
     /// <summary>
     ///     Returns the current TCP local port.
@@ -144,15 +156,9 @@ public interface INetcodeSession : INetcodeSessionInfo, IDisposable, IAsyncDispo
     ///     Gets statistics and information about a player in <see cref="NetcodePlayer.NetworkStats"/>.
     ///     Returns <see langword="false" /> if the request player is not connected or synchronized.
     /// </summary>
-    /// <seealso cref="ProtocolOptions.CalculateRemotePlayerStats"/>
+    /// <seealso cref="ProtocolOptions.RemotePlayerStatsEnabled"/>
     /// <seealso cref="NetcodeSessionBuilder{TInput}.WithPlayerStats"/>
     bool UpdateNetworkStats(NetcodePlayer player);
-
-    /// <summary>
-    ///     Reads a number of delay frames for local player input.
-    /// </summary>
-    /// <param name="player"></param>
-    int GetFrameDelay(NetcodePlayer player);
 
     /// <summary>
     ///     Change the number of delay frames for local player input.
