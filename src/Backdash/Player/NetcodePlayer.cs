@@ -3,6 +3,7 @@ using System.Net;
 using System.Numerics;
 using System.Text;
 using Backdash.Core;
+using Backdash.Options;
 
 namespace Backdash;
 
@@ -32,6 +33,25 @@ public class NetcodePlayer :
     ///     Custom user id value
     /// </summary>
     public virtual int CustomId { get; set; }
+
+    /// <summary>
+    ///     Player current input delay in frames.
+    /// </summary>
+    public FrameSpan InputDelay { get; internal set; }
+
+    /// <summary>
+    ///     Player current fixed input delay in frames.
+    /// </summary>
+    /// <seealso cref="NetcodeOptions.InputDelayFrames"/>
+    /// <seealso cref="INetcodeSession.SetFrameDelay(NetcodePlayer, int)"/>
+    public FrameSpan InputFixedDelay { get; internal set; }
+
+    /// <summary>
+    ///     Player current dynamic input delay in frames.
+    /// </summary>
+    /// <seealso cref="NetcodeOptions.DynamicFrameDelayPing"/>
+    /// <seealso cref="NetcodeOptions.MaxDynamicFrameDelay"/>
+    public FrameSpan InputDynamicDelay { get; internal set; }
 
     /// <summary>
     ///     Network stats for the peer

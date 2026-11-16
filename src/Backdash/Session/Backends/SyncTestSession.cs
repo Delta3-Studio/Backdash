@@ -115,19 +115,19 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public int NumberOfPlayers => Math.Max(addedPlayers.Count, 1);
     public int NumberOfSpectators => addedSpectators.Count;
     public int LocalPort => 0;
+    public double MaxPing => 0.0;
     public INetcodeRandom Random => random;
     public INetcodeSessionHandler GetHandler() => callbacks;
     public Frame CurrentFrame => synchronizer.CurrentFrame;
     public SessionMode Mode => SessionMode.SyncTest;
     public FrameSpan FramesBehind => synchronizer.FramesBehind;
     public FrameSpan RollbackFrames => synchronizer.RollbackFrames;
+    public FrameSpan DynamicFrameDelay => FrameSpan.Zero;
     public int FixedFrameRate => options.FrameRate;
     public Endianness StateSerializationEndianness => endianness.Endianness;
     public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;
-
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;
-
     public bool IsInRollback => synchronizer.InRollback;
     public SavedState GetSavedState() => synchronizer.Store.Last();
     public SavedState? GetSavedState(Frame frame) => synchronizer.Store.Get(frame);
@@ -434,19 +434,13 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     {
         ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
         ArgumentOutOfRangeException.ThrowIfNegative(delayInFrames);
-        synchronizer.SetFrameDelay(player, delayInFrames);
+        synchronizer.SetFixedFrameDelay(player, delayInFrames);
     }
 
     public void SetFrameDelay(int delayInFrames)
     {
         foreach (var (player, _) in addedPlayers)
             SetFrameDelay(player, delayInFrames);
-    }
-
-    public int GetFrameDelay(NetcodePlayer player)
-    {
-        ThrowIf.NotInRange(player.Index, 0, addedPlayers.Count);
-        return synchronizer.GetFrameDelay(player);
     }
 
     [MemberNotNull(nameof(callbacks))]

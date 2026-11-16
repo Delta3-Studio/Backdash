@@ -52,6 +52,11 @@ public readonly record struct FrameSpan :
     /// </summary>
     public bool IsZero => Frames is 0;
 
+    /// <summary>
+    ///     Returns <see langword="true" /> if the current frame count greater than 0
+    /// </summary>
+    public bool IsPositive => Frames > 0;
+
     /// <summary>Returns the time value for the current frame span in seconds.</summary>
     public double Seconds(int fps) => FrameTime.GetSeconds(Frames, fps);
 
