@@ -20,6 +20,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     readonly ConnectionsState localConnections;
     readonly EqualityComparer<TInput> inputComparer;
     readonly List<InputQueue<TInput>> inputQueues;
+    readonly List<GameInput<TInput>> lastLocalInputPadding;
     public required INetcodeSessionHandler Callbacks { get; internal set; }
     Frame currentFrame = Frame.Zero;
     Frame lastConfirmedFrame = Frame.Zero;
@@ -49,8 +50,9 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         this.localConnections = localConnections;
         this.inputComparer = inputComparer ?? EqualityComparer<TInput>.Default;
         this.checksumStore = checksumStore;
-        Store = stateStore;
+        lastLocalInputPadding = new(options.InputQueueLength / 2);
         inputQueues = new(2);
+        Store = stateStore;
         NumberSerializer = options.GetEndiannessStateSerializer();
         var saveBufferSize = options.TotalSavedFramesAllowed;
         stateStore.Initialize(saveBufferSize);
@@ -65,6 +67,7 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
     public Endianness SerializationEndianness => NumberSerializer.Endianness;
     public FrameSpan FramesBehind => new(currentFrame.Number - lastConfirmedFrame.Number);
     public FrameSpan RollbackFrames => new((int)Math.Round(rollbackFrameCounter));
+    public ReadOnlySpan<GameInput<TInput>> LastLocalInputPadding => lastLocalInputPadding.AsSpan();
 
     public void AddQueue(NetcodePlayer player)
     {
@@ -96,10 +99,10 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         }
     }
 
-    void AddInput(NetcodePlayer queue, ref GameInput<TInput> input) =>
-        inputQueues[queue.Index].AddInput(ref input);
+    void AddInput(NetcodePlayer player, ref GameInput<TInput> input, List<GameInput<TInput>>? paddingInputs = null) =>
+        inputQueues[player.Index].AddInput(ref input, paddingInputs);
 
-    public bool AddLocalInput(NetcodePlayer queue, ref GameInput<TInput> input)
+    public bool AddLocalInput(NetcodePlayer player, ref GameInput<TInput> input)
     {
         if (currentFrame.Number >= options.PredictionFrames && FramesBehind.Frames >= options.PredictionFrames)
         {
@@ -114,10 +117,11 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         if (currentFrame.Number is 0)
             SaveCurrentFrame();
 
-        logger.Write(LogLevel.Trace, $"Sending non-delayed local frame {currentFrame.Number} to queue {queue}");
+        logger.Write(LogLevel.Trace, $"Sending non-delayed local frame {currentFrame.Number} to player {player}");
 
         input.Frame = currentFrame;
-        AddInput(queue, ref input);
+        lastLocalInputPadding.Clear();
+        AddInput(player, ref input, lastLocalInputPadding);
         return true;
     }
 

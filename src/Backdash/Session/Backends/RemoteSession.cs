@@ -409,16 +409,38 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             $"setting local connect status for local queue {player.Index} to {input.Frame}");
         localConnections[player].LastFrame = input.Frame;
 
+        // Read possible input padding caused by frame input delay changes.
+        var inputPadding = synchronizer.LastLocalInputPadding;
+
         // Send the input to all the remote players.
         var sent = true;
         var eps = CollectionsMarshal.AsSpan(endpoints);
         ref var currEp = ref MemoryMarshal.GetReference(eps);
         ref var limitEp = ref Unsafe.Add(ref currEp, eps.Length);
-
         while (Unsafe.IsAddressLessThan(ref currEp, ref limitEp))
         {
             if (currEp is not null)
             {
+                if (inputPadding.Length > 0)
+                {
+                    var paddingOk = true;
+                    foreach (var paddingInput in inputPadding)
+                    {
+                        var paddingResult = currEp.SendInput(in paddingInput);
+                        if (paddingResult is SendInputResult.Ok) continue;
+                        paddingOk = false;
+                        logger.Write(LogLevel.Warning,
+                            $"Unable to send padding input to queue {currEp.Player.Index}, {paddingResult}");
+                        break;
+                    }
+
+                    if (!paddingOk)
+                    {
+                        sent = false;
+                        continue;
+                    }
+                }
+
                 var result = currEp.SendInput(in input);
 
                 if (result is not SendInputResult.Ok)
