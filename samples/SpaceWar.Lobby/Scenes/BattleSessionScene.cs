@@ -54,7 +54,8 @@ public sealed class BattleSessionScene : Scene
         }
 
         var spriteBatch = Services.GetService<SpriteBatch>();
-        gameSession = new(gs, ngs, new(Assets, spriteBatch), netcodeSession);
+        Renderer renderer = new(netcodeSession, Assets, spriteBatch);
+        gameSession = new(gs, ngs, renderer, netcodeSession);
         netcodeSession.SetHandler(gameSession);
         netcodeSession.Start();
     }

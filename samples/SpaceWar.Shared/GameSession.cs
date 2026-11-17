@@ -14,7 +14,6 @@ public sealed class GameSession(
     public void Update(TimeSpan deltaTime)
     {
         session.BeginFrame();
-        UpdateStats();
 
         if (nonGameState.Sleeping)
         {
@@ -112,15 +111,6 @@ public sealed class GameSession(
     {
         Log($"=> TIME SYNC REQUESTED {framesAhead.Frames}");
         nonGameState.SleepTime = framesAhead.Duration();
-    }
-
-    void UpdateStats()
-    {
-        nonGameState.RollbackFrames = session.RollbackFrames;
-        nonGameState.FrameDelay = session.DynamicFrameDelay;
-        var saved = session.GetSavedState();
-        nonGameState.StateChecksum = saved.Checksum;
-        nonGameState.StateSize = saved.Size;
     }
 
     public void OnPeerEvent(NetcodePlayer player, in PeerEventInfo evt)

@@ -131,7 +131,8 @@ public class Game1 : Game
             };
         }
 
-        gameSession = new(gs, ngs, new(assets, spriteBatch), session);
+        Renderer renderer = new(session, assets, spriteBatch);
+        gameSession = new(gs, ngs, renderer, session);
         session.SetHandler(gameSession);
     }
 

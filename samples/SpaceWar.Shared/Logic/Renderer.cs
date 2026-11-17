@@ -1,9 +1,11 @@
 using System.Globalization;
 using System.Text;
+using Backdash;
 
 namespace SpaceWar.Logic;
 
 public sealed class Renderer(
+    INetcodeSessionInfo sessionInfo,
     GameAssets gameAssets,
     SpriteBatch spriteBatch
 )
@@ -180,7 +182,7 @@ public sealed class Renderer(
             var statusSize = gameAssets.MainFont.MeasureString(ngs.StatusText);
             Vector2 statusPos = new(
                 (gs.Bounds.Width - statusSize.X) / 2,
-                (gs.Bounds.Top - Config.WindowPadding + statusSize.Y)
+                gs.Bounds.Top - Config.WindowPadding + statusSize.Y
             );
             Rectangle statusBox = new(statusPos.ToPoint(), statusSize.ToPoint());
             statusBox.Inflate(4, 4);
@@ -189,8 +191,8 @@ public sealed class Renderer(
                 Color.Yellow, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
         }
 
-        DrawConnectionStats(gs, ngs);
-        DrawStateStats(gs, ngs);
+        DrawConnectionStats(gs);
+        DrawStateStats(gs);
     }
 
     void DrawScore(int num, GameState gs, NonGameState ngs)
@@ -241,25 +243,15 @@ public sealed class Renderer(
             0, Vector2.Zero, SpriteEffects.None, 0);
     }
 
-    void DrawConnectionStats(GameState gs, NonGameState ngs)
+    void DrawConnectionStats(GameState gs)
     {
         const float statsScale = 0.6f;
         const int statsPadding = 2;
 
-        var maxPing = TimeSpan.Zero;
-        for (var i = 0; i < gs.NumberOfShips; i++)
-        {
-            var conn = ngs.Players[i];
-            if (!conn.PlayerHandle.IsRemote() || conn.PlayerHandle.NetworkStats.Ping <= maxPing)
-                continue;
-
-            maxPing = conn.PlayerHandle.NetworkStats.Ping;
-        }
-
         statsString.Clear();
-        statsString.Append(CultureInfo.InvariantCulture, $"ping: {maxPing.TotalMilliseconds:f2}ms  ");
-        statsString.Append($"rollback: {ngs.RollbackFrames.Frames}  ");
-        statsString.Append($"delay: {ngs.FrameDelay.Frames}");
+        statsString.Append(CultureInfo.InvariantCulture, $"ping: {sessionInfo.MaxPing:f2}ms  ");
+        statsString.Append($"rollback: {sessionInfo.RollbackFrames.Frames}  ");
+        statsString.Append($"delay: {sessionInfo.DynamicFrameDelay.Frames}");
         var statsSize = gameAssets.MainFont.MeasureString(statsString) * statsScale;
         Vector2 statsPos = new(
             (gs.Bounds.Width - statsSize.X) / 2,
@@ -275,14 +267,14 @@ public sealed class Renderer(
             0, Vector2.Zero, statsScale, SpriteEffects.None, 0);
     }
 
-    void DrawStateStats(GameState gs, NonGameState ngs)
+    void DrawStateStats(GameState gs)
     {
         const float statsScale = 0.5f;
         const int statsPadding = 2;
 
+        var saved = sessionInfo.GetSavedState();
         stateInfoString.Clear();
-        stateInfoString.Append(CultureInfo.InvariantCulture, $"State: {ngs.StateChecksum} {ngs.StateSize}");
-
+        stateInfoString.Append(CultureInfo.InvariantCulture, $"State: {saved.Checksum} {saved.Size}");
         var size = gameAssets.MainFont.MeasureString(stateInfoString) * statsScale;
 
         Vector2 pos = new((gs.Bounds.Width - size.X) / 2, gs.Bounds.Top - Config.WindowPadding);
