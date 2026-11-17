@@ -21,7 +21,6 @@ sealed class ProtocolOutbox(
         message.Header.SyncNumber = state.SyncNumber;
         message.Header.SequenceNumber = (ushort)nextSendSeq;
         nextSendSeq++;
-
         logger.Write(LogLevel.Trace, $"send {message} on {state.Player}");
     }
 

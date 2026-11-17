@@ -135,7 +135,7 @@ public readonly struct PeerEventInfo(PeerEvent type) : IUtf8SpanFormattable
                 return true;
             case PeerEvent.Synchronized:
                 if (!writer.Write(" ping: "u8)) return false;
-                return writer.Write(Synchronized.Ping.TotalMilliseconds, "f2");
+                return writer.Write(Synchronized.Ping, "f2");
             case PeerEvent.ConnectionInterrupted:
                 if (!writer.Write(" timeout: "u8)) return false;
                 if (!writer.Write(ConnectionInterrupted.DisconnectTimeout)) return false;
@@ -155,7 +155,8 @@ public readonly struct PeerEventInfo(PeerEvent type) : IUtf8SpanFormattable
 /// </summary>
 /// <param name="CurrentStep">Current synchronizing step.</param>
 /// <param name="TotalSteps">Total synchronization steps</param>
-public readonly record struct SynchronizingEventInfo(int CurrentStep, int TotalSteps);
+/// <param name="Ping"></param>
+public readonly record struct SynchronizingEventInfo(int CurrentStep, int TotalSteps, double Ping);
 
 /// <summary>
 ///     Data for <see cref="PeerEvent.ConnectionInterrupted" /> event.
@@ -167,7 +168,7 @@ public readonly record struct ConnectionInterruptedEventInfo(TimeSpan Disconnect
 ///     Data for <see cref="PeerEvent.Synchronized" /> event.
 /// </summary>
 /// <param name="Ping">Current ping</param>
-public readonly record struct SynchronizedEventInfo(TimeSpan Ping);
+public readonly record struct SynchronizedEventInfo(double Ping);
 
 /// <summary>
 ///     Data for <see cref="PeerEvent.ChecksumMismatch" /> event.

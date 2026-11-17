@@ -207,7 +207,7 @@ sealed class ProtocolInbox<TInput>(
 
     bool OnQualityReply(ref readonly ProtocolMessage msg)
     {
-        state.Stats.RoundTripTime = Stopwatch.GetElapsedTime(msg.QualityReply.Pong);
+        state.Stats.RoundTripTime = Stopwatch.GetElapsedTime(msg.QualityReply.Pong).TotalMilliseconds;
         return true;
     }
 
@@ -243,16 +243,18 @@ sealed class ProtocolInbox<TInput>(
 
         logger.Write(LogLevel.Debug,
             $"Checking sync state ({state.Sync.RemainingRoundTrips} round trips remaining)");
+
         if (options.NumberOfSyncRoundTrips >= state.Sync.RemainingRoundTrips)
-            state.Sync.TotalRoundTripsPing = TimeSpan.Zero;
-        state.Sync.TotalRoundTripsPing += elapsed;
+            state.Sync.TotalRoundTripsTime = TimeSpan.Zero;
+
+        state.Sync.TotalRoundTripsTime += elapsed;
+        double ping;
         if (--state.Sync.RemainingRoundTrips is 0)
         {
-            var ping = state.Sync.TotalRoundTripsPing / options.NumberOfSyncRoundTrips;
+            ping = state.Sync.TotalRoundTripsTime.TotalMilliseconds / options.NumberOfSyncRoundTrips;
             logger.Write(LogLevel.Information,
-                $"Player {state.Player.Index} Synchronized! (Ping: {ping.TotalMilliseconds:f4})");
+                $"Player {state.Player.Index} Synchronized! (Ping: {ping:f4})");
             state.CurrentStatus = ProtocolStatus.Running;
-            state.Stats.RoundTripTime = ping;
             lastReceivedInput.ResetFrame();
             state.RemoteSyncNumber = msg.Header.SyncNumber;
             networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.Synchronized)
@@ -262,17 +264,20 @@ sealed class ProtocolInbox<TInput>(
         }
         else
         {
+            ping = elapsed.TotalMilliseconds;
             networkEvents.OnNetworkEvent(state.Player, new(PeerEvent.Synchronizing)
             {
                 Synchronizing = new(
                         TotalSteps: options.NumberOfSyncRoundTrips,
-                        CurrentStep: options.NumberOfSyncRoundTrips - state.Sync.RemainingRoundTrips
+                        CurrentStep: options.NumberOfSyncRoundTrips - state.Sync.RemainingRoundTrips,
+                        Ping: ping
                     ),
             }
             );
             sync.CreateRequestMessage(ref replyMsg);
         }
 
+        state.Stats.RoundTripTime = ping;
         return true;
     }
 

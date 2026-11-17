@@ -167,7 +167,7 @@ public class View
         var info = nonGameState.SessionInfo;
         WriteLine(
             $"""
-             Ping:             {peer.Ping.TotalMilliseconds:f4} ms
+             Ping:             {peer.Ping:f4} ms
              Rollback:         {info.RollbackFrames}
              Checksum:         {nonGameState.Checksum}
              Rng Seed:         {currentState.RandomSeed:x8}

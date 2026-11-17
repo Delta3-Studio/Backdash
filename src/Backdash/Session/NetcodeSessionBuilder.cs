@@ -406,11 +406,27 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
     public NetcodeSessionBuilder<TInput> WithPlayerStats(bool enabled = true) =>
         ConfigureProtocol(o => o.RemotePlayerStatsEnabled = enabled);
 
+    /// <inheritdoc cref="ProtocolOptions.QualityReportInterval" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.QualityReportInterval"/>
+    public NetcodeSessionBuilder<TInput> WithQualityReportInterval(TimeSpan duration) =>
+        ConfigureProtocol(o => o.QualityReportInterval = duration);
+
+    /// <inheritdoc cref="WithQualityReportInterval(TimeSpan)" />
+    public NetcodeSessionBuilder<TInput> WithQualityReportInterval(double milliseconds) =>
+        WithQualityReportInterval(TimeSpan.FromMilliseconds(milliseconds));
+
     /// <inheritdoc cref="ProtocolOptions.ConsistencyCheckEnabled" />
     /// <seealso cref="ProtocolOptions"/>
     /// <seealso cref="ProtocolOptions.ConsistencyCheckEnabled"/>
     public NetcodeSessionBuilder<TInput> WithConsistencyCheck(bool enabled) =>
         ConfigureProtocol(o => o.ConsistencyCheckEnabled = enabled);
+
+    /// <inheritdoc cref="ProtocolOptions.ConsistencyCheckInterval" />
+    /// <seealso cref="ProtocolOptions"/>
+    /// <seealso cref="ProtocolOptions.ConsistencyCheckInterval"/>
+    public NetcodeSessionBuilder<TInput> WithConsistencyCheckInterval(TimeSpan duration) =>
+        ConfigureProtocol(o => o.ConsistencyCheckInterval = duration);
 
     /// <inheritdoc cref="ProtocolOptions.DisconnectTimeoutEnabled" />
     /// <seealso cref="ProtocolOptions"/>
@@ -428,7 +444,6 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
             if (enabled.HasValue)
                 o.DisconnectTimeoutEnabled = enabled.Value;
         });
-
 
     /// <inheritdoc cref="ProtocolOptions.DisconnectNotifyStart" />
     /// <seealso cref="ProtocolOptions"/>

@@ -17,8 +17,8 @@ public sealed class PeerNetworkStats
     /// </summary>
     public bool Valid { get; internal set; }
 
-    /// <summary>Current roundtrip ping time</summary>
-    public TimeSpan Ping { get; internal set; }
+    /// <summary>Current roundtrip ping time in milliseconds</summary>
+    public double Ping { get; internal set; }
 
     /// <summary>Remote frame advantage</summary>
     public FrameSpan LocalFramesBehind { get; internal set; }
@@ -87,7 +87,7 @@ public sealed class PeerNetworkStats
     public void Reset()
     {
         Valid = false;
-        Ping = TimeSpan.Zero;
+        Ping = 0;
         LocalFramesBehind = FrameSpan.Zero;
         RemoteFramesBehind = FrameSpan.Zero;
         PendingInputCount = 0;

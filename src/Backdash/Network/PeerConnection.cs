@@ -26,10 +26,11 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     readonly ProtocolOutbox outbox;
     readonly ProtocolInputBuffer<TInput> inputBuffer;
     readonly ChecksumStore checksumStore;
-
     readonly ConnectionTimers timers;
+    readonly CancellationTokenRegistration[] tokenRegistrations;
     readonly bool disconnectCheckEnabled;
     long startedAt;
+    bool disposed;
 
     public PeerConnection(
         ProtocolOptions options,
@@ -63,12 +64,20 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         timers.NetworkStats.Elapsed += OnNetworkStatsTick;
         timers.ConsistencyCheck.Elapsed += OnConsistencyCheck;
 
-        state.StoppingToken.Register(timers.Stop);
+        tokenRegistrations =
+        [
+            state.StoppingToken.Register(timers.Stop),
+            state.StoppingToken.Register(Disconnect),
+        ];
     }
 
     public void Dispose()
     {
         state.CurrentStatus = ProtocolStatus.Disconnected;
+
+        if (Interlocked.CompareExchange(ref disposed, true, false))
+            return;
+
         if (!state.StoppingTokenSource.IsCancellationRequested)
             state.StoppingTokenSource.Cancel();
 
@@ -80,6 +89,9 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
         timers.NetworkStats.Elapsed -= OnNetworkStatsTick;
         timers.ConsistencyCheck.Elapsed -= OnConsistencyCheck;
         timers.Dispose();
+
+        foreach (var reg in tokenRegistrations)
+            reg.Dispose();
     }
 
     public void Disconnect()
@@ -136,7 +148,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
     public double Ping
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => state.Stats.RoundTripTime.TotalMilliseconds;
+        get => state.Stats.RoundTripTime;
     }
 
     // require idle input should be a configuration parameter

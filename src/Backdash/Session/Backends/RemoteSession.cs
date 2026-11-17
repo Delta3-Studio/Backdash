@@ -599,10 +599,21 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
         // Check to see if everyone is now synchronized.  If so,
         // go ahead and tell the client that we're ok to accept input.
         var endpointsSpan = CollectionsMarshal.AsSpan(endpoints);
+        var endpointsOk = true;
+        MaxPing = 0;
 
         for (var i = 0; i < endpointsSpan.Length; i++)
-            if (endpointsSpan[i] is { IsRunning: false } ep && localConnections.IsConnected(ep.Player))
-                return;
+        {
+            if (endpointsSpan[i] is not { } ep)
+                continue;
+
+            MaxPing = Math.Max(MaxPing, ep.Ping);
+            if (!ep.IsRunning && localConnections.IsConnected(ep.Player))
+                endpointsOk = false;
+        }
+
+        if (!endpointsOk)
+            return;
 
         var spectatorsSpan = CollectionsMarshal.AsSpan(spectators);
         for (var i = 0; i < spectatorsSpan.Length; i++)

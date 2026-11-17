@@ -104,7 +104,7 @@ sealed class PeerClient<T> : INetcodeJob, IDisposable, IAsyncDisposable where T 
     {
         var buffer = Mem.AllocatePinnedMemory(maxPacketSize);
         var reader = sendQueue.Reader;
-        cancellationToken.Register(() => sendQueue.Writer.TryComplete());
+        await using var _ = cancellationToken.Register(() => sendQueue.Writer.TryComplete());
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -125,7 +125,6 @@ sealed class PeerClient<T> : INetcodeJob, IDisposable, IAsyncDisposable where T 
                         .ConfigureAwait(false);
 
                     ThrowIf.Assert(sentSize == bodySize);
-
                     entry.Callback?.AfterSendMessage(sentSize);
                 }
             }

@@ -40,8 +40,6 @@ sealed class PeerConnectionFactory(
             syncManager, inbox, outbox, inputBuffer, checksumStore
         );
 
-        state.StoppingToken.Register(() => connection.Disconnect());
-
         return connection;
     }
 }

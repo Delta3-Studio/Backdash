@@ -52,6 +52,7 @@ static INetcodeSession<GameInput> CreateNetcodeSession(Args args)
         .WithInitialRandomSeed(42)
         .WithLogLevel(LogLevel.Information)
         .UsePlugin<PluginSample>()
+        .WithPlayerStats()
         .WithPackageStats()
         // .WithNetworkLatency(TimeSpan.FromMilliseconds(100), Backdash.Network.LatencyStrategy.Constant)
         .WithDisconnectTimeout(false);

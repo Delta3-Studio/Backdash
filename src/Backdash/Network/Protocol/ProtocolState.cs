@@ -48,7 +48,7 @@ sealed class ProtocolState(
 
     public sealed class Statistics
     {
-        public TimeSpan RoundTripTime = TimeSpan.Zero;
+        public double RoundTripTime = 0;
         public long LastReceivedInputTime = 0;
         public PackagesStats Send = new();
         public PackagesStats Received = new();
@@ -102,7 +102,7 @@ sealed class ProtocolState(
             }
         }
 
-        public TimeSpan TotalRoundTripsPing
+        public TimeSpan TotalRoundTripsTime
         {
             get
             {

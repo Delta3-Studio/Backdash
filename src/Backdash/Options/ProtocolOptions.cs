@@ -159,11 +159,11 @@ public sealed record ProtocolOptions
     /// <summary>
     ///     When true, the session will calculate the remote player stats on each frame.
     /// </summary>
-    /// <value>Defaults to <see langword="true" /></value>
     /// <seealso cref="NetcodePlayer.NetworkStats"/>
     /// <seealso cref="NetworkPackageStatsEnabled"/>
     /// <seealso cref="INetcodeSession.UpdateNetworkStats"/>
-    public bool RemotePlayerStatsEnabled { get; set; } = true;
+    /// <value>Defaults to <see langword="false" /></value>
+    public bool RemotePlayerStatsEnabled { get; set; }
 
     /// <summary>
     ///     When the time from the last sent input until now is greater than this, resends pending inputs.
