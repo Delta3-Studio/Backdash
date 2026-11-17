@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class EndiannessSerializerEx | Backdash Netcode </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class EndiannessSerializerEx | Backdash Netcode ">
+      
+      <meta name="description" content="Endianness serializer extensions helpers">
+      <link rel="icon" href="../docs/images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../docs/images/logo.png" alt="Backdash">
+            Backdash
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Backdash.Serialization.EndiannessSerializerEx">
+
+
+
+  <h1 id="Backdash_Serialization_EndiannessSerializerEx" data-uid="Backdash.Serialization.EndiannessSerializerEx" class="text-break">
+Class EndiannessSerializerEx  
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Backdash.html">Backdash</a>.<a class="xref" href="Backdash.Serialization.html">Serialization</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Backdash.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Endianness serializer extensions helpers</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class EndiannessSerializerEx</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">EndiannessSerializerEx</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Read_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Read_Backdash_Serialization_IEndiannessSpanSerializer_System_ReadOnlySpan_System_Byte__System_Span_System_Char___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read(Backdash.Serialization.IEndiannessSpanSerializer,System.ReadOnlySpan{System.Byte},System.Span{System.Char}@)">
+  Read(IEndiannessSpanSerializer, ReadOnlySpan&lt;byte&gt;, in Span&lt;char&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads a span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a> <code class="paramref">buffer</code> buffer into <code class="paramref">values</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Read(this IEndiannessSpanSerializer serializer, ReadOnlySpan&lt;byte&gt; buffer, in Span&lt;char&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Read_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Read_Backdash_Serialization_IEndiannessSpanSerializer_System_ReadOnlySpan_System_Byte__System_Span_System_Double___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read(Backdash.Serialization.IEndiannessSpanSerializer,System.ReadOnlySpan{System.Byte},System.Span{System.Double}@)">
+  Read(IEndiannessSpanSerializer, ReadOnlySpan&lt;byte&gt;, in Span&lt;double&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> from the buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Read(this IEndiannessSpanSerializer serializer, ReadOnlySpan&lt;byte&gt; buffer, in Span&lt;double&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Read_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Read_Backdash_Serialization_IEndiannessSpanSerializer_System_ReadOnlySpan_System_Byte__System_Span_System_Half___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read(Backdash.Serialization.IEndiannessSpanSerializer,System.ReadOnlySpan{System.Byte},System.Span{System.Half}@)">
+  Read(IEndiannessSpanSerializer, ReadOnlySpan&lt;byte&gt;, in Span&lt;Half&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a> from the buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Read(this IEndiannessSpanSerializer serializer, ReadOnlySpan&lt;byte&gt; buffer, in Span&lt;Half&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Read_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Read_Backdash_Serialization_IEndiannessSpanSerializer_System_ReadOnlySpan_System_Byte__System_Span_System_Single___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read(Backdash.Serialization.IEndiannessSpanSerializer,System.ReadOnlySpan{System.Byte},System.Span{System.Single}@)">
+  Read(IEndiannessSpanSerializer, ReadOnlySpan&lt;byte&gt;, in Span&lt;float&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a> from the buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Read(this IEndiannessSpanSerializer serializer, ReadOnlySpan&lt;byte&gt; buffer, in Span&lt;float&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_ReadDouble_" data-uid="Backdash.Serialization.EndiannessSerializerEx.ReadDouble*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_ReadDouble_Backdash_Serialization_IEndiannessSerializer_System_ReadOnlySpan_System_Byte__System_Int32__" data-uid="Backdash.Serialization.EndiannessSerializerEx.ReadDouble(Backdash.Serialization.IEndiannessSerializer,System.ReadOnlySpan{System.Byte},System.Int32@)">
+  ReadDouble(IEndiannessSerializer, ReadOnlySpan&lt;byte&gt;, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads single <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a> from the buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double ReadDouble(this IEndiannessSerializer serializer, ReadOnlySpan&lt;byte&gt; buffer, out int size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_ReadFloat_" data-uid="Backdash.Serialization.EndiannessSerializerEx.ReadFloat*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_ReadFloat_Backdash_Serialization_IEndiannessSerializer_System_ReadOnlySpan_System_Byte__System_Int32__" data-uid="Backdash.Serialization.EndiannessSerializerEx.ReadFloat(Backdash.Serialization.IEndiannessSerializer,System.ReadOnlySpan{System.Byte},System.Int32@)">
+  ReadFloat(IEndiannessSerializer, ReadOnlySpan&lt;byte&gt;, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads single <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a> from the buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static float ReadFloat(this IEndiannessSerializer serializer, ReadOnlySpan&lt;byte&gt; buffer, out int size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_ReadHalf_" data-uid="Backdash.Serialization.EndiannessSerializerEx.ReadHalf*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_ReadHalf_Backdash_Serialization_IEndiannessSerializer_System_ReadOnlySpan_System_Byte__System_Int32__" data-uid="Backdash.Serialization.EndiannessSerializerEx.ReadHalf(Backdash.Serialization.IEndiannessSerializer,System.ReadOnlySpan{System.Byte},System.Int32@)">
+  ReadHalf(IEndiannessSerializer, ReadOnlySpan&lt;byte&gt;, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads single <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a> from the buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Half ReadHalf(this IEndiannessSerializer serializer, ReadOnlySpan&lt;byte&gt; buffer, out int size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Read_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Read__1_Backdash_Serialization_IEndiannessSerializer_System_ReadOnlySpan_System_Byte__System_Int32__" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read``1(Backdash.Serialization.IEndiannessSerializer,System.ReadOnlySpan{System.Byte},System.Int32@)">
+  Read&lt;T&gt;(IEndiannessSerializer, ReadOnlySpan&lt;byte&gt;, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads number from the buffer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static T Read&lt;T&gt;(this IEndiannessSerializer serializer, ReadOnlySpan&lt;byte&gt; buffer, out int bytesToRead) where T : unmanaged, IUnsignedNumber&lt;T&gt;, IBinaryInteger&lt;T&gt;</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>bytesToRead</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Read_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Read__1_Backdash_Serialization_IEndiannessSerializer_System_ReadOnlySpan_System_Byte___System_Int32__" data-uid="Backdash.Serialization.EndiannessSerializerEx.Read``1(Backdash.Serialization.IEndiannessSerializer,System.ReadOnlySpan{System.Byte}@,System.Int32@)">
+  Read&lt;T&gt;(IEndiannessSerializer, in ReadOnlySpan&lt;byte&gt;, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads number from the buffer</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static T Read&lt;T&gt;(this IEndiannessSerializer serializer, in ReadOnlySpan&lt;byte&gt; buffer, out int bytesRead) where T : unmanaged, ISignedNumber&lt;T&gt;, IBinaryInteger&lt;T&gt;</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>bytesRead</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSerializer_System_Buffers_ArrayBufferWriter_System_Byte__System_Double__" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSerializer,System.Buffers.ArrayBufferWriter{System.Byte},System.Double@)">
+  Write(IEndiannessSerializer, ArrayBufferWriter&lt;byte&gt;, in double)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes single <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a> <code class="paramref">value</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool Write(this IEndiannessSerializer serializer, ArrayBufferWriter&lt;byte&gt; buffer, in double value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.arraybufferwriter-1">ArrayBufferWriter</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSerializer_System_Buffers_ArrayBufferWriter_System_Byte__System_Half__" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSerializer,System.Buffers.ArrayBufferWriter{System.Byte},System.Half@)">
+  Write(IEndiannessSerializer, ArrayBufferWriter&lt;byte&gt;, in Half)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes single <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a> <code class="paramref">value</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool Write(this IEndiannessSerializer serializer, ArrayBufferWriter&lt;byte&gt; buffer, in Half value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.arraybufferwriter-1">ArrayBufferWriter</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSerializer_System_Buffers_ArrayBufferWriter_System_Byte__System_Single__" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSerializer,System.Buffers.ArrayBufferWriter{System.Byte},System.Single@)">
+  Write(IEndiannessSerializer, ArrayBufferWriter&lt;byte&gt;, in float)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes single <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a> <code class="paramref">value</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool Write(this IEndiannessSerializer serializer, ArrayBufferWriter&lt;byte&gt; buffer, in float value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.arraybufferwriter-1">ArrayBufferWriter</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSerializer_System_Span_System_Byte__System_Double__System_Int32__" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSerializer,System.Span{System.Byte},System.Double@,System.Int32@)">
+  Write(IEndiannessSerializer, Span&lt;byte&gt;, in double, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes single <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a> <code class="paramref">value</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool Write(this IEndiannessSerializer serializer, Span&lt;byte&gt; buffer, in double value, out int size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSerializer_System_Span_System_Byte__System_Half__System_Int32__" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSerializer,System.Span{System.Byte},System.Half@,System.Int32@)">
+  Write(IEndiannessSerializer, Span&lt;byte&gt;, in Half, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes single <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a> <code class="paramref">value</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool Write(this IEndiannessSerializer serializer, Span&lt;byte&gt; buffer, in Half value, out int size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a></dt>
+    <dd></dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSerializer_System_Span_System_Byte__System_Single__System_Int32__" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSerializer,System.Span{System.Byte},System.Single@,System.Int32@)">
+  Write(IEndiannessSerializer, Span&lt;byte&gt;, in float, out int)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes single <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a> <code class="paramref">value</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool Write(this IEndiannessSerializer serializer, Span&lt;byte&gt; buffer, in float value, out int size)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSerializer.html">IEndiannessSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+    <dt><code>size</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSpanSerializer_System_Buffers_ArrayBufferWriter_System_Byte__System_ReadOnlySpan_System_Char___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSpanSerializer,System.Buffers.ArrayBufferWriter{System.Byte},System.ReadOnlySpan{System.Char}@)">
+  Write(IEndiannessSpanSerializer, ArrayBufferWriter&lt;byte&gt;, in ReadOnlySpan&lt;char&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes a span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a> <code class="paramref">value</code> into <code class="paramref">buffer</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void Write(this IEndiannessSpanSerializer serializer, ArrayBufferWriter&lt;byte&gt; buffer, in ReadOnlySpan&lt;char&gt; value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.arraybufferwriter-1">ArrayBufferWriter</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSpanSerializer_System_Buffers_ArrayBufferWriter_System_Byte__System_ReadOnlySpan_System_Double___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSpanSerializer,System.Buffers.ArrayBufferWriter{System.Byte},System.ReadOnlySpan{System.Double}@)">
+  Write(IEndiannessSpanSerializer, ArrayBufferWriter&lt;byte&gt;, in ReadOnlySpan&lt;double&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes a span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <code class="paramref">values</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void Write(this IEndiannessSpanSerializer serializer, ArrayBufferWriter&lt;byte&gt; buffer, in ReadOnlySpan&lt;double&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.arraybufferwriter-1">ArrayBufferWriter</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSpanSerializer_System_Buffers_ArrayBufferWriter_System_Byte__System_ReadOnlySpan_System_Half___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSpanSerializer,System.Buffers.ArrayBufferWriter{System.Byte},System.ReadOnlySpan{System.Half}@)">
+  Write(IEndiannessSpanSerializer, ArrayBufferWriter&lt;byte&gt;, in ReadOnlySpan&lt;Half&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes a span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a> <code class="paramref">values</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void Write(this IEndiannessSpanSerializer serializer, ArrayBufferWriter&lt;byte&gt; buffer, in ReadOnlySpan&lt;Half&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.arraybufferwriter-1">ArrayBufferWriter</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSpanSerializer_System_Buffers_ArrayBufferWriter_System_Byte__System_ReadOnlySpan_System_Single___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSpanSerializer,System.Buffers.ArrayBufferWriter{System.Byte},System.ReadOnlySpan{System.Single}@)">
+  Write(IEndiannessSpanSerializer, ArrayBufferWriter&lt;byte&gt;, in ReadOnlySpan&lt;float&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes a span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a> <code class="paramref">values</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void Write(this IEndiannessSpanSerializer serializer, ArrayBufferWriter&lt;byte&gt; buffer, in ReadOnlySpan&lt;float&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.buffers.arraybufferwriter-1">ArrayBufferWriter</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSpanSerializer_System_Span_System_Byte__System_ReadOnlySpan_System_Char___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSpanSerializer,System.Span{System.Byte},System.ReadOnlySpan{System.Char}@)">
+  Write(IEndiannessSpanSerializer, Span&lt;byte&gt;, in ReadOnlySpan&lt;char&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes a span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a> <code class="paramref">value</code> into <code class="paramref">buffer</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Write(this IEndiannessSpanSerializer serializer, Span&lt;byte&gt; buffer, in ReadOnlySpan&lt;char&gt; value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of bytes written.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSpanSerializer_System_Span_System_Byte__System_ReadOnlySpan_System_Double___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSpanSerializer,System.Span{System.Byte},System.ReadOnlySpan{System.Double}@)">
+  Write(IEndiannessSpanSerializer, Span&lt;byte&gt;, in ReadOnlySpan&lt;double&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes a span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <code class="paramref">values</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Write(this IEndiannessSpanSerializer serializer, Span&lt;byte&gt; buffer, in ReadOnlySpan&lt;double&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSpanSerializer_System_Span_System_Byte__System_ReadOnlySpan_System_Half___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSpanSerializer,System.Span{System.Byte},System.ReadOnlySpan{System.Half}@)">
+  Write(IEndiannessSpanSerializer, Span&lt;byte&gt;, in ReadOnlySpan&lt;Half&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes a span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a> <code class="paramref">values</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Write(this IEndiannessSpanSerializer serializer, Span&lt;byte&gt; buffer, in ReadOnlySpan&lt;Half&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.half">Half</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_Serialization_EndiannessSerializerEx_Write_" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write*"></a>
+
+  <h3 id="Backdash_Serialization_EndiannessSerializerEx_Write_Backdash_Serialization_IEndiannessSpanSerializer_System_Span_System_Byte__System_ReadOnlySpan_System_Single___" data-uid="Backdash.Serialization.EndiannessSerializerEx.Write(Backdash.Serialization.IEndiannessSpanSerializer,System.Span{System.Byte},System.ReadOnlySpan{System.Single}@)">
+  Write(IEndiannessSpanSerializer, Span&lt;byte&gt;, in ReadOnlySpan&lt;float&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Writes a span of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a> <code class="paramref">values</code> into buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Write(this IEndiannessSpanSerializer serializer, Span&lt;byte&gt; buffer, in ReadOnlySpan&lt;float&gt; values)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>serializer</code> <a class="xref" href="Backdash.Serialization.IEndiannessSpanSerializer.html">IEndiannessSpanSerializer</a></dt>
+    <dd></dd>
+    <dt><code>buffer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.span-1">Span</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Developed by <a href="http://delta3.studio/">Delta3</a> and <a href="https://lucasteles.dev/">Lucas Teles</a>.</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
