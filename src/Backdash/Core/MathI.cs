@@ -160,4 +160,48 @@ public static class MathI
     }
 
     #endregion
+
+    #region Sign Checks
+
+    /// <summary>
+    /// Checks if a type is an unsigned number
+    /// </summary>
+    public static bool IsUnsigned(Type type) =>
+        type == typeof(byte)
+        || type == typeof(ushort)
+        || type == typeof(uint)
+        || type == typeof(ulong)
+        || type == typeof(UInt128)
+        || type == typeof(nuint)
+        || (type.IsEnum && IsUnsigned(Enum.GetUnderlyingType(type)));
+
+    /// <summary>
+    /// Checks if an integer number type is unsigned
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsUnsigned<T>() where T : IBinaryInteger<T>, IMinMaxValue<T> => T.IsZero(T.MinValue);
+
+    /// <summary>
+    /// Checks if a type is a signed number
+    /// </summary>
+    public static bool IsSigned(Type type) =>
+        type == typeof(sbyte)
+        || type == typeof(short)
+        || type == typeof(int)
+        || type == typeof(long)
+        || type == typeof(Int128)
+        || type == typeof(nint)
+        || type == typeof(Half)
+        || type == typeof(float)
+        || type == typeof(double)
+        || type == typeof(decimal)
+        || (type.IsEnum && IsSigned(Enum.GetUnderlyingType(type)));
+
+    /// <summary>
+    /// Checks if an integer number type is signed
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsSigned<T>() where T : IBinaryInteger<T>, IMinMaxValue<T> => !IsUnsigned<T>();
+
+    #endregion
 }

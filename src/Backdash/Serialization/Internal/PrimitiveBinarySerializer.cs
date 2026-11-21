@@ -88,23 +88,23 @@ static class EnumBinarySerializer
     {
         endianness ??= Platform.Endianness;
 
-        return Type.GetTypeCode(typeof(TEnum)) switch
+        return EnumType.GetEnumTypeCode<TEnum>() switch
         {
-            TypeCode.Int32 => new EnumBinarySerializer<TEnum, int>(
+            EnumTypeCode.Int32 => new EnumBinarySerializer<TEnum, int>(
                 IntegerBinarySerializer.Create<int>(false, endianness)),
-            TypeCode.UInt32 => new EnumBinarySerializer<TEnum, uint>(
+            EnumTypeCode.UInt32 => new EnumBinarySerializer<TEnum, uint>(
                 IntegerBinarySerializer.Create<uint>(true, endianness)),
-            TypeCode.UInt64 => new EnumBinarySerializer<TEnum, ulong>(
+            EnumTypeCode.UInt64 => new EnumBinarySerializer<TEnum, ulong>(
                 IntegerBinarySerializer.Create<ulong>(true, endianness)),
-            TypeCode.UInt16 => new EnumBinarySerializer<TEnum, ushort>(
+            EnumTypeCode.UInt16 => new EnumBinarySerializer<TEnum, ushort>(
                 IntegerBinarySerializer.Create<ushort>(true, endianness)),
-            TypeCode.Byte => new EnumBinarySerializer<TEnum, byte>(
+            EnumTypeCode.Byte => new EnumBinarySerializer<TEnum, byte>(
                 IntegerBinarySerializer.Create<byte>(true, endianness)),
-            TypeCode.Int64 => new EnumBinarySerializer<TEnum, long>(
+            EnumTypeCode.Int64 => new EnumBinarySerializer<TEnum, long>(
                 IntegerBinarySerializer.Create<long>(false, endianness)),
-            TypeCode.Int16 => new EnumBinarySerializer<TEnum, short>(
+            EnumTypeCode.Int16 => new EnumBinarySerializer<TEnum, short>(
                 IntegerBinarySerializer.Create<short>(false, endianness)),
-            TypeCode.SByte => new EnumBinarySerializer<TEnum, sbyte>(
+            EnumTypeCode.SByte => new EnumBinarySerializer<TEnum, sbyte>(
                 IntegerBinarySerializer.Create<sbyte>(false, endianness)),
             _ => throw new InvalidTypeArgumentException<TEnum>(),
         };

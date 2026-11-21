@@ -1,5 +1,4 @@
 using System.Numerics;
-using Backdash.Core;
 using Backdash.Network;
 
 namespace Backdash.Serialization.Internal;
@@ -8,7 +7,7 @@ static class BinarySerializerFactory
 {
     public static IBinarySerializer<TInput> ForInteger<TInput>(Endianness? endianness = null)
         where TInput : unmanaged, IBinaryInteger<TInput>, IMinMaxValue<TInput> =>
-        IntegerBinarySerializer.Create<TInput>(Mem.IsUnsigned<TInput>(), endianness);
+        IntegerBinarySerializer.Create<TInput>(MathI.IsUnsigned<TInput>(), endianness);
 
     public static IBinarySerializer<TInput> ForInteger<TInput>(bool isUnsigned, Endianness? endianness = null)
         where TInput : unmanaged, IBinaryInteger<TInput> =>

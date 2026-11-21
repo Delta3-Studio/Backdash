@@ -46,10 +46,11 @@ public sealed class InputContext<TInput> where TInput : unmanaged
     /// <inheritdoc cref="ProtocolOptions.SerializationEndianness"/>
     public Endianness Endianness => options.Protocol.SerializationEndianness;
 
-    /// <summary>
-    /// Input type code
-    /// </summary>
+    /// <summary>Input type code</summary>
     public TypeCode InputTypeCode { get; }
+
+    /// <summary>EnumTypeCode (null if <typeparamref name="TInput"/> is not an enum type.)</summary>
+    public EnumTypeCode? InputEnumTypeCode { get; }
 
     internal InputContext(
         NetcodeOptions options,
@@ -61,6 +62,7 @@ public sealed class InputContext<TInput> where TInput : unmanaged
         Serializer = serializer;
         PlayerInputSerializer = inputSerializer;
         InputTypeCode = Type.GetTypeCode(typeof(TInput));
+        InputEnumTypeCode = EnumType.GetEnumTypeCode(typeof(TInput));
         PlayerInputSize = Unsafe.SizeOf<TInput>();
         ConfirmedInputSize = Unsafe.SizeOf<ConfirmedInputs<TInput>>();
         NumberSerializer = options.GetEndiannessStateSerializer();

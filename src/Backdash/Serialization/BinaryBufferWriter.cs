@@ -971,4 +971,17 @@ public readonly struct BinaryBufferWriter(
     public void WriteAsUInt128<T>(in List<T> value) where T : unmanaged => WriteAsUInt128(GetListSpan(in value));
 
     #endregion
+
+    /// <summary>Writes a <see cref="Enum" /> of type <typeparamref name="T"/> into buffer.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteEnum<T>(in T value) where T : unmanaged, Enum => EnumBinarySerialization<T>.Write(in this, value);
+
+    /// <inheritdoc cref="WriteEnum{T}(in T)" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteEnum<T>(in T? value) where T : unmanaged, Enum
+    {
+        Write(value.HasValue);
+        if (value.HasValue)
+            WriteEnum(in Nullable.GetValueRefOrDefaultRef(in value));
+    }
 }

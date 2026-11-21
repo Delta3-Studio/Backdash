@@ -1281,4 +1281,21 @@ public readonly ref struct BinaryBufferReader
 
         return null;
     }
+
+    /// <summary>Reads a <see cref="Enum" /> of type <typeparamref name="T"/> from the buffer.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T ReadEnum<T>() where T : unmanaged, Enum => EnumBinarySerialization<T>.Read(in this);
+
+    /// <inheritdoc cref="ReadEnum{T}()" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ReadEnum<T>(ref T value) where T : unmanaged, Enum =>
+        EnumBinarySerialization<T>.Read(in this, ref value);
+
+    /// <inheritdoc cref="ReadEnum{T}()" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ReadEnum<T>(ref T? value) where T : unmanaged, Enum => value = ReadNullableEnum<T>();
+
+    /// <inheritdoc cref="ReadEnum{T}()" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T? ReadNullableEnum<T>() where T : unmanaged, Enum => ReadBoolean() ? ReadEnum<T>() : null;
 }

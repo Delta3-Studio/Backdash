@@ -1,7 +1,6 @@
 using System.Buffers;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Backdash.Core;
 using Backdash.Data;
 using Backdash.Network;
 using Backdash.Serialization;
@@ -569,7 +568,7 @@ public class BinaryBufferReadWriteValueTests
             writer.WriteNumber(value);
             var reader = GetReader(writer);
             T read = default;
-            reader.ReadNumber(ref read, Mem.IsUnsigned<T>());
+            reader.ReadNumber(ref read, MathI.IsUnsigned<T>());
             reader.ReadCount.Should().Be(size);
             return EqualityComparer<T>.Default.Equals(read, value);
         }
@@ -752,6 +751,154 @@ public class BinaryBufferReadWriteValueTests
 
             ResetRead();
             var otherRead = reader.ReadAsUInt128<UInt128Enum>();
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            return value == read;
+        }
+    }
+
+    [Collection(SerialCollectionDefinition.Name)]
+    public class EnumTests
+    {
+        [PropertyTest]
+        public bool TestByte(ByteEnum value, ByteEnum read, Endianness endianness)
+        {
+            var size = Setup<ByteEnum>(endianness, out var writer);
+            writer.WriteEnum(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadEnum(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            var otherRead = reader.ReadEnum<ByteEnum>();
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            return value == read;
+        }
+
+        [PropertyTest]
+        public bool TestSByte(SByteEnum value, SByteEnum read, Endianness endianness)
+        {
+            var size = Setup<SByteEnum>(endianness, out var writer);
+            writer.WriteEnum(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadEnum(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            var otherRead = reader.ReadEnum<SByteEnum>();
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            return value == read;
+        }
+
+        [PropertyTest]
+        public bool TestInt16(Int16Enum value, Int16Enum read, Endianness endianness)
+        {
+            var size = Setup<Int16Enum>(endianness, out var writer);
+            writer.WriteEnum(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadEnum(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            var otherRead = reader.ReadEnum<Int16Enum>();
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            return value == read;
+        }
+
+        [PropertyTest]
+        public bool TestUInt16(UInt16Enum value, UInt16Enum read, Endianness endianness)
+        {
+            var size = Setup<UInt16Enum>(endianness, out var writer);
+            writer.WriteEnum(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadEnum(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            var otherRead = reader.ReadEnum<UInt16Enum>();
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            return value == read;
+        }
+
+        [PropertyTest]
+        public bool TestInt32(Int32Enum value, Int32Enum read, Endianness endianness)
+        {
+            var size = Setup<Int32Enum>(endianness, out var writer);
+            writer.WriteEnum(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadEnum(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            var otherRead = reader.ReadEnum<Int32Enum>();
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            return value == read;
+        }
+
+        [PropertyTest]
+        public bool TestUInt32(UInt32Enum value, UInt32Enum read, Endianness endianness)
+        {
+            var size = Setup<UInt32Enum>(endianness, out var writer);
+            writer.WriteEnum(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadEnum(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            var otherRead = reader.ReadEnum<UInt32Enum>();
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            return value == read;
+        }
+
+        [PropertyTest]
+        public bool TestInt64(Int64Enum value, Int64Enum read, Endianness endianness)
+        {
+            var size = Setup<Int64Enum>(endianness, out var writer);
+            writer.WriteEnum(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadEnum(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            var otherRead = reader.ReadEnum<Int64Enum>();
+            reader.ReadCount.Should().Be(size);
+            otherRead.Should().Be(read);
+
+            return value == read;
+        }
+
+        [PropertyTest]
+        public bool TestUInt64(UInt64Enum value, UInt64Enum read, Endianness endianness)
+        {
+            var size = Setup<UInt64Enum>(endianness, out var writer);
+            writer.WriteEnum(in value);
+
+            var reader = GetReader(writer);
+            reader.ReadEnum(ref read);
+            reader.ReadCount.Should().Be(size);
+
+            ResetRead();
+            var otherRead = reader.ReadEnum<UInt64Enum>();
             reader.ReadCount.Should().Be(size);
             otherRead.Should().Be(read);
 

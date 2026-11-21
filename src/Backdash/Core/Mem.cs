@@ -1,5 +1,4 @@
 using System.Buffers;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -47,9 +46,6 @@ static class Mem
         hash.AddBytes(MemoryMarshal.AsBytes(values));
         return hash.ToHashCode();
     }
-
-    public static bool IsUnsigned<T>() where T : IBinaryInteger<T>, IMinMaxValue<T> =>
-        T.IsZero(T.MinValue);
 
     public static string GetBitString(
         ReadOnlySpan<byte> bytes,
