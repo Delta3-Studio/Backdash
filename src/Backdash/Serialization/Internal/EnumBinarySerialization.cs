@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using Backdash.Serialization;
 
 namespace Backdash;
+
 static class EnumBinarySerialization<TEnum> where TEnum : unmanaged, Enum
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -16,7 +16,7 @@ public class SerializationBenchmark
 {
     TestData data = null!;
     TestData result = null!;
-    IEndiannessSerializer numberSerializer = null!;
+    EndiannessNumberSerializer numberSerializer;
     ArrayBufferWriter<byte> buffer = null!;
 
     [Params(Endianness.LittleEndian, Endianness.BigEndian)]

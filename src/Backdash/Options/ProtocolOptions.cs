@@ -12,9 +12,10 @@ public sealed record ProtocolOptions
     /// <summary>
     ///     Sets the <see cref="Endianness" /> used for network communication.
     /// </summary>
-    /// <seealso cref="Platform" />
+    /// <seealso cref="Platform.Endianness" />
+    /// <seealso cref="NetcodeOptions.StateSerializationEndianness" />
     /// <value>Defaults to <see cref="Endianness.BigEndian" /></value>
-    public Endianness SerializationEndianness { get; set; } = Endianness.BigEndian;
+    public Endianness NetworkSerializationEndianness { get; set; } = Endianness.BigEndian;
 
     /// <summary>
     ///     Number of bytes used on the <see cref="UdpSocket" /> message buffer.
@@ -223,7 +224,7 @@ public sealed record ProtocolOptions
 
     internal void Validate()
     {
-        ThrowIf.NotDefined(SerializationEndianness);
+        ThrowIf.NotDefined(NetworkSerializationEndianness);
         ThrowIf.NotDefined(LatencyStrategy);
         ThrowIf.NotPositive(UdpPacketBufferSize);
         ThrowIf.NotPositive(MaxPendingInputs);

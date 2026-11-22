@@ -92,7 +92,6 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         inputSerializer = services.InputSerializer;
         inputGroupSerializer = new ConfirmedInputsSerializer<TInput>(inputSerializer);
-        inputContext = new(this.options, inputSerializer, inputGroupSerializer);
 
         peerInputEventQueue = new();
         networkEventQueue = new();
@@ -133,6 +132,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
             Callbacks = callbacks,
         };
 
+        inputContext = new(this.options, inputSerializer, inputGroupSerializer, synchronizer.NumberSerializer);
         ConfigureJobs(services);
     }
 
@@ -213,7 +213,7 @@ sealed class RemoteSession<TInput> : INetcodeSession<TInput> where TInput : unma
     public int NumberOfSpectators => addedSpectators.Count;
     public int LocalPort => udp.BindPort;
     public Endianness StateSerializationEndianness => synchronizer.SerializationEndianness;
-    public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
+    public Endianness InputSerializationEndianness => options.Protocol.NetworkSerializationEndianness;
     public INetcodeSessionHandler GetHandler() => callbacks;
     public SessionMode Mode => SessionMode.Remote;
 

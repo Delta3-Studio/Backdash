@@ -46,7 +46,7 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
         var options = this.options.CloneOptions();
 
         SessionServices<TInput> services = new(
-            serializer.Invoke(options.Protocol.SerializationEndianness), options, sessionServices
+            serializer.Invoke(options.Protocol.NetworkSerializationEndianness), options, sessionServices
         );
 
         var session = GetSession();
@@ -317,7 +317,7 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
     /// <inheritdoc cref="NetcodeOptions.StateSerializationEndianness" />
     /// <seealso cref="NetcodeOptions"/>
     /// <seealso cref="NetcodeOptions.StateSerializationEndianness"/>
-    public NetcodeSessionBuilder<TInput> WithStateSerializationEndianness(Endianness endianness)
+    public NetcodeSessionBuilder<TInput> WithStateSerializationEndianness(Endianness? endianness)
     {
         options.StateSerializationEndianness = endianness;
         return this;
@@ -384,15 +384,15 @@ public sealed class NetcodeSessionBuilder<TInput> where TInput : unmanaged
             o.AppendLevel = appendLevel;
         });
 
-    /// <inheritdoc cref="ProtocolOptions.SerializationEndianness" />
+    /// <inheritdoc cref="ProtocolOptions.NetworkSerializationEndianness" />
     /// <seealso cref="ProtocolOptions"/>
-    /// <seealso cref="ProtocolOptions.SerializationEndianness"/>
+    /// <seealso cref="ProtocolOptions.NetworkSerializationEndianness"/>
     public NetcodeSessionBuilder<TInput> WithNetworkEndianness(Endianness endianness) =>
-        ConfigureProtocol(p => p.SerializationEndianness = endianness);
+        ConfigureProtocol(p => p.NetworkSerializationEndianness = endianness);
 
     /// <inheritdoc cref="WithNetworkEndianness(Endianness)" />
     public NetcodeSessionBuilder<TInput> WithNetworkEndianness(bool useNetworkEndianness = true) =>
-        WithNetworkEndianness(Platform.GetNetworkEndianness(useNetworkEndianness));
+        WithNetworkEndianness(Platform.FindEndianness(useNetworkEndianness));
 
     /// <inheritdoc cref="ProtocolOptions.NetworkPackageStatsEnabled" />
     /// <seealso cref="ProtocolOptions"/>

@@ -30,7 +30,7 @@ public class CompareSerializationBenchmark
     {
         Random random = new(42);
         data = TestData.Generate(random);
-        native = new(new(stream), new(stream));
+        native = (new(stream), new(stream));
         Console.WriteLine($"===> Current-Endianness: {Platform.Endianness})");
     }
 
@@ -61,7 +61,7 @@ public class CompareSerializationBenchmark
     [Benchmark]
     public void Backdash()
     {
-        var endianness = EndiannessSerializer.LittleEndian.Instance;
+        var endianness = EndiannessSerializer.LittleEndian;
         var writer = new BinaryBufferWriter(buffer, endianness);
         writer.Write(data);
         int offset = 0;
@@ -73,7 +73,7 @@ public class CompareSerializationBenchmark
     [Benchmark]
     public void Backdash_BigEndian()
     {
-        var endianness = EndiannessSerializer.BigEndian.Instance;
+        var endianness = EndiannessSerializer.BigEndian;
         var writer = new BinaryBufferWriter(buffer, endianness);
         writer.Write(data);
         int offset = 0;
@@ -128,7 +128,7 @@ public sealed partial class TestData : IBinarySerializable, INativeSerializable,
         writer.Write(Field1);
         writer.Write(Field2);
         writer.Write(Field3);
-        writer.WriteObject<TestEntryData>(Field4);
+        writer.WriteObject(Field4);
     }
 
     public void Deserialize(BinaryReader reader)
@@ -136,7 +136,7 @@ public sealed partial class TestData : IBinarySerializable, INativeSerializable,
         Field1 = reader.ReadBoolean();
         Field2 = reader.ReadUInt64();
         _ = reader.Read(Field3);
-        reader.ReadObject<TestEntryData>(Field4.AsSpan());
+        reader.ReadObject(Field4.AsSpan());
     }
 
     public override int GetHashCode() => throw new InvalidOperationException();
@@ -235,7 +235,7 @@ public partial struct TestEntryData() : IBinarySerializable, INativeSerializable
         writer.Write(Field6);
         writer.Write(Field7);
         writer.Write(Field8);
-        writer.WriteSpan<int>(Field9);
+        writer.WriteSpan(Field9);
     }
 
     public void Deserialize(BinaryReader reader)

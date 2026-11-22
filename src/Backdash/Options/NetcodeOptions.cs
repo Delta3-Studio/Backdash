@@ -1,7 +1,6 @@
 using Backdash.Core;
 using Backdash.Network;
 using Backdash.Network.Client;
-using Backdash.Serialization;
 using Backdash.Synchronizing.State;
 
 namespace Backdash.Options;
@@ -36,16 +35,15 @@ public sealed record NetcodeOptions
     public int SynchronizationInterval { get; set; } = 240;
 
     /// <summary>
-    ///     Sets the <see cref="Endianness" /> used for state serialization.
-    ///     If null, use the same endianness as <see cref="ProtocolOptions" />.
-    ///     <see cref="ProtocolOptions.SerializationEndianness" /> will be used.
+    ///     Sets the <see cref="Endianness" /> used for state serialization.<br/>
+    ///     If <see langword="null"/>, the <see cref="ProtocolOptions.NetworkSerializationEndianness" /> will be used.
     /// </summary>
-    /// <seealso cref="Platform" />
+    /// <seealso cref="Platform.Endianness" />
     /// <value>Defaults to <see cref="Endianness.LittleEndian" /></value>
     public Endianness? StateSerializationEndianness { get; set; } = Endianness.LittleEndian;
 
-    internal IEndiannessSerializer GetEndiannessStateSerializer() =>
-        EndiannessSerializer.Get(StateSerializationEndianness ?? Protocol.SerializationEndianness);
+    internal Endianness GetStateSerializationEndianness() =>
+        StateSerializationEndianness ?? Protocol.NetworkSerializationEndianness;
 
     /// <summary>
     ///     Max length for player input queues.

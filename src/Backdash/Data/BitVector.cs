@@ -11,14 +11,12 @@ readonly ref struct ReadOnlyBitVector(scoped in ReadOnlySpan<byte> bits)
     public int BitCount => Size * ByteSize.ByteToBits;
     public bool Get(int i) => BitVector.GetBit(Buffer, i);
     public bool this[int bit] => Get(bit);
-    public static ReadOnlyBitVector FromSpan(scoped in ReadOnlySpan<byte> bits) => new(bits);
     public override string ToString() => Mem.GetBitString(Buffer);
 }
 
 [DebuggerDisplay("{ToString()}")]
 readonly ref struct BitVector(scoped in Span<byte> bits)
 {
-    public static BitVector FromSpan(scoped in Span<byte> bits) => new(bits);
     public readonly Span<byte> Buffer = bits;
     public int ByteLength => Buffer.Length;
     public int Length => ByteLength * ByteSize.ByteToBits;

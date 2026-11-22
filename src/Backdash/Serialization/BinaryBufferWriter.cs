@@ -23,7 +23,7 @@ namespace Backdash.Serialization;
 [DebuggerDisplay("Written: {WrittenCount}")]
 public readonly struct BinaryBufferWriter(
     ArrayBufferWriter<byte> buffer,
-    IEndiannessSerializer numberSerializer
+    EndiannessNumberSerializer numberSerializer
 )
 {
     /// <summary>
@@ -31,12 +31,11 @@ public readonly struct BinaryBufferWriter(
     /// </summary>
     /// <param name="buffer">Byte buffer to be written</param>
     /// <param name="endianness">Serialization endianness</param>
-    public BinaryBufferWriter(ArrayBufferWriter<byte> buffer, Endianness endianness) : this(buffer,
-        EndiannessSerializer.Get(endianness))
-    { }
+    public BinaryBufferWriter(ArrayBufferWriter<byte> buffer, Endianness endianness)
+        : this(buffer, EndiannessSerializer.Get(endianness)) { }
 
     /// <inheritdoc cref="BinaryBufferWriter(System.Buffers.ArrayBufferWriter{byte},Backdash.Network.Endianness)"/>
-    public BinaryBufferWriter(ArrayBufferWriter<byte> buffer) : this(buffer, Platform.Endianness) { }
+    public BinaryBufferWriter(ArrayBufferWriter<byte> buffer) : this(buffer, EndiannessSerializer.Current) { }
 
     /// <summary>Gets current serialization endianness.</summary>
     public Endianness Endianness => numberSerializer.Endianness;
@@ -348,14 +347,14 @@ public readonly struct BinaryBufferWriter(
     public void Write(in bool[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="short" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<short> value) => numberSerializer.Span.Write(buffer, in value);
+    public void Write(in ReadOnlySpan<short> value) => numberSerializer.Buffer.Write(buffer, in value);
 
     /// <inheritdoc cref="Write(in ReadOnlySpan{short})"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(in short[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="ushort" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<ushort> value) => numberSerializer.Span.Write(buffer, in value);
+    public void Write(in ReadOnlySpan<ushort> value) => numberSerializer.Buffer.Write(buffer, in value);
 
     /// <inheritdoc cref="Write(in ReadOnlySpan{ushort})"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -369,42 +368,42 @@ public readonly struct BinaryBufferWriter(
     public void Write(in char[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="int" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<int> value) => numberSerializer.Span.Write(buffer, in value);
+    public void Write(in ReadOnlySpan<int> value) => numberSerializer.Buffer.Write(buffer, in value);
 
     /// <inheritdoc cref="Write(in ReadOnlySpan{int})"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(in int[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="uint" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<uint> value) => numberSerializer.Span.Write(buffer, in value);
+    public void Write(in ReadOnlySpan<uint> value) => numberSerializer.Buffer.Write(buffer, in value);
 
     /// <inheritdoc cref="Write(in ReadOnlySpan{uint})"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(in uint[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="long" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<long> value) => numberSerializer.Span.Write(buffer, in value);
+    public void Write(in ReadOnlySpan<long> value) => numberSerializer.Buffer.Write(buffer, in value);
 
     /// <inheritdoc cref="Write(in ReadOnlySpan{long})"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(in long[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="ulong" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<ulong> value) => numberSerializer.Span.Write(buffer, in value);
+    public void Write(in ReadOnlySpan<ulong> value) => numberSerializer.Buffer.Write(buffer, in value);
 
     /// <inheritdoc cref="Write(in ReadOnlySpan{ulong})"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(in ulong[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="Int128" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<Int128> value) => numberSerializer.Span.Write(buffer, in value);
+    public void Write(in ReadOnlySpan<Int128> value) => numberSerializer.Buffer.Write(buffer, in value);
 
     /// <inheritdoc cref="Write(in ReadOnlySpan{Int128})"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(in Int128[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="UInt128" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<UInt128> value) => numberSerializer.Span.Write(buffer, in value);
+    public void Write(in ReadOnlySpan<UInt128> value) => numberSerializer.Buffer.Write(buffer, in value);
 
     /// <inheritdoc cref="Write(in ReadOnlySpan{UInt128})"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -415,13 +414,13 @@ public readonly struct BinaryBufferWriter(
     public void Write(in float[] value) => Write(value.AsSpan());
 
     /// <summary>Writes a span of <see cref="float" /> <paramref name="values" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<float> values) => numberSerializer.Span.Write(buffer, in values);
+    public void Write(in ReadOnlySpan<float> values) => numberSerializer.Buffer.Write(buffer, in values);
 
     /// <summary>Writes a span of <see cref="double" /> <paramref name="values" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<double> values) => numberSerializer.Span.Write(buffer, in values);
+    public void Write(in ReadOnlySpan<double> values) => numberSerializer.Buffer.Write(buffer, in values);
 
     /// <summary>Writes a span of <see cref="Half" /> <paramref name="values" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<Half> values) => numberSerializer.Span.Write(buffer, in values);
+    public void Write(in ReadOnlySpan<Half> values) => numberSerializer.Buffer.Write(buffer, in values);
 
     /// <summary>Writes a span of <see cref="Guid" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<Guid> values)

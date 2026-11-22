@@ -28,8 +28,11 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
     readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
     readonly IDeterministicRandom<TInput> random;
-    readonly IEndiannessSerializer endianness;
+    readonly EndiannessNumberSerializer numberSerializer;
 
+    public Frame CurrentFrame { get; private set; } = Frame.Zero;
+    public Endianness InputSerializationEndianness { get; }
+    public Endianness StateSerializationEndianness { get; }
     public int TargetFrameRate { get; }
     public SessionReplayControl ReplayController { get; }
 
@@ -50,8 +53,9 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         random = services.DeterministicRandom;
         NumberOfPlayers = options.NumberOfPlayers;
         TargetFrameRate = options.FrameRate;
-        InputSerializationEndianness = options.Protocol.SerializationEndianness;
-        endianness = options.GetEndiannessStateSerializer();
+        InputSerializationEndianness = options.Protocol.NetworkSerializationEndianness;
+        StateSerializationEndianness = options.GetStateSerializationEndianness();
+        numberSerializer = EndiannessSerializer.Get(StateSerializationEndianness);
         callbacks = services.SessionHandler;
 
         fakePlayers = Enumerable.Range(0, NumberOfPlayers)
@@ -64,7 +68,8 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
 
         InputContext<TInput> inputContext = new(
             options, services.InputSerializer,
-            new ConfirmedInputsSerializer<TInput>(services.InputSerializer)
+            new ConfirmedInputsSerializer<TInput>(services.InputSerializer),
+            in numberSerializer
         );
 
         if (replayOptions.InputProvider is { } provider)
@@ -73,7 +78,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         else
             inputList = [];
 
-        ReplayController.LastInputFrame = Frame.Positive(inputList.Count - 1);
+        ReplayController.LastInputFrame = Frame.Nat(inputList.Count - 1);
     }
 
     public void Dispose()
@@ -98,9 +103,6 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         callbacks.OnSessionClose();
     }
 
-    public Endianness InputSerializationEndianness { get; }
-    public Endianness StateSerializationEndianness => endianness.Endianness;
-    public Frame CurrentFrame { get; private set; } = Frame.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public FrameSpan DynamicFrameDelay => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
@@ -220,7 +222,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         var currentFrame = CurrentFrame;
         ref var nextState = ref stateStore.Next();
 
-        BinaryBufferWriter writer = new(nextState.GameState, endianness);
+        BinaryBufferWriter writer = new(nextState.GameState, numberSerializer);
         callbacks.SaveState(currentFrame, ref writer);
         nextState.Frame = currentFrame;
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
@@ -249,7 +251,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
         logger.Write(LogLevel.Trace,
             $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum})");
         var offset = 0;
-        BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
+        BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, numberSerializer);
         callbacks.LoadState(frame, ref reader);
         CurrentFrame = savedFrame.Frame;
         return true;
@@ -261,7 +263,7 @@ sealed class ReplaySession<TInput> : INetcodeSession<TInput> where TInput : unma
             CurrentFrame = snapshot.Frame;
 
         var offset = 0;
-        BinaryBufferReader reader = new(snapshot.State, ref offset, endianness);
+        BinaryBufferReader reader = new(snapshot.State, ref offset, numberSerializer);
         callbacks.LoadState(CurrentFrame, ref reader);
     }
 }

@@ -28,7 +28,7 @@ public sealed class InputContext<TInput> where TInput : unmanaged
     /// <seealso cref="NetcodeOptions.StateSerializationEndianness"/>
     /// <seealso cref="Backdash.Network.Endianness"/>
     /// </summary>
-    public IEndiannessSerializer NumberSerializer { get; }
+    public EndiannessNumberSerializer NumberSerializer { get; }
 
     /// <summary>
     /// Struct size of <typeparamref name="TInput" />
@@ -43,8 +43,8 @@ public sealed class InputContext<TInput> where TInput : unmanaged
     /// <inheritdoc cref="NetcodeOptions.NumberOfPlayers"/>
     public int NumberOfPlayers => options.NumberOfPlayers;
 
-    /// <inheritdoc cref="ProtocolOptions.SerializationEndianness"/>
-    public Endianness Endianness => options.Protocol.SerializationEndianness;
+    /// <inheritdoc cref="ProtocolOptions.NetworkSerializationEndianness"/>
+    public Endianness Endianness => options.Protocol.NetworkSerializationEndianness;
 
     /// <summary>Input type code</summary>
     public TypeCode InputTypeCode { get; }
@@ -55,7 +55,8 @@ public sealed class InputContext<TInput> where TInput : unmanaged
     internal InputContext(
         NetcodeOptions options,
         IBinarySerializer<TInput> inputSerializer,
-        IBinarySerializer<ConfirmedInputs<TInput>> serializer
+        IBinarySerializer<ConfirmedInputs<TInput>> serializer,
+        in EndiannessNumberSerializer numberSerializer
     )
     {
         this.options = options;
@@ -65,7 +66,7 @@ public sealed class InputContext<TInput> where TInput : unmanaged
         InputEnumTypeCode = EnumType.GetEnumTypeCode(typeof(TInput));
         PlayerInputSize = Unsafe.SizeOf<TInput>();
         ConfirmedInputSize = Unsafe.SizeOf<ConfirmedInputs<TInput>>();
-        NumberSerializer = options.GetEndiannessStateSerializer();
+        NumberSerializer = numberSerializer;
     }
 
     /// <summary>

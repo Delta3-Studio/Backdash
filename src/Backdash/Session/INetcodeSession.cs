@@ -82,7 +82,7 @@ public interface INetcodeSessionInfo
 
     /// <summary>
     ///     Returns the input serialization <see cref="Endianness"/>
-    ///     <seealso cref="ProtocolOptions.SerializationEndianness"/>
+    ///     <seealso cref="ProtocolOptions.NetworkSerializationEndianness"/>
     /// </summary>
     Endianness InputSerializationEndianness { get; }
 

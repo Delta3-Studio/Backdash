@@ -53,7 +53,8 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
         lastLocalInputPadding = new(options.InputQueueLength / 2);
         inputQueues = new(2);
         Store = stateStore;
-        NumberSerializer = options.GetEndiannessStateSerializer();
+        SerializationEndianness = options.GetStateSerializationEndianness();
+        NumberSerializer = EndiannessSerializer.Get(SerializationEndianness);
         var saveBufferSize = options.TotalSavedFramesAllowed;
         stateStore.Initialize(saveBufferSize);
     }
@@ -62,9 +63,9 @@ sealed class Synchronizer<TInput> where TInput : unmanaged
 
     public bool InRollback { get; private set; }
     public IStateStore Store { get; }
-    public IEndiannessSerializer NumberSerializer { get; }
+    public Endianness SerializationEndianness { get; }
+    public EndiannessNumberSerializer NumberSerializer { get; }
     public Frame CurrentFrame => currentFrame;
-    public Endianness SerializationEndianness => NumberSerializer.Endianness;
     public FrameSpan FramesBehind => new(currentFrame.Number - lastConfirmedFrame.Number);
     public FrameSpan RollbackFrames => new((int)Math.Round(rollbackFrameCounter));
     public ReadOnlySpan<GameInput<TInput>> LastLocalInputPadding => lastLocalInputPadding.AsSpan();

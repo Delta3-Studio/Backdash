@@ -45,7 +45,11 @@ sealed class SpectatorSession<TInput> :
     bool closed;
     readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
-    readonly IEndiannessSerializer endianness;
+    readonly EndiannessNumberSerializer numberSerializer;
+
+    public Frame CurrentFrame { get; private set; } = Frame.Zero;
+    public int NumberOfPlayers { get; private set; }
+    public Endianness StateSerializationEndianness { get; }
 
     public SpectatorSession(
         SpectatorOptions spectatorOptions,
@@ -74,7 +78,8 @@ sealed class SpectatorSession<TInput> :
         PeerObserverGroup<ProtocolMessage> peerObservers = new();
         inputs = new GameInput<ConfirmedInputs<TInput>>[options.SpectatorInputBufferLength];
         callbacks = services.SessionHandler;
-        endianness = options.GetEndiannessStateSerializer();
+        StateSerializationEndianness = options.GetStateSerializationEndianness();
+        numberSerializer = EndiannessSerializer.Get(StateSerializationEndianness);
         udp = services.PeerClientFactory.CreateClient(options.LocalPort, peerObservers);
         ConfigureJobs(services);
 
@@ -151,7 +156,6 @@ sealed class SpectatorSession<TInput> :
     }
 
     public int TargetFrameRate => options.FrameRate;
-    public Frame CurrentFrame { get; private set; } = Frame.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
     public FrameSpan DynamicFrameDelay => FrameSpan.Zero;
     public FrameSpan FramesBehind => FrameSpan.Zero;
@@ -160,12 +164,10 @@ sealed class SpectatorSession<TInput> :
     public SavedState? GetSavedState(Frame frame) => stateStore.Get(frame);
     public INetcodeRandom Random => random;
     public INetcodeSessionHandler GetHandler() => callbacks;
-    public int NumberOfPlayers { get; private set; }
     public int NumberOfSpectators => 0;
     public int LocalPort => udp.BindPort;
     public double MaxPing => host.Ping;
-    public Endianness StateSerializationEndianness => endianness.Endianness;
-    public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
+    public Endianness InputSerializationEndianness => options.Protocol.NetworkSerializationEndianness;
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;
 
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;
@@ -317,7 +319,7 @@ sealed class SpectatorSession<TInput> :
     {
         ref var nextState = ref stateStore.Next();
 
-        BinaryBufferWriter writer = new(nextState.GameState, endianness);
+        BinaryBufferWriter writer = new(nextState.GameState, numberSerializer);
         callbacks.SaveState(CurrentFrame, ref writer);
         nextState.Frame = CurrentFrame;
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);
@@ -345,7 +347,7 @@ sealed class SpectatorSession<TInput> :
             $"Loading replay frame {savedFrame.Frame} (checksum: {savedFrame.Checksum})");
 
         var offset = 0;
-        BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, endianness);
+        BinaryBufferReader reader = new(savedFrame.GameState.WrittenSpan, ref offset, numberSerializer);
         callbacks.LoadState(frame, ref reader);
         CurrentFrame = savedFrame.Frame;
         return true;

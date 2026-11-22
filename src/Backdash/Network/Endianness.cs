@@ -18,16 +18,15 @@ public enum Endianness : byte
 public static class Platform
 {
     /// <summary>
-    ///     Current Endianness
+    ///     Returns the current machine endianness
     /// </summary>
     public static readonly Endianness Endianness =
         BitConverter.IsLittleEndian ? Endianness.LittleEndian : Endianness.BigEndian;
 
     /// <summary>
-    ///     Get Endianness for Network.
-    ///     If <paramref name="network" /> is True, returns <see cref="Network.Endianness.BigEndian" />.
-    ///     Otherwise, returns the current platform endianness, same as <see cref="Platform" />.
-    ///     <see cref="Platform.Endianness" />
+    ///     Gets a suitable <see cref="Endianness" />.<br/>
+    ///     If <paramref name="network" /> is <see langword="true"/>, returns <see cref="Endianness.BigEndian" />.
+    ///     otherwise, returns <see cref="Platform.Endianness" />.
     /// </summary>
-    public static Endianness GetNetworkEndianness(bool network) => network ? Endianness.BigEndian : Endianness;
+    public static Endianness FindEndianness(bool network = true) => network ? Endianness.BigEndian : Endianness;
 }

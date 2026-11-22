@@ -30,7 +30,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     readonly IStateStore stateStore;
     readonly IChecksumProvider checksumProvider;
     readonly IDeterministicRandom<TInput> random;
-    readonly IEndiannessSerializer endianness;
+    readonly EndiannessNumberSerializer numberSerializer;
     readonly EqualityComparer<TInput> comparer;
     readonly NetcodeOptions options;
 
@@ -39,6 +39,9 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
 
     INetcodeSessionHandler callbacks;
     Task backGroundJobTask = Task.CompletedTask;
+
+    public Frame CurrentFrame { get; private set; } = Frame.Zero;
+    public Endianness StateSerializationEndianness { get; }
 
     public LocalSession(
         NetcodeOptions options,
@@ -52,14 +55,16 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         checksumProvider = services.ChecksumProvider;
         random = services.DeterministicRandom;
         logger = services.Logger;
-        endianness = options.GetEndiannessStateSerializer();
+        StateSerializationEndianness = options.GetStateSerializationEndianness();
+        numberSerializer = EndiannessSerializer.Get(StateSerializationEndianness);
         callbacks = services.SessionHandler;
         comparer = services.InputComparer;
         stateStore.Initialize(options.TotalSavedFramesAllowed);
 
         var inputSerializer = services.InputSerializer;
         var inputGroupSerializer = new ConfirmedInputsSerializer<TInput>(inputSerializer);
-        inputContext = new(options, inputSerializer, inputGroupSerializer);
+        inputContext = new(options, inputSerializer, inputGroupSerializer, in numberSerializer);
+
         inputListener = services.InputListener;
         if (options.SaveConfirmedInputHistory)
             inputListener = new MemoryInputListener<TInput>(inputListener);
@@ -97,14 +102,11 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
     public int LocalPort => 0;
     public double MaxPing => 0.0;
     public int TargetFrameRate => options.FrameRate;
-    public Endianness StateSerializationEndianness => endianness.Endianness;
-    public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
     public INetcodeRandom Random => random;
     public INetcodeSessionHandler GetHandler() => callbacks;
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;
-
-    public Frame CurrentFrame { get; private set; } = Frame.Zero;
+    public Endianness InputSerializationEndianness => options.Protocol.NetworkSerializationEndianness;
     public SessionMode Mode => SessionMode.Local;
     public FrameSpan FramesBehind => FrameSpan.Zero;
     public FrameSpan RollbackFrames => FrameSpan.Zero;
@@ -298,7 +300,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         DiscardInputsAfter(frame);
 
         var offset = 0;
-        BinaryBufferReader reader = new(state.GameState.WrittenSpan, ref offset, endianness);
+        BinaryBufferReader reader = new(state.GameState.WrittenSpan, ref offset, numberSerializer);
         callbacks.LoadState(frame, ref reader);
         CurrentFrame = frame;
     }
@@ -333,7 +335,7 @@ sealed class LocalSession<TInput> : INetcodeSession<TInput> where TInput : unman
         var currentFrame = CurrentFrame;
         ref var nextState = ref stateStore.Next();
 
-        BinaryBufferWriter writer = new(nextState.GameState, endianness);
+        BinaryBufferWriter writer = new(nextState.GameState, numberSerializer);
         callbacks.SaveState(currentFrame, ref writer);
         nextState.Frame = currentFrame;
         nextState.Checksum = checksumProvider.Compute(nextState.GameState.WrittenSpan);

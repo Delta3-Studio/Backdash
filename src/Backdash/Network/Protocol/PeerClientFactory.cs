@@ -16,7 +16,7 @@ sealed class PeerClientFactory(
     public PeerClient<ProtocolMessage> CreateClient(int port, IPeerObserver<ProtocolMessage> observer) =>
         new(
             socketFactory.Create(port, options),
-            new ProtocolMessageSerializer(options.Protocol.SerializationEndianness),
+            new ProtocolMessageSerializer(options.Protocol.NetworkSerializationEndianness),
             observer,
             logger,
             LatencyWaiter.Create(

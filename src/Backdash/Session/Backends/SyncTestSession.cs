@@ -47,7 +47,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     readonly IStateStringParser stateParser;
     readonly IInputGenerator<TInput>? inputGenerator;
     readonly IDeterministicRandom<TInput> random;
-    readonly IEndiannessSerializer endianness;
+    readonly EndiannessNumberSerializer numberSerializer;
     readonly bool logStateOnDesync;
 
     INetcodeSessionHandler callbacks;
@@ -101,7 +101,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
             Callbacks = callbacks,
         };
 
-        endianness = synchronizer.NumberSerializer;
+        numberSerializer = synchronizer.NumberSerializer;
     }
 
     public void Dispose() => tsc.SetResult();
@@ -124,8 +124,8 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
     public FrameSpan RollbackFrames => synchronizer.RollbackFrames;
     public FrameSpan DynamicFrameDelay => FrameSpan.Zero;
     public int TargetFrameRate => options.FrameRate;
-    public Endianness StateSerializationEndianness => endianness.Endianness;
-    public Endianness InputSerializationEndianness => options.Protocol.SerializationEndianness;
+    public Endianness StateSerializationEndianness => synchronizer.SerializationEndianness;
+    public Endianness InputSerializationEndianness => options.Protocol.NetworkSerializationEndianness;
     public ReadOnlySpan<SynchronizedInput<TInput>> CurrentSynchronizedInputs => syncInputBuffer;
     public ReadOnlySpan<TInput> CurrentInputs => inputBuffer;
     public bool IsInRollback => synchronizer.InRollback;
@@ -324,7 +324,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
             Checksum: lastSaved.Checksum
         ));
 
-        if (frame - lastVerified < checkDistance.ToFrame())
+        if (frame - lastVerified < checkDistance.Last)
             return;
 
         // We've gone far enough ahead and should now start replaying frames.
@@ -378,13 +378,13 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
 
         var currentOffset = 0;
         var currentBytes = current.State.AsSpan(0, current.StateSize);
-        BinaryBufferReader currentReader = new(currentBytes, ref currentOffset, endianness);
+        BinaryBufferReader currentReader = new(currentBytes, ref currentOffset, numberSerializer);
         var currentObject = callbacks.CreateState(current.Frame, ref currentReader);
         var currentBody = stateParser.GetStateString(current.Frame, in currentReader, currentObject);
         LogSaveState(level, "CURRENT", currentBody, current.Checksum, current.Frame, current.Inputs.Frame.Number);
 
         var lastOffset = 0;
-        BinaryBufferReader previousReader = new(previous.GameState.WrittenSpan, ref lastOffset, endianness);
+        BinaryBufferReader previousReader = new(previous.GameState.WrittenSpan, ref lastOffset, numberSerializer);
         var previousObject = callbacks.CreateState(current.Frame, ref previousReader);
         var previousBody = stateParser.GetStateString(current.Frame, in previousReader, previousObject);
         LogSaveState(level, "LAST", previousBody, previous.Checksum, previous.Frame);

@@ -7,100 +7,85 @@ namespace Backdash.Serialization.Internal;
 static class DeltaXorRle
 {
     [DebuggerDisplay("{ToString()}")]
-    public ref struct Encoder
+    public ref struct Encoder(Span<byte> output, Span<byte> lastBuffer)
     {
-        BitOffsetWriter bitWriter;
-        readonly Span<byte> last;
-        public int Count { get; private set; }
+        BitOffsetWriter writer = new(output);
+        readonly Span<byte> last = lastBuffer;
+        public int Count { get; private set; } = 0;
 
-        public Encoder(Span<byte> output, Span<byte> lastBuffer)
-        {
-            Count = 0;
-            last = lastBuffer;
-            ThrowIf.Assert(output.Length > 0);
-            bitWriter = new(output);
-        }
-
-        public readonly ushort BitOffset => bitWriter.Offset;
+        public readonly ushort BitOffset => writer.Offset;
 
         public bool Write(ReadOnlySpan<byte> current)
         {
             ThrowIf.Assert(current.Length <= last.Length);
             if (!Mem.EqualBytes(current, last, truncate: true))
             {
-                var currentBits = ReadOnlyBitVector.FromSpan(current);
-                var lastBits = ReadOnlyBitVector.FromSpan(last);
-                var lastOffset = bitWriter.Offset;
+                ReadOnlyBitVector currentBits = new(in current);
+                ReadOnlyBitVector lastBits = new(last);
+                var lastOffset = writer.Offset;
                 try
                 {
                     for (var i = 0; i < currentBits.BitCount; i++)
                     {
                         if (currentBits[i] == lastBits[i])
                             continue;
-                        bitWriter.SetNext();
+                        writer.SetNext();
                         if (currentBits[i])
-                            bitWriter.SetNext();
+                            writer.SetNext();
                         else
-                            bitWriter.ClearNext();
-                        bitWriter.WriteNibble(i);
+                            writer.ClearNext();
+                        writer.WriteNibble(i);
                     }
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    bitWriter.Offset = lastOffset;
+                    writer.Offset = lastOffset;
                     return false;
                 }
             }
 
-            bitWriter.ClearNext();
+            writer.ClearNext();
             current.CopyTo(last);
             Count++;
             return true;
         }
 
         public override readonly string ToString() =>
-            $"{{ Count: {Count}, Writer: {bitWriter.ToString()} }}";
+            $"{{ Count: {Count}, Writer: {writer.ToString()} }}";
     }
 
     [DebuggerDisplay("{ToString()}")]
-    public ref struct Decoder
+    public ref struct Decoder(Span<byte> buffer, ushort bitCount)
     {
-        readonly ushort bitCount;
-        BitOffsetWriter bitVector;
-
-        public Decoder(Span<byte> buffer, ushort bitCount)
-        {
-            this.bitCount = bitCount;
-            bitVector = new(buffer);
-        }
+        BitOffsetWriter writer = new(buffer);
 
         public bool Skip(int count)
         {
             if (count <= 0) return true;
-            var lastOffset = bitVector.Offset;
+            var lastOffset = writer.Offset;
             try
             {
-                while (bitVector.Offset < bitCount)
+                while (writer.Offset < bitCount)
                 {
                     var skipNext = count-- > 0;
                     if (skipNext)
                     {
-                        while (bitVector.Read())
+                        while (writer.Read())
                         {
-                            bitVector.Read();
-                            bitVector.ReadNibble();
+                            writer.Read();
+                            writer.ReadNibble();
                         }
 
                         continue;
                     }
 
-                    ThrowIf.Assert(bitVector.Offset <= bitCount);
+                    ThrowIf.Assert(writer.Offset <= bitCount);
                     return true;
                 }
             }
             catch (IndexOutOfRangeException)
             {
-                bitVector.Offset = lastOffset;
+                writer.Offset = lastOffset;
                 return false;
             }
 
@@ -109,36 +94,36 @@ static class DeltaXorRle
 
         public bool Read(Span<byte> output)
         {
-            var outputBits = BitVector.FromSpan(output);
-            if (bitVector.Offset >= bitCount || bitVector.Completed)
+            BitVector bits = new(in output);
+            if (writer.Offset >= bitCount || writer.Completed)
                 return false;
-            var lastOffset = bitVector.Offset;
+            var lastOffset = writer.Offset;
             try
             {
-                while (bitVector.Read())
+                while (writer.Read())
                 {
-                    var on = bitVector.Read();
-                    var button = bitVector.ReadNibble();
+                    var on = writer.Read();
+                    var button = writer.ReadNibble();
                     if (on)
-                        outputBits.Set(button);
+                        bits.Set(button);
                     else
-                        outputBits.Clear(button);
+                        bits.Clear(button);
                 }
             }
             catch (IndexOutOfRangeException)
             {
-                bitVector.Offset = lastOffset;
+                writer.Offset = lastOffset;
                 return false;
             }
 
-            ThrowIf.Assert(bitVector.Offset <= bitCount);
+            ThrowIf.Assert(writer.Offset <= bitCount);
             return true;
         }
 
         public override readonly string ToString() =>
-            $"{{ Offset: {bitVector.Offset}/{bitCount}, " +
-            $"Read: {Mem.GetBitString(bitVector.Buffer[..bitVector.Offset])}," +
-            $"Pending: {Mem.GetBitString(bitVector.Buffer[bitVector.Offset..])}," +
+            $"{{ Offset: {writer.Offset}/{bitCount}, " +
+            $"Read: {Mem.GetBitString(writer.Buffer[..writer.Offset])}," +
+            $"Pending: {Mem.GetBitString(writer.Buffer[writer.Offset..])}," +
             $"}}";
     }
 }

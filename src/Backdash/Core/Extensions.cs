@@ -1,5 +1,7 @@
 using System.Buffers;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using Backdash.Core;
 
 namespace Backdash;
@@ -34,87 +36,108 @@ public static class NetcodeExtensions
         return result;
     }
 
-    /// <summary>
-    /// Return random gaussian numbers.
-    /// </summary>
-    public static void NextGaussian(this Random @this, out double first, out double second)
+    extension(Random @this)
     {
-        double u, v, s;
-        do
+        /// <summary>
+        /// Return random gaussian numbers.
+        /// </summary>
+        public void NextGaussian(out double first, out double second)
         {
-            u = (2.0 * @this.NextDouble()) - 1.0;
-            v = (2.0 * @this.NextDouble()) - 1.0;
-            s = (u * u) + (v * v);
-        } while (s is >= 1.0 or 0.0);
+            double u, v, s;
+            do
+            {
+                u = (2.0 * @this.NextDouble()) - 1.0;
+                v = (2.0 * @this.NextDouble()) - 1.0;
+                s = (u * u) + (v * v);
+            } while (s is >= 1.0 or 0.0);
 
-        var fac = Math.Sqrt(-2.0 * Math.Log(s) / s);
-        first = u * fac;
-        second = v * fac;
+            var fac = Math.Sqrt(-2.0 * Math.Log(s) / s);
+            first = u * fac;
+            second = v * fac;
+        }
+
+        /// <summary>
+        /// Return random gaussian number.
+        /// </summary>
+        public double NextGaussian()
+        {
+            @this.NextGaussian(out double first, out _);
+            return first;
+        }
+
+        /// <summary>
+        /// Returns a random <see cref="bool"/>
+        /// </summary>
+        public bool NextBool() => @this.Next(2) is 0;
+
+        /// <summary>
+        /// Returns a random <see cref="bool"/> using a success percentage defined by the parameter <paramref name="percentage"/>.
+        /// The <paramref name="percentage"/> must be in between 0 and 1.
+        /// </summary>
+        public bool NextBool(double percentage) =>
+            @this.NextDouble() < Math.Clamp(percentage, 0.0, 1.0);
+
+        /// <inheritdoc cref="System.Random.Shuffle{T}(T[])"/>
+        public void Shuffle<T>(List<T> values) =>
+            @this.Shuffle(CollectionsMarshal.AsSpan(values));
+
+        /// <summary>
+        /// Fill <paramref name="value"/> with random values.
+        /// </summary>
+        public void Generate<T>(scoped ref T value) where T : unmanaged
+        {
+            var bytes = Mem.AsBytes(ref value);
+            @this.NextBytes(bytes);
+        }
+
+        /// <summary>
+        /// Return a random <typeparamref name="T"/> value.
+        /// </summary>
+        public T Generate<T>() where T : unmanaged
+        {
+            T result = new();
+            @this.Generate(ref result);
+            return result;
+        }
+
+        /// <summary>
+        /// Fill <paramref name="buffer"/> with random <typeparamref name="T"/> values.
+        /// </summary>
+        public void Generate<T>(Span<T> buffer) where T : unmanaged =>
+            @this.NextBytes(MemoryMarshal.AsBytes(buffer));
+
+        /// <summary>
+        /// Fill <paramref name="buffer"/> with random <typeparamref name="T"/> values.
+        /// </summary>
+        public void Generate<T>(T[] buffer) where T : unmanaged =>
+            @this.Generate(buffer.AsSpan());
+
+        /// <summary>
+        /// Return an  array with random <typeparamref name="T"/> values.
+        /// </summary>
+        public T[] Generate<T>(int count) where T : unmanaged
+        {
+            var result = new T[count];
+            @this.Generate(result.AsSpan());
+            return result;
+        }
     }
 
-    /// <summary>
-    /// Return random gaussian number.
-    /// </summary>
-    public static double NextGaussian(this Random @this)
-    {
-        @this.NextGaussian(out double first, out _);
-        return first;
-    }
+    /// <summary>Reads a <see cref="Frame"/> value from <see cref="Utf8JsonReader"/></summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Frame GetFrame(this ref Utf8JsonReader reader) => new(reader.GetInt32());
 
-    /// <summary>
-    /// Returns a random <see cref="bool"/>
-    /// </summary>
-    public static bool NextBool(this Random random) => random.Next(2) is 0;
+    /// <summary>Writes a <see cref="Frame"/> value to <see cref="Utf8JsonWriter"/></summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteFrame(this Utf8JsonWriter writer, Frame value) =>
+        writer.WriteNumberValue(value.Number);
 
-    /// <summary>
-    /// Returns a random <see cref="bool"/> using a success percentage defined by the parameter <paramref name="percentage"/>.
-    /// The <paramref name="percentage"/> must be in between 0 and 1.
-    /// </summary>
-    public static bool NextBool(this Random random, double percentage) =>
-        random.NextDouble() < Math.Clamp(percentage, 0.0, 1.0);
+    /// <summary>Reads a <see cref="FrameSpan"/> value from <see cref="Utf8JsonReader"/></summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static FrameSpan GetFrameSpan(this ref Utf8JsonReader reader) => new(reader.GetInt32());
 
-    /// <inheritdoc cref="System.Random.Shuffle{T}(T[])"/>
-    public static void Shuffle<T>(this Random random, List<T> values) =>
-        random.Shuffle(CollectionsMarshal.AsSpan(values));
-
-    /// <summary>
-    /// Fill <paramref name="value"/> with random values.
-    /// </summary>
-    public static void Generate<T>(this Random random, scoped ref T value) where T : unmanaged
-    {
-        var bytes = Mem.AsBytes(ref value);
-        random.NextBytes(bytes);
-    }
-
-    /// <summary>
-    /// Return a random <typeparamref name="T"/> value.
-    /// </summary>
-    public static T Generate<T>(this Random random) where T : unmanaged
-    {
-        T result = new();
-        random.Generate(ref result);
-        return result;
-    }
-
-    /// <summary>
-    /// Fill <paramref name="buffer"/> with random <typeparamref name="T"/> values.
-    /// </summary>
-    public static void Generate<T>(this Random random, Span<T> buffer) where T : unmanaged =>
-        random.NextBytes(MemoryMarshal.AsBytes(buffer));
-
-    /// <summary>
-    /// Fill <paramref name="buffer"/> with random <typeparamref name="T"/> values.
-    /// </summary>
-    public static void Generate<T>(this Random random, T[] buffer) where T : unmanaged =>
-        random.Generate(buffer.AsSpan());
-
-    /// <summary>
-    /// Return an  array with random <typeparamref name="T"/> values.
-    /// </summary>
-    public static T[] Generate<T>(this Random random, int count) where T : unmanaged
-    {
-        var result = new T[count];
-        random.Generate(result.AsSpan());
-        return result;
-    }
+    /// <summary>Writes a <see cref="FrameSpan"/> value to <see cref="Utf8JsonWriter"/></summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteFrameSpan(this Utf8JsonWriter writer, FrameSpan value) =>
+        writer.WriteNumberValue(value.Frames);
 }
