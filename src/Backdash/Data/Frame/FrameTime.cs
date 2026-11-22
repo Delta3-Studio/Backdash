@@ -93,22 +93,22 @@ public static class FrameTime
         Default.GetTotalMillisecondFrames(milliseconds);
 
     /// <summary>
-    ///     Returns the number of frames for <paramref name="seconds" />.
-    /// </summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetFrames(double seconds) => Default.GetFrames(seconds);
-
-    /// <summary>
     ///     Returns the number of frames for <paramref name="duration" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetFrames(TimeSpan duration) => Default.GetFrames(duration);
+    public static int From(TimeSpan duration) => Default.GetFrames(duration);
 
     /// <summary>
     ///     Returns the number of frames for <paramref name="milliseconds" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetMillisecondFrames(double milliseconds) => Default.GetMillisecondFrames(milliseconds);
+    public static int FromMillisecond(double milliseconds) => Default.GetMillisecondFrames(milliseconds);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="seconds" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int FromSeconds(double seconds) => Default.GetFrames(seconds);
 
     /// <summary>Return one frame in seconds</summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]

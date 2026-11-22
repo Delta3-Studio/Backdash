@@ -1,5 +1,8 @@
+// ReSharper disable InvocationIsCultureSensitive
+
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Backdash.Core;
 using Backdash.Core.Json;
 
@@ -57,6 +60,13 @@ public readonly record struct FrameSpan :
     /// </summary>
     public bool IsPositive => Frames > 0;
 
+    /// <summary>Returns the value for the current frame span as a <see cref="Frame" />.</summary>
+    public Frame Last
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => (Frame)Frames;
+    }
+
     /// <summary>Returns the time value for the current frame span in seconds.</summary>
     public double Seconds(int fps) => FrameTime.GetSeconds(Frames, fps);
 
@@ -69,14 +79,21 @@ public readonly record struct FrameSpan :
     /// <summary>Returns the time value for the current frame span in <see cref="TimeSpan" />.</summary>
     public TimeSpan Duration() => FrameTime.GetDuration(Frames);
 
-    /// <summary>Returns the value for the current frame span as a <see cref="Frame" />.</summary>
-    public Frame ToFrame() => new(Frames);
-
     /// <summary>Returns a <see cref="FrameRange"/> starting at 0 with the current frame span duration.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public FrameRange ToRange() => new(this);
 
     /// <summary>Returns a <see cref="FrameRange"/> starting at <paramref name="start"/> with the current frame span duration.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public FrameRange ToRange(Frame start) => new(start, this);
+
+    /// <summary>Returns a <see cref="FrameCounter"/> starting at 0 with the current frame span total.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public FrameCounter ToCounter() => new(this);
+
+    /// <summary>Returns a <see cref="FrameCounter"/> starting at <paramref name="start"/> with the current frame span total.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public FrameCounter ToCounter(Frame start) => new(start, this);
 
     /// <summary>
     ///     Returns a frame at the time position in milliseconds
@@ -84,34 +101,30 @@ public readonly record struct FrameSpan :
     public Frame GetFrameAtMilliSecond(double millis, int fps)
     {
         var span = FromMilliseconds(millis, fps);
-        if (span.Frames > Frames)
-            throw new InvalidOperationException("Out of range frame time");
-
-        return span.ToFrame();
+        return ValidateFrame(span);
     }
 
     /// <summary>
     ///     Returns a frame at the time position in milliseconds
     /// </summary>
+    /// <returns><see cref="Frame.Null"/> if outside of current range</returns>
     public Frame GetFrameAtMilliSecond(double millis)
     {
-        var span = FromMilliseconds(millis);
-        if (span.Frames > Frames)
-            throw new InvalidOperationException("Out of range frame time");
-
-        return span.ToFrame();
+        var result = FromMilliseconds(millis);
+        return ValidateFrame(result);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    Frame ValidateFrame(FrameSpan result) =>
+        result.Frames > Frames ? Frame.Null : result.Last;
 
     /// <summary>
     ///     Returns a frame at the time position in seconds
     /// </summary>
     public Frame GetFrameAtSecond(double seconds, int fps)
     {
-        var span = FromSeconds(seconds, fps);
-        if (span.Frames > Frames)
-            throw new InvalidOperationException("Out of range frame time");
-
-        return span.ToFrame();
+        var result = FromSeconds(seconds, fps);
+        return ValidateFrame(result);
     }
 
     /// <summary>
@@ -119,11 +132,8 @@ public readonly record struct FrameSpan :
     /// </summary>
     public Frame GetFrameAtSecond(double seconds)
     {
-        var span = FromSeconds(seconds);
-        if (span.Frames > Frames)
-            throw new InvalidOperationException("Out of range frame time");
-
-        return span.ToFrame();
+        var result = FromSeconds(seconds);
+        return ValidateFrame(result);
     }
 
     /// <summary>
@@ -183,7 +193,7 @@ public readonly record struct FrameSpan :
     /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="seconds" />
     /// </summary>
-    public static FrameSpan FromSeconds(double seconds) => new(FrameTime.GetFrames(seconds));
+    public static FrameSpan FromSeconds(double seconds) => new(FrameTime.FromSeconds(seconds));
 
     /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="duration" /> at specified <paramref name="fps" />.
@@ -194,8 +204,7 @@ public readonly record struct FrameSpan :
     /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="duration" />.
     /// </summary>
-    public static FrameSpan FromTimeSpan(TimeSpan duration) =>
-        new(FrameTime.GetFrames(duration));
+    public static FrameSpan From(TimeSpan duration) => new(FrameTime.From(duration));
 
     /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="milliseconds" /> at specified <paramref name="fps" />.
@@ -235,6 +244,21 @@ public readonly record struct FrameSpan :
     /// </summary>
     public static FrameSpan Clamp(FrameSpan frame, Frame min, Frame max) =>
         Clamp(frame, min.Number, max.Number);
+
+    /// <summary>
+    ///     Clamps frame value to be greater than zero
+    /// </summary>
+    public static FrameSpan Nat(int frame) => new(Math.Max(frame, 0));
+
+    /// <summary>
+    ///     Clamps frame value to greater than or equal 0
+    /// </summary>
+    public static FrameSpan Nat(FrameSpan frame) => Nat(frame.Frames);
+
+    /// <summary>
+    ///     Clamps frame value from 0 to <paramref name="max"/>
+    /// </summary>
+    public static FrameSpan Nat(FrameSpan frame, FrameSpan max) => Clamp(frame, Zero, max);
 
     /// <inheritdoc />
     public static bool operator >(FrameSpan left, FrameSpan right) => left.Frames > right.Frames;
@@ -282,14 +306,34 @@ public readonly record struct FrameSpan :
     public static FrameRange operator -(FrameSpan left, FrameRange right) => right + left;
 
     /// <inheritdoc cref="Frames" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator int(FrameSpan frame) => frame.Frames;
 
     /// <inheritdoc cref="FrameSpan(int)" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator FrameSpan(int frame) => new(frame);
 
     /// <inheritdoc cref="Frames" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator Frame(FrameSpan frame) => new(frame.Frames);
 
     /// <inheritdoc cref="FrameSpan(int)" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator FrameSpan(Frame frame) => new(frame.Number);
+
+    /// <inheritdoc cref="Duration()" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator TimeSpan(FrameSpan frames) => frames.Duration();
+
+    /// <inheritdoc cref="From" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator FrameSpan(TimeSpan frame) => From(frame);
+
+    /// <inheritdoc cref="Frames" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator FrameRange(FrameSpan frames) => frames.ToRange();
+
+    /// <inheritdoc cref="Frames" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator FrameCounter(FrameSpan frames) => frames.ToCounter();
 }

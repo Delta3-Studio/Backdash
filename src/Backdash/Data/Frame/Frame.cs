@@ -1,6 +1,9 @@
+// ReSharper disable InvocationIsCultureSensitive
+
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Backdash.Core;
 using Backdash.Core.Json;
 
@@ -53,6 +56,22 @@ public readonly record struct Frame :
     public Frame(int number) => Number = number;
 
     /// <summary>
+    ///     Returns <see langword="true" /> if the current frame is a null frame.
+    ///     <see cref="Null"/>
+    /// </summary>
+    public bool IsNull => Number is NullValue;
+
+    /// <summary>
+    ///     Returns <see langword="true" /> if the current frame is 0
+    /// </summary>
+    public bool IsZero => Number is 0;
+
+    /// <summary>
+    ///     Returns <see langword="true" /> if the current frame negative
+    /// </summary>
+    public bool IsNegative => Number < 0;
+
+    /// <summary>
     ///     Returns the next frame for the current <see cref="Frame" /> value.
     /// </summary>
     public Frame Next() => new(Number + 1);
@@ -73,15 +92,9 @@ public readonly record struct Frame :
     public Frame Previous(int amount) => new(Number - amount);
 
     /// <summary>
-    ///     Returns <see langword="true" /> if the current frame is a null frame.
-    ///     <see cref="Null"/>
+    ///     Returns frame as a <see cref="FrameSpan"/>
     /// </summary>
-    public bool IsNull => Number is NullValue;
-
-    /// <summary>
-    ///     Returns <see langword="true" /> if the current frame is 0
-    /// </summary>
-    public bool IsZero => Number is 0;
+    public FrameSpan ToSpan() => (FrameSpan)this;
 
     /// <inheritdoc />
     public int CompareTo(Frame other) => Number.CompareTo(other.Number);
@@ -156,12 +169,17 @@ public readonly record struct Frame :
     /// <summary>
     ///     Clamps frame value to be greater than zero
     /// </summary>
-    public static Frame Positive(int frame) => new(Math.Clamp(frame, 0, int.MaxValue));
+    public static Frame Nat(int frame) => new(Math.Max(frame, 0));
 
     /// <summary>
     ///     Clamps frame value to be greater than zero
     /// </summary>
-    public static Frame Positive(Frame frame) => Positive(frame.Number);
+    public static Frame Nat(Frame frame) => Nat(frame.Number);
+
+    /// <summary>
+    ///     Clamps frame value from 0 to <paramref name="max"/>
+    /// </summary>
+    public static Frame Nat(Frame frame, Frame max) => Clamp(frame, Zero, max);
 
     /// <inheritdoc />
     public static bool operator >(Frame left, Frame right) => left.Number > right.Number;
@@ -218,8 +236,10 @@ public readonly record struct Frame :
     public static FrameSpan operator +(Frame left, FrameSpan right) => right + left.Number;
 
     /// <inheritdoc cref="Number" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator int(Frame frame) => frame.Number;
 
     /// <inheritdoc cref="Frame(int)" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator Frame(int frame) => new(frame);
 }

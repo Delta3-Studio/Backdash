@@ -1,12 +1,12 @@
+// ReSharper disable InvocationIsCultureSensitive
+
 using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Backdash.Core;
 
 namespace Backdash;
 
@@ -39,7 +39,7 @@ public readonly record struct FrameRange(Frame Start, Frame End)
     public FrameRange(FrameSpan duration) : this(Frame.Zero, duration) { }
 
     /// <summary>
-    /// Get or set the duration of the range
+    /// Get the duration of the range
     /// </summary>
     public FrameSpan Duration => new(Math.Abs(End.Number - Start.Number) + 1);
 
@@ -100,84 +100,37 @@ public readonly record struct FrameRange(Frame Start, Frame End)
         }
     }
 
-    sealed class FrameRangeJsonConverter : JsonConverter<FrameRange>
-    {
-        public override FrameRange Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            if (reader.TokenType is not JsonTokenType.StartArray)
-                throw new JsonException("Start of array expected");
-
-            reader.Read();
-            var start = reader.GetInt32();
-
-            reader.Read();
-            var end = reader.GetInt32();
-
-            reader.Read();
-            if (reader.TokenType is not JsonTokenType.EndArray)
-                throw new JsonException("End of array expected");
-
-            return new((Frame)start, (Frame)end);
-        }
-
-        public override void Write(Utf8JsonWriter writer, FrameRange value, JsonSerializerOptions options)
-        {
-            writer.WriteStartArray();
-            writer.WriteNumberValue(value.Start.Number);
-            writer.WriteNumberValue(value.End.Number);
-            writer.WriteEndArray();
-        }
-    }
-
-    /// <inheritdoc />
-    public string ToString(string? format, IFormatProvider? formatProvider)
-    {
-        format ??= "D";
-        DefaultInterpolatedStringHandler handler = new(3, 2, formatProvider ?? CultureInfo.InvariantCulture);
-        handler.AppendLiteral("[");
-        handler.AppendFormatted(Start, format);
-        handler.AppendLiteral("..");
-        handler.AppendFormatted(End, format);
-        handler.AppendLiteral("]");
-        return handler.ToStringAndClear();
-    }
-
     /// <inheritdoc />
     public override string ToString() => ToString(null, null);
+
+    /// <inheritdoc />
+    public string ToString(string? format, IFormatProvider? formatProvider) =>
+        FrameHelpers.GetString(
+            Start, End, "[", "..", "]",
+            format, formatProvider
+        );
 
     /// <inheritdoc />
     public bool TryFormat(
         Span<char> destination, out int charsWritten,
         [StringSyntax(StringSyntaxAttribute.NumericFormat)]
         ReadOnlySpan<char> format,
-        IFormatProvider? provider)
-    {
-        charsWritten = 0;
-        SpanStringBuilder writer = new(destination, ref charsWritten, provider ?? CultureInfo.InvariantCulture);
-        if (format.IsEmpty) format = "D";
-        return writer.Write("[")
-               && writer.Write(Start.Number, format)
-               && writer.Write("..")
-               && writer.Write(End.Number, format)
-               && writer.Write("]");
-    }
+        IFormatProvider? provider) =>
+        FrameHelpers.TryFormat(
+            Start, End, "[", "..", "]",
+            destination, out charsWritten, format, provider
+        );
 
     /// <inheritdoc />
     public bool TryFormat(
         Span<byte> utf8Destination, out int bytesWritten,
         [StringSyntax(StringSyntaxAttribute.NumericFormat)]
         ReadOnlySpan<char> format,
-        IFormatProvider? provider)
-    {
-        bytesWritten = 0;
-        if (format.IsEmpty) format = "D";
-        Utf8StringBuilder writer = new(utf8Destination, ref bytesWritten);
-        return writer.Write("[")
-               && writer.Write(Start.Number, format)
-               && writer.Write("..")
-               && writer.Write(End.Number, format)
-               && writer.Write("]");
-    }
+        IFormatProvider? provider) =>
+        FrameHelpers.TryFormat(
+            Start, End, "[", "..", "]",
+            utf8Destination, out bytesWritten, format, provider
+        );
 
     /// <summary>
     /// Checks if a frame intersects with another range
@@ -245,9 +198,11 @@ public readonly record struct FrameRange(Frame Start, Frame End)
         new(range.Start, range.Duration);
 
     /// <inheritdoc cref="Duration" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator FrameSpan(FrameRange range) => range.Duration;
 
     /// <inheritdoc cref="FrameSpan(int)" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator FrameRange(FrameSpan amount) => new(amount);
 
     /// <summary>
@@ -301,5 +256,34 @@ public readonly record struct FrameRange(Frame Start, Frame End)
 
         /// <inheritdoc />
         public readonly void Dispose() { }
+    }
+
+    sealed class FrameRangeJsonConverter : JsonConverter<FrameRange>
+    {
+        public override FrameRange Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType is not JsonTokenType.StartArray)
+                throw new JsonException("Start of array expected");
+
+            reader.Read();
+            var start = reader.GetFrame();
+
+            reader.Read();
+            var end = reader.GetFrame();
+
+            reader.Read();
+            if (reader.TokenType is not JsonTokenType.EndArray)
+                throw new JsonException("End of array expected");
+
+            return new(start, end);
+        }
+
+        public override void Write(Utf8JsonWriter writer, FrameRange value, JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+            writer.WriteFrame(value.Start);
+            writer.WriteFrame(value.End);
+            writer.WriteEndArray();
+        }
     }
 }
