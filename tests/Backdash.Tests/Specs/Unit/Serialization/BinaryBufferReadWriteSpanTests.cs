@@ -529,6 +529,45 @@ public class BinaryBufferReadWriteSpanTests
         }
     }
 
+    [Collection(SerialCollectionDefinition.Name)]
+    public class EnumTests
+    {
+        static bool TestEnum<T>(T[] value, Endianness endianness) where T : unmanaged, Enum
+        {
+            var size = Setup(value, endianness, out var writer);
+            writer.WriteEnum(value);
+            var reader = GetReader(writer);
+            Span<T> read = stackalloc T[value.Length];
+            reader.ReadEnum(read);
+            reader.ReadCount.Should().Be(size);
+            return value.AsSpan().SequenceEqual(read);
+        }
+
+        [PropertyTest]
+        public bool SpanOfByte(ByteEnum[] value, Endianness endianness) => TestEnum(value, endianness);
+
+        [PropertyTest]
+        public bool SpanOfSByte(SByteEnum[] value, Endianness endianness) => TestEnum(value, endianness);
+
+        [PropertyTest]
+        public bool SpanOfInt16(Int16Enum[] value, Endianness endianness) => TestEnum(value, endianness);
+
+        [PropertyTest]
+        public bool SpanOfUInt16(UInt16Enum[] value, Endianness endianness) => TestEnum(value, endianness);
+
+        [PropertyTest]
+        public bool SpanOfInt32(Int32Enum[] value, Endianness endianness) => TestEnum(value, endianness);
+
+        [PropertyTest]
+        public bool SpanOfUInt32(UInt32Enum[] value, Endianness endianness) => TestEnum(value, endianness);
+
+        [PropertyTest]
+        public bool SpanOfInt64(Int64Enum[] value, Endianness endianness) => TestEnum(value, endianness);
+
+        [PropertyTest]
+        public bool SpanOfUInt64(UInt64Enum[] value, Endianness endianness) => TestEnum(value, endianness);
+    }
+
     static int readOffset;
 
     static int Setup<T>(

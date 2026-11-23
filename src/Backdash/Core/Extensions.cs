@@ -123,21 +123,27 @@ public static class NetcodeExtensions
         }
     }
 
-    /// <summary>Reads a <see cref="Frame"/> value from <see cref="Utf8JsonReader"/></summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Frame GetFrame(this ref Utf8JsonReader reader) => new(reader.GetInt32());
+    extension(ref Utf8JsonReader reader)
+    {
+        /// <summary>Reads a <see cref="Frame"/> value from <see cref="Utf8JsonReader"/></summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Frame GetFrame() => new(reader.GetInt32());
 
-    /// <summary>Writes a <see cref="Frame"/> value to <see cref="Utf8JsonWriter"/></summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteFrame(this Utf8JsonWriter writer, Frame value) =>
-        writer.WriteNumberValue(value.Number);
+        /// <summary>Reads a <see cref="FrameSpan"/> value from <see cref="Utf8JsonReader"/></summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public FrameSpan GetFrameSpan() => new(reader.GetInt32());
+    }
 
-    /// <summary>Reads a <see cref="FrameSpan"/> value from <see cref="Utf8JsonReader"/></summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static FrameSpan GetFrameSpan(this ref Utf8JsonReader reader) => new(reader.GetInt32());
+    extension(Utf8JsonWriter writer)
+    {
+        /// <summary>Writes a <see cref="Frame"/> value to <see cref="Utf8JsonWriter"/></summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteFrame(Frame value) =>
+            writer.WriteNumberValue(value.Number);
 
-    /// <summary>Writes a <see cref="FrameSpan"/> value to <see cref="Utf8JsonWriter"/></summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteFrameSpan(this Utf8JsonWriter writer, FrameSpan value) =>
-        writer.WriteNumberValue(value.Frames);
+        /// <summary>Writes a <see cref="FrameSpan"/> value to <see cref="Utf8JsonWriter"/></summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteFrameSpan(FrameSpan value) =>
+            writer.WriteNumberValue(value.Frames);
+    }
 }

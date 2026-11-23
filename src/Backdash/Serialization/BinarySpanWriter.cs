@@ -839,4 +839,15 @@ public readonly ref struct BinarySpanWriter
         if (value.HasValue)
             WriteEnum(in Nullable.GetValueRefOrDefaultRef(in value));
     }
+
+    /// <inheritdoc cref="WriteEnum{T}(in T)" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteEnum<T>(ReadOnlySpan<T> values) where T : unmanaged, Enum =>
+        EnumBinarySerialization<T>.Write(in this, values);
+
+    /// <inheritdoc cref="WriteEnum{T}(in T)" />
+    public void WriteEnum<T>(in T[] value) where T : unmanaged, Enum => WriteEnum((ReadOnlySpan<T>)value);
+
+    /// <inheritdoc cref="WriteEnum{T}(in T)" />
+    public void WriteEnum<T>(in List<T> value) where T : unmanaged, Enum => WriteEnum(GetListSpan(in value));
 }

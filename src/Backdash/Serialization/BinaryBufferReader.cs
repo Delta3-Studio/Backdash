@@ -984,6 +984,9 @@ public readonly ref struct BinaryBufferReader
     public void ReadAsByte<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, byte>(values));
 
     /// <inheritdoc cref="ReadAsByte{T}()" />
+    public void ReadAsByte<T>(in T[] values) where T : unmanaged => ReadAsByte(values.AsSpan());
+
+    /// <inheritdoc cref="ReadAsByte{T}()" />
     public void ReadAsByte<T>(in List<T> values) where T : unmanaged => ReadAsByte(GetListSpan(in values));
 
     /// <inheritdoc cref="ReadAsByte{T}()" />
@@ -1013,6 +1016,9 @@ public readonly ref struct BinaryBufferReader
 
     /// <inheritdoc cref="ReadAsSByte{T}()" />
     public void ReadAsSByte<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, sbyte>(values));
+
+    /// <inheritdoc cref="ReadAsSByte{T}()" />
+    public void ReadAsSByte<T>(in T[] values) where T : unmanaged => ReadAsSByte(values.AsSpan());
 
     /// <inheritdoc cref="ReadAsSByte{T}()" />
     public void ReadAsSByte<T>(in List<T> values) where T : unmanaged => ReadAsSByte(GetListSpan(in values));
@@ -1046,6 +1052,9 @@ public readonly ref struct BinaryBufferReader
     public void ReadAsInt16<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, short>(values));
 
     /// <inheritdoc cref="ReadAsInt16{T}()" />
+    public void ReadAsInt16<T>(in T[] values) where T : unmanaged => ReadAsInt16(values.AsSpan());
+
+    /// <inheritdoc cref="ReadAsInt16{T}()" />
     public void ReadAsInt16<T>(in List<T> values) where T : unmanaged => ReadAsInt16(GetListSpan(in values));
 
     /// <inheritdoc cref="ReadAsInt16{T}()" />
@@ -1075,6 +1084,9 @@ public readonly ref struct BinaryBufferReader
 
     /// <inheritdoc cref="ReadAsUInt16{T}()" />
     public void ReadAsUInt16<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, ushort>(values));
+
+    /// <inheritdoc cref="ReadAsUInt16{T}()" />
+    public void ReadAsUInt16<T>(in T[] values) where T : unmanaged => ReadAsUInt16(values.AsSpan());
 
     /// <inheritdoc cref="ReadAsUInt16{T}()" />
     public void ReadAsUInt16<T>(in List<T> values) where T : unmanaged => ReadAsUInt16(GetListSpan(in values));
@@ -1108,6 +1120,9 @@ public readonly ref struct BinaryBufferReader
     public void ReadAsInt32<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, int>(values));
 
     /// <inheritdoc cref="ReadAsInt32{T}()" />
+    public void ReadAsInt32<T>(in T[] values) where T : unmanaged => ReadAsInt32(values.AsSpan());
+
+    /// <inheritdoc cref="ReadAsInt32{T}()" />
     public void ReadAsInt32<T>(in List<T> values) where T : unmanaged => ReadAsInt32(GetListSpan(in values));
 
     /// <inheritdoc cref="ReadAsInt32{T}()" />
@@ -1137,6 +1152,9 @@ public readonly ref struct BinaryBufferReader
 
     /// <inheritdoc cref="ReadAsUInt32{T}()" />
     public void ReadAsUInt32<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, uint>(values));
+
+    /// <inheritdoc cref="ReadAsUInt32{T}()" />
+    public void ReadAsUInt32<T>(in T[] values) where T : unmanaged => ReadAsUInt32(values.AsSpan());
 
     /// <inheritdoc cref="ReadAsUInt32{T}()" />
     public void ReadAsUInt32<T>(in List<T> values) where T : unmanaged => ReadAsUInt32(GetListSpan(in values));
@@ -1170,6 +1188,9 @@ public readonly ref struct BinaryBufferReader
     public void ReadAsInt64<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, long>(values));
 
     /// <inheritdoc cref="ReadAsInt64{T}()" />
+    public void ReadAsInt64<T>(in T[] values) where T : unmanaged => ReadAsInt64(values.AsSpan());
+
+    /// <inheritdoc cref="ReadAsInt64{T}()" />
     public void ReadAsInt64<T>(in List<T> values) where T : unmanaged => ReadAsInt64(GetListSpan(in values));
 
     /// <inheritdoc cref="ReadAsInt64{T}()" />
@@ -1201,6 +1222,9 @@ public readonly ref struct BinaryBufferReader
     public void ReadAsUInt64<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, ulong>(values));
 
     /// <inheritdoc cref="ReadAsUInt64{T}()" />
+    public void ReadAsUInt64<T>(in T[] values) where T : unmanaged => ReadAsUInt64(values.AsSpan());
+
+    /// <inheritdoc cref="ReadAsUInt64{T}()" />
     public void ReadAsUInt64<T>(in List<T> values) where T : unmanaged => ReadAsUInt64(GetListSpan(in values));
 
     /// <inheritdoc cref="ReadAsUInt64{T}()" />
@@ -1230,6 +1254,9 @@ public readonly ref struct BinaryBufferReader
 
     /// <inheritdoc cref="ReadAsInt128{T}()" />
     public void ReadAsInt128<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, Int128>(values));
+
+    /// <inheritdoc cref="ReadAsInt128{T}()" />
+    public void ReadAsInt128<T>(in T[] values) where T : unmanaged => ReadAsInt128(values.AsSpan());
 
     /// <inheritdoc cref="ReadAsInt128{T}()" />
     public void ReadAsInt128<T>(in List<T> values) where T : unmanaged => ReadAsInt128(GetListSpan(in values));
@@ -1264,6 +1291,9 @@ public readonly ref struct BinaryBufferReader
     public void ReadAsUInt128<T>(in Span<T> values) where T : unmanaged => Read(MemoryMarshal.Cast<T, UInt128>(values));
 
     /// <inheritdoc cref="ReadAsUInt128{T}()" />
+    public void ReadAsUInt128<T>(in T[] values) where T : unmanaged => ReadAsUInt128(values.AsSpan());
+
+    /// <inheritdoc cref="ReadAsUInt128{T}()" />
     public void ReadAsUInt128<T>(in List<T> values) where T : unmanaged => ReadAsUInt128(GetListSpan(in values));
 
     /// <inheritdoc cref="ReadAsUInt128{T}()" />
@@ -1281,6 +1311,10 @@ public readonly ref struct BinaryBufferReader
         return null;
     }
 
+    /// <inheritdoc cref="ReadEnum{T}()" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T? ReadNullableEnum<T>() where T : unmanaged, Enum => ReadBoolean() ? ReadEnum<T>() : null;
+
     /// <summary>Reads a <see cref="Enum" /> of type <typeparamref name="T"/> from the buffer.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T ReadEnum<T>() where T : unmanaged, Enum => EnumBinarySerialization<T>.Read(in this);
@@ -1296,5 +1330,13 @@ public readonly ref struct BinaryBufferReader
 
     /// <inheritdoc cref="ReadEnum{T}()" />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T? ReadNullableEnum<T>() where T : unmanaged, Enum => ReadBoolean() ? ReadEnum<T>() : null;
+    public void ReadEnum<T>(Span<T> values) where T : unmanaged, Enum =>
+        EnumBinarySerialization<T>.Read(in this, values);
+
+    /// <inheritdoc cref="ReadEnum{T}()" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ReadEnum<T>(T[] values) where T : unmanaged, Enum => ReadEnum(values.AsSpan());
+
+    /// <inheritdoc cref="ReadEnum{T}()" />
+    public void ReadEnum<T>(in List<T> values) where T : unmanaged, Enum => ReadEnum(GetListSpan(in values));
 }

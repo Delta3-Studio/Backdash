@@ -36,6 +36,36 @@ static class EnumBinarySerialization<TEnum> where TEnum : unmanaged, Enum
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Write(ref readonly BinaryBufferWriter writer, ReadOnlySpan<TEnum> value)
+    {
+        var type = EnumType<TEnum>.UnderlyingType;
+        if (type == typeof(byte)) writer.WriteAsByte(in value);
+        else if (type == typeof(sbyte)) writer.WriteAsSByte(in value);
+        else if (type == typeof(short)) writer.WriteAsInt16(in value);
+        else if (type == typeof(ushort)) writer.WriteAsUInt16(in value);
+        else if (type == typeof(int)) writer.WriteAsInt32(in value);
+        else if (type == typeof(uint)) writer.WriteAsUInt32(in value);
+        else if (type == typeof(long)) writer.WriteAsInt64(in value);
+        else if (type == typeof(ulong)) writer.WriteAsUInt64(in value);
+        else throw new NotSupportedException();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Write(ref readonly BinarySpanWriter writer, ReadOnlySpan<TEnum> value)
+    {
+        var type = EnumType<TEnum>.UnderlyingType;
+        if (type == typeof(byte)) writer.WriteAsByte(in value);
+        else if (type == typeof(sbyte)) writer.WriteAsSByte(in value);
+        else if (type == typeof(short)) writer.WriteAsInt16(in value);
+        else if (type == typeof(ushort)) writer.WriteAsUInt16(in value);
+        else if (type == typeof(int)) writer.WriteAsInt32(in value);
+        else if (type == typeof(uint)) writer.WriteAsUInt32(in value);
+        else if (type == typeof(long)) writer.WriteAsInt64(in value);
+        else if (type == typeof(ulong)) writer.WriteAsUInt64(in value);
+        else throw new NotSupportedException();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TEnum Read(ref readonly BinaryBufferReader reader)
     {
         var type = EnumType<TEnum>.UnderlyingType;
@@ -65,5 +95,19 @@ static class EnumBinarySerialization<TEnum> where TEnum : unmanaged, Enum
         else if (type == typeof(ulong)) reader.ReadAsUInt64(ref value);
         else throw new NotSupportedException();
     }
-}
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Read(ref readonly BinaryBufferReader reader, Span<TEnum> value)
+    {
+        var type = EnumType<TEnum>.UnderlyingType;
+        if (type == typeof(byte)) reader.ReadAsByte(value);
+        else if (type == typeof(sbyte)) reader.ReadAsSByte(value);
+        else if (type == typeof(short)) reader.ReadAsInt16(value);
+        else if (type == typeof(ushort)) reader.ReadAsUInt16(value);
+        else if (type == typeof(int)) reader.ReadAsInt32(value);
+        else if (type == typeof(uint)) reader.ReadAsUInt32(value);
+        else if (type == typeof(long)) reader.ReadAsInt64(value);
+        else if (type == typeof(ulong)) reader.ReadAsUInt64(value);
+        else throw new NotSupportedException();
+    }
+}
