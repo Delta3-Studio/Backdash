@@ -378,40 +378,40 @@ public readonly ref struct BinarySpanWriter
     public void Write(in ReadOnlySpan<bool> value) => WriteSpan(in value);
 
     /// <summary>Writes a span of <see cref="short" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<short> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<short> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="ushort" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<ushort> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<ushort> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="char" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<char> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<char> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="int" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<int> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<int> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="uint" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<uint> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<uint> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="long" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<long> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<long> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="ulong" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<ulong> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<ulong> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="Int128" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<Int128> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<Int128> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="UInt128" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<UInt128> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<UInt128> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="float" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<float> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<float> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="double" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<double> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<double> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="Half" /> <paramref name="value" /> into buffer.</summary>
-    public void Write(in ReadOnlySpan<Half> value) => Advance(numberSerializer.Buffer.Write(CurrentBuffer, in value));
+    public void Write(in ReadOnlySpan<Half> value) => Advance(numberSerializer.Write(CurrentBuffer, in value));
 
     /// <summary>Writes a span of <see cref="Guid" /> <paramref name="values" /> into buffer.</summary>
     public void Write(in ReadOnlySpan<Guid> values)

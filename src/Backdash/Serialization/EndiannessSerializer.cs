@@ -1,4 +1,6 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable S4136 // Adjacent methods with same name
+// ReSharper disable MemberCanBePrivate.Global
 
 using System.Buffers;
 using System.Buffers.Binary;
@@ -45,18 +47,19 @@ public static class EndiannessSerializer
 public readonly struct EndiannessNumberSerializer
 {
     readonly bool bigEndian;
-
-    /// <summary>Gets the span serializer.</summary>
-    public readonly EndiannessSpanSerializer Buffer;
+    readonly bool reverse;
 
     internal EndiannessNumberSerializer(Endianness endianness)
     {
         bigEndian = endianness is Endianness.BigEndian;
-        Buffer = new(EndiannessSerializer.NeedsReverse(endianness));
+        reverse = EndiannessSerializer.NeedsReverse(endianness);
     }
 
     /// <summary>Gets the serializer endianness.</summary>
     public Endianness Endianness => bigEndian ? Endianness.BigEndian : Endianness.LittleEndian;
+
+    // ReSharper disable once ConvertToAutoPropertyWhenPossible
+    public bool NeedsReverse => reverse;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Read<T>(ReadOnlySpan<byte> buffer, bool isUnsigned, out int size)
@@ -88,11 +91,14 @@ public readonly struct EndiannessNumberSerializer
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Guid ReadGuid(ReadOnlySpan<byte> buffer, out int size)
-    {
-        size = Unsafe.SizeOf<Guid>();
-        return new(buffer[..size], bigEndian);
-    }
+    public T Read<T>(in ReadOnlySpan<byte> buffer, out int bytesRead)
+        where T : unmanaged, ISignedNumber<T>, IBinaryInteger<T> =>
+        Read<T>(buffer, false, out bytesRead);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T Read<T>(ReadOnlySpan<byte> buffer, out int bytesToRead)
+        where T : unmanaged, IUnsignedNumber<T>, IBinaryInteger<T> =>
+        Read<T>(buffer, true, out bytesToRead);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Write<T>(Span<byte> buffer, T value, out int size)
@@ -133,22 +139,6 @@ public readonly struct EndiannessNumberSerializer
         buffer.Advance(size);
         return true;
     }
-}
-
-/// <summary>
-/// Endianness-specific span serializer.
-/// </summary>
-public readonly struct EndiannessSpanSerializer
-{
-    readonly bool reverse;
-
-    // ReSharper disable once UnusedMember.Global
-    public EndiannessSpanSerializer(Endianness endianness) : this(EndiannessSerializer.NeedsReverse(endianness)) { }
-
-    internal EndiannessSpanSerializer(bool reverse) => this.reverse = reverse;
-
-    // ReSharper disable once ConvertToAutoPropertyWhenPossible
-    public bool ReverseEnabled => reverse;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<short> value)
@@ -303,11 +293,65 @@ public readonly struct EndiannessSpanSerializer
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<char> value) =>
+        Write(buffer, MemoryMarshal.Cast<char, ushort>(value));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Write(Span<byte> buffer, in ReadOnlySpan<char> value) =>
+        Write(buffer, MemoryMarshal.Cast<char, ushort>(value));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Write(Span<byte> buffer, in ReadOnlySpan<float> values) =>
+        Write(buffer, MemoryMarshal.Cast<float, int>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Write(Span<byte> buffer, in ReadOnlySpan<double> values) =>
+        Write(buffer, MemoryMarshal.Cast<double, long>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Write(Span<byte> buffer, in ReadOnlySpan<Half> values) =>
+        Write(buffer, MemoryMarshal.Cast<Half, short>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<float> values) =>
+        Write(buffer, MemoryMarshal.Cast<float, int>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<double> values) =>
+        Write(buffer, MemoryMarshal.Cast<double, long>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<Half> values) =>
+        Write(buffer, MemoryMarshal.Cast<Half, short>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Write(Span<byte> buffer, in Half value, out int size) =>
+        Write(buffer, BitConverter.HalfToInt16Bits(value), out size);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Write(Span<byte> buffer, in float value, out int size) =>
+        Write(buffer, BitConverter.SingleToInt32Bits(value), out size);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Write(Span<byte> buffer, in double value, out int size) =>
+        Write(buffer, BitConverter.DoubleToInt64Bits(value), out size);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Write(ArrayBufferWriter<byte> buffer, in Half value) =>
+        Write(buffer, BitConverter.HalfToInt16Bits(value));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Write(ArrayBufferWriter<byte> buffer, in float value) =>
+        Write(buffer, BitConverter.SingleToInt32Bits(value));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Write(ArrayBufferWriter<byte> buffer, in double value) =>
+        Write(buffer, BitConverter.DoubleToInt64Bits(value));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Read(ReadOnlySpan<byte> buffer, in Span<short> values)
     {
-        if (!reverse)
-            return Mem.ReadSpan(buffer, values);
-
+        if (!reverse) return Mem.ReadSpan(buffer, values);
         var data = Mem.CastSpan<short>(buffer, values.Length, out var size);
         BinaryPrimitives.ReverseEndianness(data, values);
         return size;
@@ -316,9 +360,7 @@ public readonly struct EndiannessSpanSerializer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Read(ReadOnlySpan<byte> buffer, in Span<ushort> values)
     {
-        if (!reverse)
-            return Mem.ReadSpan(buffer, values);
-
+        if (!reverse) return Mem.ReadSpan(buffer, values);
         var data = Mem.CastSpan<ushort>(buffer, values.Length, out var size);
         BinaryPrimitives.ReverseEndianness(data, values);
         return size;
@@ -327,9 +369,7 @@ public readonly struct EndiannessSpanSerializer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Read(ReadOnlySpan<byte> buffer, in Span<int> values)
     {
-        if (!reverse)
-            return Mem.ReadSpan(buffer, values);
-
+        if (!reverse) return Mem.ReadSpan(buffer, values);
         var data = Mem.CastSpan<int>(buffer, values.Length, out var size);
         BinaryPrimitives.ReverseEndianness(data, values);
         return size;
@@ -338,9 +378,7 @@ public readonly struct EndiannessSpanSerializer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Read(ReadOnlySpan<byte> buffer, in Span<uint> values)
     {
-        if (!reverse)
-            return Mem.ReadSpan(buffer, values);
-
+        if (!reverse) return Mem.ReadSpan(buffer, values);
         var data = Mem.CastSpan<uint>(buffer, values.Length, out var size);
         BinaryPrimitives.ReverseEndianness(data, values);
         return size;
@@ -349,9 +387,7 @@ public readonly struct EndiannessSpanSerializer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Read(ReadOnlySpan<byte> buffer, in Span<long> values)
     {
-        if (!reverse)
-            return Mem.ReadSpan(buffer, values);
-
+        if (!reverse) return Mem.ReadSpan(buffer, values);
         var data = Mem.CastSpan<long>(buffer, values.Length, out var size);
         BinaryPrimitives.ReverseEndianness(data, values);
         return size;
@@ -360,9 +396,7 @@ public readonly struct EndiannessSpanSerializer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Read(ReadOnlySpan<byte> buffer, in Span<ulong> values)
     {
-        if (!reverse)
-            return Mem.ReadSpan(buffer, values);
-
+        if (!reverse) return Mem.ReadSpan(buffer, values);
         var data = Mem.CastSpan<ulong>(buffer, values.Length, out var size);
         BinaryPrimitives.ReverseEndianness(data, values);
         return size;
@@ -371,9 +405,7 @@ public readonly struct EndiannessSpanSerializer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Read(ReadOnlySpan<byte> buffer, in Span<Int128> values)
     {
-        if (!reverse)
-            return Mem.ReadSpan(buffer, values);
-
+        if (!reverse) return Mem.ReadSpan(buffer, values);
         var data = Mem.CastSpan<Int128>(buffer, values.Length, out var size);
         BinaryPrimitives.ReverseEndianness(data, values);
         return size;
@@ -382,105 +414,53 @@ public readonly struct EndiannessSpanSerializer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Read(ReadOnlySpan<byte> buffer, in Span<UInt128> values)
     {
-        if (!reverse)
-            return Mem.ReadSpan(buffer, values);
-
+        if (!reverse) return Mem.ReadSpan(buffer, values);
         var data = Mem.CastSpan<UInt128>(buffer, values.Length, out var size);
         BinaryPrimitives.ReverseEndianness(data, values);
         return size;
     }
-}
 
-/// <summary>
-/// Endianness serializer extensions.
-/// </summary>
-public static class EndiannessSerializerEx
-{
-    extension(ref readonly EndiannessNumberSerializer serializer)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Read(ReadOnlySpan<byte> buffer, in Span<char> values) =>
+        Read(buffer, MemoryMarshal.Cast<char, ushort>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Read(ReadOnlySpan<byte> buffer, in Span<Half> values) =>
+        Read(buffer, MemoryMarshal.Cast<Half, short>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Read(ReadOnlySpan<byte> buffer, in Span<float> values) =>
+        Read(buffer, MemoryMarshal.Cast<float, int>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Read(ReadOnlySpan<byte> buffer, in Span<double> values) =>
+        Read(buffer, MemoryMarshal.Cast<double, long>(values));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Guid ReadGuid(ReadOnlySpan<byte> buffer, out int size)
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Read<T>(in ReadOnlySpan<byte> buffer, out int bytesRead)
-            where T : unmanaged, ISignedNumber<T>, IBinaryInteger<T> =>
-            serializer.Read<T>(buffer, false, out bytesRead);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Read<T>(ReadOnlySpan<byte> buffer, out int bytesToRead)
-            where T : unmanaged, IUnsignedNumber<T>, IBinaryInteger<T> =>
-            serializer.Read<T>(buffer, true, out bytesToRead);
-
-        public Half ReadHalf(ReadOnlySpan<byte> buffer, out int size)
-        {
-            var num = serializer.Read<short>(buffer, false, out size);
-            return BitConverter.Int16BitsToHalf(num);
-        }
-
-        public float ReadFloat(ReadOnlySpan<byte> buffer, out int size)
-        {
-            var num = serializer.Read<int>(buffer, false, out size);
-            return BitConverter.Int32BitsToSingle(num);
-        }
-
-        public double ReadDouble(ReadOnlySpan<byte> buffer, out int size)
-        {
-            var num = serializer.Read<long>(buffer, false, out size);
-            return BitConverter.Int64BitsToDouble(num);
-        }
-
-        public bool Write(Span<byte> buffer, in Half value, out int size) =>
-            serializer.Write(buffer, BitConverter.HalfToInt16Bits(value), out size);
-
-        public bool Write(Span<byte> buffer, in float value, out int size) =>
-            serializer.Write(buffer, BitConverter.SingleToInt32Bits(value), out size);
-
-        public bool Write(Span<byte> buffer, in double value, out int size) =>
-            serializer.Write(buffer, BitConverter.DoubleToInt64Bits(value), out size);
-
-        public bool Write(ArrayBufferWriter<byte> buffer, in Half value) =>
-            serializer.Write(buffer, BitConverter.HalfToInt16Bits(value));
-
-        public bool Write(ArrayBufferWriter<byte> buffer, in float value) =>
-            serializer.Write(buffer, BitConverter.SingleToInt32Bits(value));
-
-        public bool Write(ArrayBufferWriter<byte> buffer, in double value) =>
-            serializer.Write(buffer, BitConverter.DoubleToInt64Bits(value));
+        size = Unsafe.SizeOf<Guid>();
+        return new(buffer[..size], bigEndian);
     }
 
-    extension(ref readonly EndiannessSpanSerializer serializer)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Half ReadHalf(ReadOnlySpan<byte> buffer, out int size)
     {
-        public int Read(ReadOnlySpan<byte> buffer, in Span<char> values) =>
-            serializer.Read(buffer, MemoryMarshal.Cast<char, ushort>(values));
+        var num = Read<short>(buffer, false, out size);
+        return BitConverter.Int16BitsToHalf(num);
+    }
 
-        public int Read(ReadOnlySpan<byte> buffer, in Span<Half> values) =>
-            serializer.Read(buffer, MemoryMarshal.Cast<Half, short>(values));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float ReadFloat(ReadOnlySpan<byte> buffer, out int size)
+    {
+        var num = Read<int>(buffer, false, out size);
+        return BitConverter.Int32BitsToSingle(num);
+    }
 
-        public int Read(ReadOnlySpan<byte> buffer, in Span<float> values) =>
-            serializer.Read(buffer, MemoryMarshal.Cast<float, int>(values));
-
-        public int Read(ReadOnlySpan<byte> buffer, in Span<double> values) =>
-            serializer.Read(buffer, MemoryMarshal.Cast<double, long>(values));
-
-        public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<char> value) =>
-            serializer.Write(buffer, MemoryMarshal.Cast<char, ushort>(value));
-
-        public int Write(Span<byte> buffer, in ReadOnlySpan<char> value) =>
-            serializer.Write(buffer, MemoryMarshal.Cast<char, ushort>(value));
-
-        public int Write(Span<byte> buffer, in ReadOnlySpan<float> values) =>
-            serializer.Write(buffer, MemoryMarshal.Cast<float, int>(values));
-
-        public int Write(Span<byte> buffer, in ReadOnlySpan<double> values) =>
-            serializer.Write(buffer, MemoryMarshal.Cast<double, long>(values));
-
-        public int Write(Span<byte> buffer, in ReadOnlySpan<Half> values) =>
-            serializer.Write(buffer, MemoryMarshal.Cast<Half, short>(values));
-
-        public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<float> values) =>
-            serializer.Write(buffer, MemoryMarshal.Cast<float, int>(values));
-
-        public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<double> values) =>
-            serializer.Write(buffer, MemoryMarshal.Cast<double, long>(values));
-
-        public void Write(ArrayBufferWriter<byte> buffer, in ReadOnlySpan<Half> values) =>
-            serializer.Write(buffer, MemoryMarshal.Cast<Half, short>(values));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public double ReadDouble(ReadOnlySpan<byte> buffer, out int size)
+    {
+        var num = Read<long>(buffer, false, out size);
+        return BitConverter.Int64BitsToDouble(num);
     }
 }

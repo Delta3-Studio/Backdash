@@ -226,7 +226,7 @@ public class EndiannessSerializationBufferBenchmarks
         ReadOnlySpan<int> source = values;
 
         oldSerializer.Buffer.Write(oldSpanWriteBuffer, in source);
-        newSerializer.Buffer.Write(newSpanWriteBuffer, in source);
+        newSerializer.Write(newSpanWriteBuffer, in source);
         Ensure.Equal(oldSpanWriteBuffer, newSpanWriteBuffer, "Span");
 
         ReadOnlySpan<byte> oldSource = oldSpanWriteBuffer;
@@ -235,7 +235,7 @@ public class EndiannessSerializationBufferBenchmarks
         Span<int> oldDestination = oldReadValues;
         Span<int> newDestination = newReadValues;
         oldSerializer.Buffer.Read(oldSource, in oldDestination);
-        newSerializer.Buffer.Read(newSource, in newDestination);
+        newSerializer.Read(newSource, in newDestination);
 
         if (!oldReadValues.AsSpan().SequenceEqual(values))
             throw new InvalidOperationException("Old span deserialization mismatch.");
@@ -247,7 +247,7 @@ public class EndiannessSerializationBufferBenchmarks
         newBufferWriter.Clear();
 
         oldSerializer.Buffer.Write(oldBufferWriter, in source);
-        newSerializer.Buffer.Write(newBufferWriter, in source);
+        newSerializer.Write(newBufferWriter, in source);
         Ensure.Equal(oldBufferWriter, newBufferWriter, "BufferWriter span");
 
         oldBufferWriter.Clear();
@@ -267,7 +267,7 @@ public class EndiannessSerializationBufferBenchmarks
     public int New_SpanWrite()
     {
         ReadOnlySpan<int> source = values;
-        return newSerializer.Buffer.Write(newSpanWriteBuffer, in source);
+        return newSerializer.Write(newSpanWriteBuffer, in source);
     }
 
     [Benchmark(Baseline = true)]
@@ -288,7 +288,7 @@ public class EndiannessSerializationBufferBenchmarks
         ReadOnlySpan<byte> source = newSpanWriteBuffer;
         Span<int> destination = newReadValues;
 
-        var bytesRead = newSerializer.Buffer.Read(source, in destination);
+        var bytesRead = newSerializer.Read(source, in destination);
         return bytesRead ^ destination[0] ^ destination[^1];
     }
 
@@ -308,7 +308,7 @@ public class EndiannessSerializationBufferBenchmarks
     {
         newBufferWriter.Clear();
         ReadOnlySpan<int> source = values;
-        newSerializer.Buffer.Write(newBufferWriter, in source);
+        newSerializer.Write(newBufferWriter, in source);
         return newBufferWriter.WrittenCount;
     }
 }
