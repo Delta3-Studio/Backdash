@@ -77,7 +77,6 @@ static class EnumBinarySerialization<TEnum> where TEnum : unmanaged, Enum
         if (type == typeof(uint)) return reader.ReadAsUInt32<TEnum>();
         if (type == typeof(long)) return reader.ReadAsInt64<TEnum>();
         if (type == typeof(ulong)) return reader.ReadAsUInt64<TEnum>();
-
         throw new NotSupportedException();
     }
 

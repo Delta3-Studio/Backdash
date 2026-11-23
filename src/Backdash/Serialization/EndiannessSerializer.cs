@@ -80,25 +80,24 @@ public readonly struct EndiannessNumberSerializer
         out int size)
         where T : unmanaged, IBinaryInteger<T>
     {
-        size = Unsafe.SizeOf<T>();
-
-        var success = bigEndian
-            ? T.TryReadBigEndian(buffer[..size], isUnsigned, out value)
-            : T.TryReadLittleEndian(buffer[..size], isUnsigned, out value);
-
-        if (!success)
+        if (!TryRead(ref value, buffer, isUnsigned, out size))
             throw new OverflowException();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T Read<T>(in ReadOnlySpan<byte> buffer, out int bytesRead)
-        where T : unmanaged, ISignedNumber<T>, IBinaryInteger<T> =>
-        Read<T>(buffer, false, out bytesRead);
+    public bool TryRead<T>(
+        ref T value,
+        ReadOnlySpan<byte> buffer,
+        bool isUnsigned,
+        out int size)
+        where T : unmanaged, IBinaryInteger<T>
+    {
+        size = Unsafe.SizeOf<T>();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T Read<T>(ReadOnlySpan<byte> buffer, out int bytesToRead)
-        where T : unmanaged, IUnsignedNumber<T>, IBinaryInteger<T> =>
-        Read<T>(buffer, true, out bytesToRead);
+        return bigEndian
+            ? T.TryReadBigEndian(buffer[..size], isUnsigned, out value)
+            : T.TryReadLittleEndian(buffer[..size], isUnsigned, out value);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Write<T>(Span<byte> buffer, T value, out int size)

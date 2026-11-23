@@ -326,6 +326,146 @@ public class BinarySpanReadWriteValueTests
         return value == read;
     }
 
+    [Collection(SerialCollectionDefinition.Name)]
+    public class ReadWriteBinaryIntegerTests
+    {
+        [PropertyTest] public bool TestInt(int value, Endianness endianness) => TestInteger(value, endianness);
+        [PropertyTest] public bool TestUInt(uint value, Endianness endianness) => TestInteger(value, endianness);
+        [PropertyTest] public bool TestLong(long value, Endianness endianness) => TestInteger(value, endianness);
+        [PropertyTest] public bool TestULong(ulong value, Endianness endianness) => TestInteger(value, endianness);
+        [PropertyTest] public bool TestShort(short value, Endianness endianness) => TestInteger(value, endianness);
+        [PropertyTest] public bool TestUShort(ushort value, Endianness endianness) => TestInteger(value, endianness);
+        [PropertyTest] public bool TestByte(byte value, Endianness endianness) => TestInteger(value, endianness);
+        [PropertyTest] public bool TestSByte(sbyte value, Endianness endianness) => TestInteger(value, endianness);
+        [PropertyTest] public bool TestInt128(Int128 value, Endianness endianness) => TestInteger(value, endianness);
+        [PropertyTest] public bool TestUInt128(UInt128 value, Endianness endianness) => TestInteger(value, endianness);
+
+        static bool TestInteger<T>(T value, Endianness endianness)
+            where T : unmanaged, IBinaryInteger<T>, IMinMaxValue<T>
+        {
+            var size = Setup<T>(endianness, out var writer, out var reader);
+            writer.WriteNumber(value);
+            writer.WrittenCount.Should().Be(size);
+            var read = reader.ReadNumber<T>(MathI.IsUnsigned<T>());
+            reader.ReadCount.Should().Be(size);
+            return EqualityComparer<T>.Default.Equals(read, value);
+        }
+    }
+
+    [Collection(SerialCollectionDefinition.Name)]
+    public class ReadIntegralNumberTests
+    {
+        [PropertyTest]
+        public bool TestByte(byte value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<byte>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        [PropertyTest]
+        public bool TestSByte(sbyte value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<sbyte>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        [PropertyTest]
+        public bool TestShort(short value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<short>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        [PropertyTest]
+        public bool TestUShort(ushort value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<ushort>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        [PropertyTest]
+        public bool TestInt(int value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<int>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        [PropertyTest]
+        public bool TestUInt(uint value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<uint>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        [PropertyTest]
+        public bool TestLong(long value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<long>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        [PropertyTest]
+        public bool TestULong(ulong value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<ulong>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        [PropertyTest]
+        public bool TestInt128(Int128 value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<Int128>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        [PropertyTest]
+        public bool TestUInt128(UInt128 value, Endianness endianness)
+        {
+            var size = SetupNumber(value, endianness, out var reader);
+            var read = reader.ReadNumber<UInt128>();
+            reader.ReadCount.Should().Be(size);
+            read.Should().BeOfType(value.GetType());
+            return read == value;
+        }
+
+        static int SetupNumber<T>(T value, Endianness endianness, out BinaryBufferReader reader)
+            where T : unmanaged, IBinaryInteger<T>
+        {
+            var size = Setup<T>(endianness, out var writer, out reader);
+            writer.WriteNumber(value);
+            writer.WrittenCount.Should().Be(size);
+            return size;
+        }
+    }
+
     static int writeOffset;
     static int readOffset;
 
@@ -343,42 +483,5 @@ public class BinarySpanReadWriteValueTests
         writer = new(buffer, ref writeOffset, endianness);
         reader = new(buffer, ref readOffset, endianness);
         return size;
-    }
-
-    [Collection(SerialCollectionDefinition.Name)]
-    public class ReadWriteBinaryIntegerTests
-    {
-        [PropertyTest] public bool TestInt(int value, Endianness endianness) => TestInteger(value, endianness);
-        [PropertyTest] public bool TestUInt(uint value, Endianness endianness) => TestInteger(value, endianness);
-        [PropertyTest] public bool TestLong(long value, Endianness endianness) => TestInteger(value, endianness);
-
-        [PropertyTest]
-        public bool TestULong(ulong value, Endianness endianness) =>
-            TestInteger(value, endianness);
-
-        [PropertyTest]
-        public bool TestShort(short value, Endianness endianness) =>
-            TestInteger(value, endianness);
-
-        [PropertyTest]
-        public bool TestUShort(ushort value, Endianness endianness) =>
-            TestInteger(value, endianness);
-
-        [PropertyTest] public bool TestByte(byte value, Endianness endianness) => TestInteger(value, endianness);
-
-        [PropertyTest]
-        public bool TestSByte(sbyte value, Endianness endianness) =>
-            TestInteger(value, endianness);
-
-        static bool TestInteger<T>(T value, Endianness endianness)
-            where T : unmanaged, IBinaryInteger<T>, IMinMaxValue<T>
-        {
-            var size = Setup<T>(endianness, out var writer, out var reader);
-            writer.WriteNumber(value);
-            writer.WrittenCount.Should().Be(size);
-            var read = reader.ReadNumber<T>(MathI.IsUnsigned<T>());
-            reader.ReadCount.Should().Be(size);
-            return EqualityComparer<T>.Default.Equals(read, value);
-        }
     }
 }

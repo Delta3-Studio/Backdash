@@ -567,11 +567,15 @@ public readonly ref struct BinarySpanWriter
     }
 
     /// <summary>Writes an unmanaged struct span into buffer.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteStruct<T>(ReadOnlySpan<T> values) where T : unmanaged => Write(MemoryMarshal.AsBytes(values));
 
     /// <summary>Writes an unmanaged struct span into buffer.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteStruct<T>(in T[] values) where T : unmanaged => WriteStruct(values.AsSpan());
+
+    /// <inheritdoc cref="WriteAsSByte{T}(in T)" />
+    public void WriteStruct<T>(in List<T> value) where T : unmanaged => WriteStruct(GetListSpan(in value));
 
     /// <summary>Writes a <see cref="IBinaryInteger{T}" /> <paramref name="value" /> into buffer.</summary>
     /// <typeparam name="T">A numeric type that implements <see cref="IBinaryInteger{T}" />.</typeparam>
