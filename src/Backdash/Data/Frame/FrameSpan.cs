@@ -92,52 +92,52 @@ public readonly record struct FrameSpan :
     public Frame ToFrame() => (Frame)Frames;
 
     /// <summary>Returns the time value for the current frame span in seconds.</summary>
-    /// <seealso cref="FrameTime.GetSeconds(int, int)"/>
-    public double Seconds(int fps) => FrameTime.GetSeconds(Frames, fps);
+    /// <seealso cref="FrameTime.ToSeconds(int,int)"/>
+    public double Seconds(int fps) => FrameTime.ToSeconds(Frames, fps);
 
     /// <summary>Returns the time value for the current frame span in seconds.</summary>
-    /// <seealso cref="FrameTime.GetSeconds(int)"/>
-    public double Seconds() => FrameTime.GetSeconds(Frames);
+    /// <seealso cref="FrameTime.ToSeconds(int)"/>
+    public double Seconds() => FrameTime.ToSeconds(Frames);
 
     /// <summary>Returns the time value for the current frame span in ticks.</summary>
-    /// <seealso cref="FrameTime.GetTicks(int, int)"/>
-    public long Ticks(int fps) => FrameTime.GetTicks(Frames, fps);
+    /// <seealso cref="FrameTime.ToTicks(int, int)"/>
+    public long Ticks(int fps) => FrameTime.ToTicks(Frames, fps);
 
     /// <summary>Returns the time value for the current frame span in ticks.</summary>
-    /// <seealso cref="FrameTime.GetTicks(int)"/>
-    public long Ticks() => FrameTime.GetTicks(Frames);
+    /// <seealso cref="FrameTime.ToTicks(int)"/>
+    public long Ticks() => FrameTime.ToTicks(Frames);
 
     /// <summary>Returns the time value for the current frame span in <see cref="TimeSpan" />.</summary>
-    /// <seealso cref="FrameTime.GetDuration(int, int)"/>
-    public TimeSpan Duration(int fps) => FrameTime.GetDuration(Frames, fps);
+    /// <seealso cref="FrameTime.ToDuration(int, int)"/>
+    public TimeSpan Duration(int fps) => FrameTime.ToDuration(Frames, fps);
 
     /// <summary>Returns the time value for the current frame span in <see cref="TimeSpan" />.</summary>
-    /// <seealso cref="FrameTime.GetDuration(int)"/>
-    public TimeSpan Duration() => FrameTime.GetDuration(Frames);
+    /// <seealso cref="FrameTime.ToDuration(int)"/>
+    public TimeSpan Duration() => FrameTime.ToDuration(Frames);
 
     /// <summary>Returns the time value for the current frame span in milliseconds.</summary>
-    /// <seealso cref="FrameTime.GetMilliseconds(int, int)"/>
-    public double Milliseconds(int fps) => FrameTime.GetMilliseconds(Frames, fps);
+    /// <seealso cref="FrameTime.ToMilliseconds(int,int)"/>
+    public double Milliseconds(int fps) => FrameTime.ToMilliseconds(Frames, fps);
 
     /// <summary>Returns the time value for the current frame span in milliseconds.</summary>
-    /// <seealso cref="FrameTime.GetMilliseconds(int)"/>
-    public double Milliseconds() => FrameTime.GetMilliseconds(Frames);
+    /// <seealso cref="FrameTime.ToMilliseconds(int)"/>
+    public double Milliseconds() => FrameTime.ToMilliseconds(Frames);
 
     /// <summary>Returns the time value for the current frame span as <see cref="Stopwatch"/> timestamp.</summary>
-    /// <seealso cref="FrameTime.GetTimestamp(int, int)"/>
-    public long Timestamp(int fps) => FrameTime.GetTimestamp(Frames, fps);
+    /// <seealso cref="FrameTime.ToTimestamp(int, int)"/>
+    public long Timestamp(int fps) => FrameTime.ToTimestamp(Frames, fps);
 
     /// <summary>Returns the time value for the current frame span as <see cref="Stopwatch"/> timestamp.</summary>
-    /// <seealso cref="FrameTime.GetTimestamp(int)"/>
-    public long Timestamp() => FrameTime.GetTimestamp(Frames);
+    /// <seealso cref="FrameTime.ToTimestamp(int)"/>
+    public long Timestamp() => FrameTime.ToTimestamp(Frames);
 
     /// <summary>Returns the time value for a future <see cref="Stopwatch"/> timestamp after the current frame span.</summary>
-    /// <seealso cref="FrameTime.GetDeadlineTimestamp(int, int)"/>
-    public long Deadline(int fps) => FrameTime.GetDeadlineTimestamp(Frames, fps);
+    /// <seealso cref="FrameTime.ToTimestampDeadline(int, int)"/>
+    public long Deadline(int fps) => FrameTime.ToTimestampDeadline(Frames, fps);
 
     /// <summary>Returns the time value for a future <see cref="Stopwatch"/> timestamp after the current frame span.</summary>
-    /// <seealso cref="FrameTime.GetDeadlineTimestamp(int)"/>
-    public long Deadline() => FrameTime.GetDeadlineTimestamp(Frames);
+    /// <seealso cref="FrameTime.ToTimestampDeadline(int)"/>
+    public long Deadline() => FrameTime.ToTimestampDeadline(Frames);
 
     /// <summary>Returns a <see cref="FrameRange"/> starting at 0 with the current frame span duration.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

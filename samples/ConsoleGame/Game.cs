@@ -194,7 +194,7 @@ public sealed class Game : INetcodeSessionHandler
 
     public async Task Run(CancellationToken cancellationToken)
     {
-        var frameDuration = FrameTime.GetDuration(1, 60);
+        var frameDuration = FrameTime.ToDuration(1, 60);
 
         try
         {
