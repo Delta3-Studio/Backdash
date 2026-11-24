@@ -324,7 +324,7 @@ sealed class SyncTestSession<TInput> : INetcodeSession<TInput>
             Checksum: lastSaved.Checksum
         ));
 
-        if (frame - lastVerified < checkDistance.Last)
+        if (frame - lastVerified < checkDistance)
             return;
 
         // We've gone far enough ahead and should now start replaying frames.

@@ -162,7 +162,7 @@ sealed class PeerConnection<TInput> : IDisposable where TInput : unmanaged
          * trip time.
          */
         var deltaFrame = FrameSpan.FromMilliseconds(Ping, fps);
-        var remoteFrame = inbox.LastReceivedInput.Frame + deltaFrame;
+        var remoteFrame = (FrameSpan)inbox.LastReceivedInput.Frame + deltaFrame;
         /*
          * Our frame advantage is how many frames *behind* the other guy
          * we are.  Counter-intuitive, I know.  It's an advantage because

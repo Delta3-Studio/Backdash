@@ -21,6 +21,8 @@ public readonly record struct FrameSpan :
     IUtf8SpanFormattable,
     ISpanFormattable,
     IComparisonOperators<FrameSpan, FrameSpan, bool>,
+    IIncrementOperators<FrameSpan>,
+    IDecrementOperators<FrameSpan>,
     IAdditionOperators<FrameSpan, FrameSpan, FrameSpan>,
     ISubtractionOperators<FrameSpan, FrameSpan, FrameSpan>,
     IModulusOperators<FrameSpan, int, FrameSpan>,
@@ -38,6 +40,9 @@ public readonly record struct FrameSpan :
     /// <summary>Return frame span of <c>1</c> frame</summary>
     public static readonly FrameSpan One = new(1);
 
+    /// <summary>Returns min frame span value</summary>
+    public static readonly FrameSpan MinValue = new(int.MinValue);
+
     /// <summary>Returns max frame span value</summary>
     public static readonly FrameSpan MaxValue = new(int.MaxValue);
 
@@ -47,8 +52,19 @@ public readonly record struct FrameSpan :
     /// <summary>
     ///     Initialize new <see cref="FrameSpan" /> for frame <paramref name="frames" />.
     /// </summary>
-    /// <param name="frames"></param>
     public FrameSpan(int frames) => Frames = frames;
+
+    /// <summary>
+    ///     Initialize new <see cref="FrameSpan" /> for <paramref name="duration" />
+    ///     in frames per second equal to <paramref name="fps" />.
+    /// </summary>
+    public FrameSpan(TimeSpan duration, int fps) : this(FrameTime.FromDuration(duration, fps)) { }
+
+    /// <summary>
+    ///     Initialize new <see cref="FrameSpan" /> for <paramref name="duration" />
+    ///     in frames per second equal to <see cref= "FrameTime.CurrentFrameRate" />.
+    /// </summary>
+    public FrameSpan(TimeSpan duration) : this(FrameTime.FromDuration(duration)) { }
 
     /// <summary>
     ///     Returns <see langword="true" /> if the current frame count is 0
@@ -60,24 +76,68 @@ public readonly record struct FrameSpan :
     /// </summary>
     public bool IsPositive => Frames > 0;
 
-    /// <summary>Returns the value for the current frame span as a <see cref="Frame" />.</summary>
+    /// <summary>
+    ///     Returns <see langword="true" /> if the current frame count lesser than 0
+    /// </summary>
+    public bool IsNegative => Frames < 0;
+
+    /// <summary>Returns the last <see cref="Frame" /> index within the current frame span.</summary>
     public Frame Last
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => (Frame)Frames;
+        get => (Frame)Math.Max(Frames - 1, 0);
     }
 
+    /// <summary>Returns the value for the current frame span as a <see cref="Frame" />.</summary>
+    public Frame ToFrame() => (Frame)Frames;
+
     /// <summary>Returns the time value for the current frame span in seconds.</summary>
+    /// <seealso cref="FrameTime.GetSeconds(int, int)"/>
     public double Seconds(int fps) => FrameTime.GetSeconds(Frames, fps);
 
     /// <summary>Returns the time value for the current frame span in seconds.</summary>
+    /// <seealso cref="FrameTime.GetSeconds(int)"/>
     public double Seconds() => FrameTime.GetSeconds(Frames);
 
+    /// <summary>Returns the time value for the current frame span in ticks.</summary>
+    /// <seealso cref="FrameTime.GetTicks(int, int)"/>
+    public long Ticks(int fps) => FrameTime.GetTicks(Frames, fps);
+
+    /// <summary>Returns the time value for the current frame span in ticks.</summary>
+    /// <seealso cref="FrameTime.GetTicks(int)"/>
+    public long Ticks() => FrameTime.GetTicks(Frames);
+
     /// <summary>Returns the time value for the current frame span in <see cref="TimeSpan" />.</summary>
+    /// <seealso cref="FrameTime.GetDuration(int, int)"/>
     public TimeSpan Duration(int fps) => FrameTime.GetDuration(Frames, fps);
 
     /// <summary>Returns the time value for the current frame span in <see cref="TimeSpan" />.</summary>
+    /// <seealso cref="FrameTime.GetDuration(int)"/>
     public TimeSpan Duration() => FrameTime.GetDuration(Frames);
+
+    /// <summary>Returns the time value for the current frame span in milliseconds.</summary>
+    /// <seealso cref="FrameTime.GetMilliseconds(int, int)"/>
+    public double Milliseconds(int fps) => FrameTime.GetMilliseconds(Frames, fps);
+
+    /// <summary>Returns the time value for the current frame span in milliseconds.</summary>
+    /// <seealso cref="FrameTime.GetMilliseconds(int)"/>
+    public double Milliseconds() => FrameTime.GetMilliseconds(Frames);
+
+    /// <summary>Returns the time value for the current frame span as <see cref="Stopwatch"/> timestamp.</summary>
+    /// <seealso cref="FrameTime.GetTimestamp(int, int)"/>
+    public long Timestamp(int fps) => FrameTime.GetTimestamp(Frames, fps);
+
+    /// <summary>Returns the time value for the current frame span as <see cref="Stopwatch"/> timestamp.</summary>
+    /// <seealso cref="FrameTime.GetTimestamp(int)"/>
+    public long Timestamp() => FrameTime.GetTimestamp(Frames);
+
+    /// <summary>Returns the time value for a future <see cref="Stopwatch"/> timestamp after the current frame span.</summary>
+    /// <seealso cref="FrameTime.GetDeadlineTimestamp(int, int)"/>
+    public long Deadline(int fps) => FrameTime.GetDeadlineTimestamp(Frames, fps);
+
+    /// <summary>Returns the time value for a future <see cref="Stopwatch"/> timestamp after the current frame span.</summary>
+    /// <seealso cref="FrameTime.GetDeadlineTimestamp(int)"/>
+    public long Deadline() => FrameTime.GetDeadlineTimestamp(Frames);
 
     /// <summary>Returns a <see cref="FrameRange"/> starting at 0 with the current frame span duration.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -95,10 +155,17 @@ public readonly record struct FrameSpan :
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public FrameCounter ToCounter(Frame start) => new(start, this);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    Frame ValidateFrame(FrameSpan result)
+    {
+        if (result.IsNegative) return Frame.Zero;
+        return result.Frames > Frames ? Frame.Null : result.ToFrame();
+    }
+
     /// <summary>
     ///     Returns a frame at the time position in milliseconds
     /// </summary>
-    public Frame GetFrameAtMilliSecond(double millis, int fps)
+    public Frame GetFrameAtMilliseconds(double millis, int fps)
     {
         var span = FromMilliseconds(millis, fps);
         return ValidateFrame(span);
@@ -108,20 +175,16 @@ public readonly record struct FrameSpan :
     ///     Returns a frame at the time position in milliseconds
     /// </summary>
     /// <returns><see cref="Frame.Null"/> if outside of current range</returns>
-    public Frame GetFrameAtMilliSecond(double millis)
+    public Frame GetFrameAtMilliseconds(double millis)
     {
         var result = FromMilliseconds(millis);
         return ValidateFrame(result);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    Frame ValidateFrame(FrameSpan result) =>
-        result.Frames > Frames ? Frame.Null : result.Last;
-
     /// <summary>
     ///     Returns a frame at the time position in seconds
     /// </summary>
-    public Frame GetFrameAtSecond(double seconds, int fps)
+    public Frame GetFrameAtSeconds(double seconds, int fps)
     {
         var result = FromSeconds(seconds, fps);
         return ValidateFrame(result);
@@ -130,7 +193,7 @@ public readonly record struct FrameSpan :
     /// <summary>
     ///     Returns a frame at the time position in seconds
     /// </summary>
-    public Frame GetFrameAtSecond(double seconds)
+    public Frame GetFrameAtSeconds(double seconds)
     {
         var result = FromSeconds(seconds);
         return ValidateFrame(result);
@@ -139,12 +202,12 @@ public readonly record struct FrameSpan :
     /// <summary>
     ///     Returns a frame at the timespan position
     /// </summary>
-    public Frame GetFrameAt(TimeSpan duration, int fps) => GetFrameAtMilliSecond(duration.TotalMilliseconds, fps);
+    public Frame GetFrameAt(TimeSpan duration, int fps) => ValidateFrame(FromDuration(duration, fps));
 
     /// <summary>
     ///     Returns a frame at the timespan position
     /// </summary>
-    public Frame GetFrameAt(TimeSpan duration) => GetFrameAtMilliSecond(duration.TotalMilliseconds);
+    public Frame GetFrameAt(TimeSpan duration) => ValidateFrame(FromDuration(duration));
 
     /// <inheritdoc />
     public int CompareTo(FrameSpan other) => Frames.CompareTo(other.Frames);
@@ -169,7 +232,6 @@ public readonly record struct FrameSpan :
         if (format.IsEmpty) format = DefaultFormat;
         Utf8StringBuilder writer = new(in utf8Destination, ref bytesWritten);
         if (!writer.Write(Frames, format, provider)) return false;
-        if (!writer.Write(" frames"u8)) return false;
         return true;
     }
 
@@ -187,8 +249,7 @@ public readonly record struct FrameSpan :
     /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="seconds" /> at specified <paramref name="fps" />.
     /// </summary>
-    public static FrameSpan FromSeconds(double seconds, int fps) =>
-        new(FrameTime.GetFrames(seconds, fps));
+    public static FrameSpan FromSeconds(double seconds, int fps) => new(FrameTime.FromSeconds(seconds, fps));
 
     /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="seconds" />
@@ -196,26 +257,59 @@ public readonly record struct FrameSpan :
     public static FrameSpan FromSeconds(double seconds) => new(FrameTime.FromSeconds(seconds));
 
     /// <summary>
+    ///     Returns new <see cref="FrameSpan" /> for <paramref name="ticks" /> at specified <paramref name="fps" />.
+    /// </summary>
+    public static FrameSpan FromTicks(long ticks, int fps) => new(FrameTime.FromTicks(ticks, fps));
+
+    /// <summary>
+    ///     Returns new <see cref="FrameSpan" /> for <paramref name="ticks" />
+    /// </summary>
+    public static FrameSpan FromTicks(long ticks) => new(FrameTime.FromTicks(ticks));
+
+    /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="duration" /> at specified <paramref name="fps" />.
     /// </summary>
-    public static FrameSpan FromTimeSpan(TimeSpan duration, int fps) =>
-        new(FrameTime.GetFrames(duration, fps));
+    public static FrameSpan FromDuration(TimeSpan duration, int fps) => new(duration, fps);
 
     /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="duration" />.
     /// </summary>
-    public static FrameSpan From(TimeSpan duration) => new(FrameTime.From(duration));
+    public static FrameSpan FromDuration(TimeSpan duration) => new(duration);
 
     /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="milliseconds" /> at specified <paramref name="fps" />.
     /// </summary>
     public static FrameSpan FromMilliseconds(double milliseconds, int fps) =>
-        FromSeconds(milliseconds / 1000.0, fps);
+        new(FrameTime.FromMilliseconds(milliseconds, fps));
 
     /// <summary>
     ///     Returns new <see cref="FrameSpan" /> for <paramref name="milliseconds" />
     /// </summary>
-    public static FrameSpan FromMilliseconds(double milliseconds) => FromSeconds(milliseconds / 1000.0);
+    public static FrameSpan FromMilliseconds(double milliseconds) => new(FrameTime.FromMilliseconds(milliseconds));
+
+    /// <summary>
+    ///     Returns new <see cref="FrameSpan" /> for <see cref="Stopwatch"/> <paramref name="timestamp" /> at specified <paramref name="fps" />.
+    /// </summary>
+    public static FrameSpan FromTimestamp(long timestamp, int fps) => new(FrameTime.FromTimestamp(timestamp, fps));
+
+    /// <summary>
+    ///     Returns new <see cref="FrameSpan" /> for <see cref="Stopwatch"/> <paramref name="timestamp" />
+    /// </summary>
+    public static FrameSpan FromTimestamp(long timestamp) => new(FrameTime.FromTimestamp(timestamp));
+
+    /// <summary>
+    ///     Returns new <see cref="FrameSpan" /> for the elapsed time since <paramref name="timestamp" />
+    /// </summary>
+    /// <seealso cref="Stopwatch"/>
+    /// <seealso cref="FrameTime.FromElapsedTimestamp(long, int)"/>
+    public static FrameSpan FromElapsed(long timestamp, int fps) => new(FrameTime.FromElapsedTimestamp(timestamp, fps));
+
+    /// <summary>
+    ///     Returns new <see cref="FrameSpan" /> for the elapsed time since <paramref name="timestamp" />
+    /// </summary>
+    /// <seealso cref="Stopwatch"/>
+    /// <seealso cref="FrameTime.FromElapsedTimestamp(long)"/>
+    public static FrameSpan FromElapsed(long timestamp) => new(FrameTime.FromElapsedTimestamp(timestamp));
 
     /// <summary>Returns the smaller of two <see cref="FrameSpan" />.</summary>
     public static FrameSpan Min(FrameSpan left, FrameSpan right) => left <= right ? left : right;
@@ -303,7 +397,13 @@ public readonly record struct FrameSpan :
     public static FrameRange operator +(FrameSpan left, FrameRange right) => right + left;
 
     /// <inheritdoc />
-    public static FrameRange operator -(FrameSpan left, FrameRange right) => right + left;
+    public static FrameRange operator -(FrameSpan left, FrameRange right) => right - left;
+
+    /// <inheritdoc />
+    public static FrameSpan operator ++(FrameSpan value) => new(value.Frames + 1);
+
+    /// <inheritdoc />
+    public static FrameSpan operator --(FrameSpan value) => new(value.Frames - 1);
 
     /// <inheritdoc cref="Frames" />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -325,9 +425,9 @@ public readonly record struct FrameSpan :
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator TimeSpan(FrameSpan frames) => frames.Duration();
 
-    /// <inheritdoc cref="From" />
+    /// <inheritdoc cref="FromDuration(System.TimeSpan)" />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static explicit operator FrameSpan(TimeSpan frame) => From(frame);
+    public static explicit operator FrameSpan(TimeSpan frame) => FromDuration(frame);
 
     /// <inheritdoc cref="Frames" />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

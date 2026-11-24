@@ -233,7 +233,7 @@ public class Game1 : Game
 
         if (keyboard.IsKeyPressed(Keys.Right))
         {
-            gameSession.Update(FrameTime.Step);
+            gameSession.Update(FrameTime.FrameDuration);
         }
     }
 

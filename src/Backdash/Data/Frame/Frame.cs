@@ -30,7 +30,8 @@ public readonly record struct Frame :
     IModulusOperators<Frame, int, Frame>,
     IAdditionOperators<Frame, int, Frame>,
     ISubtractionOperators<Frame, int, Frame>,
-    IAdditionOperators<Frame, FrameSpan, FrameSpan>
+    IAdditionOperators<Frame, FrameSpan, Frame>,
+    ISubtractionOperators<Frame, FrameSpan, Frame>
 {
     internal const sbyte NullValue = -1;
 
@@ -233,7 +234,22 @@ public readonly record struct Frame :
     public static bool operator <=(Frame left, int right) => left.Number <= right;
 
     /// <inheritdoc />
-    public static FrameSpan operator +(Frame left, FrameSpan right) => right + left.Number;
+    public static Frame operator +(Frame left, FrameSpan right) => new(left.Number + right.Frames);
+
+    /// <inheritdoc />
+    public static Frame operator -(Frame left, FrameSpan right) => new(left.Number - right.Frames);
+
+    /// <inheritdoc cref="IComparisonOperators{TSelf,TOther,TResult}.op_GreaterThan" />
+    public static bool operator >(Frame left, FrameSpan right) => left.Number > right.Frames;
+
+    /// <inheritdoc cref="IComparisonOperators{TSelf,TOther,TResult}.op_GreaterThanOrEqual" />
+    public static bool operator >=(Frame left, FrameSpan right) => left.Number >= right.Frames;
+
+    /// <inheritdoc cref="IComparisonOperators{TSelf,TOther,TResult}.op_LessThan" />
+    public static bool operator <(Frame left, FrameSpan right) => left.Number < right.Frames;
+
+    /// <inheritdoc cref="IComparisonOperators{TSelf,TOther,TResult}.op_LessThanOrEqual" />
+    public static bool operator <=(Frame left, FrameSpan right) => left.Number <= right.Frames;
 
     /// <inheritdoc cref="Number" />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

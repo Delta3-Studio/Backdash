@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
@@ -18,10 +19,10 @@ public static class FrameTime
     public const float One30FpsF = 1f / 30f;
 
     /// <summary>Return one frame in seconds for 60 FPS</summary>
-    public const double One60Fps = 1f / 60f;
+    public const double One60Fps = 1.0 / 60.0;
 
     /// <summary>Return one frame in seconds for 30 FPS</summary>
-    public const double One30Fps = 1f / 30f;
+    public const double One30Fps = 1.0 / 30.0;
 
     /// <summary>
     ///     Default FPS (frames per second)
@@ -35,88 +36,56 @@ public static class FrameTime
     public static readonly Fixed Default = new(DefaultFrameRate);
 
     /// <summary>
-    ///     Current FPS (frames per second) used in <see cref="Default"/>
-    ///     <value>60</value>
+    ///     Current FPS (frames per second) used in <see cref="Default"/>. <br/>
+    ///     Defaults to <see cref="DefaultFrameRate"/>
     /// </summary>
     public static int CurrentFrameRate
     {
-        get => Default.FrameRate;
-        set => Default.SetFrameRate(value);
+        get => GetCurrentFrameRate();
+        set => SetCurrentFrameRate(value);
     }
 
-    /// <summary>Return one frame in seconds</summary>
-    public static double One => Default.One;
+    /// <inheritdoc cref="Fixed.FrameSeconds"/>
+    public static double FrameSeconds
+    {
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Default.FrameSeconds;
+    }
 
-    /// <summary>Return one frame in seconds</summary>
-    public static TimeSpan Step => Default.Step;
+    /// <inheritdoc cref="Fixed.FrameTicks"/>
+    public static long FrameTicks
+    {
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Default.FrameTicks;
+    }
 
-    /// <summary>
-    ///     Returns <see cref="double" /> seconds for <paramref name="frameCount" />.
-    /// </summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetSeconds(int frameCount) => Default.GetSeconds(frameCount);
+    /// <inheritdoc cref="Fixed.FrameDuration"/>
+    public static TimeSpan FrameDuration
+    {
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Default.FrameDuration;
+    }
 
-    /// <summary>
-    ///     Returns <see cref="double" /> seconds for <paramref name="frameCount" />.
-    /// </summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetSeconds(double frameCount) => Default.GetSeconds(frameCount);
-
-    /// <summary>
-    ///     Returns <see cref="double" /> seconds for <paramref name="frameCount" />.
-    /// </summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetMilliseconds(int frameCount) => Default.GetMilliseconds(frameCount);
-
-    /// <summary>
-    ///     Returns <see cref="System.TimeSpan" /> for <paramref name="frameCount" />.
-    /// </summary>
-    public static TimeSpan GetDuration(int frameCount) => Default.GetDuration(frameCount);
-
-    /// <summary>
-    ///     Returns the number of frames for <paramref name="seconds" />.
-    /// </summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetTotalFrames(double seconds) => Default.GetTotalFrames(seconds);
+    /// <inheritdoc cref="Fixed.FrameMilliseconds"/>
+    public static double FrameMilliseconds
+    {
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Default.FrameMilliseconds;
+    }
 
     /// <summary>
-    ///     Returns the number of frames for <paramref name="duration" />.
+    /// Sets the current frame rate value.
     /// </summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetTotalFrames(TimeSpan duration) => Default.GetTotalFrames(duration);
+    /// <seealso cref="CurrentFrameRate"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void SetCurrentFrameRate(int newFps) => Default.SetFrameRate(newFps);
 
     /// <summary>
-    ///     Returns the number of frames for <paramref name="milliseconds" />.
+    /// Reads the current frame rate value.
     /// </summary>
+    /// <seealso cref="CurrentFrameRate"/>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetTotalMillisecondFrames(double milliseconds) =>
-        Default.GetTotalMillisecondFrames(milliseconds);
-
-    /// <summary>
-    ///     Returns the number of frames for <paramref name="duration" />.
-    /// </summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int From(TimeSpan duration) => Default.GetFrames(duration);
-
-    /// <summary>
-    ///     Returns the number of frames for <paramref name="milliseconds" />.
-    /// </summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int FromMillisecond(double milliseconds) => Default.GetMillisecondFrames(milliseconds);
-
-    /// <summary>
-    ///     Returns the number of frames for <paramref name="seconds" />.
-    /// </summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int FromSeconds(double seconds) => Default.GetFrames(seconds);
-
-    /// <summary>Return one frame in seconds</summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double RateStepSeconds(int fps) => GetSeconds(1, fps);
-
-    /// <summary>Return one frame duration</summary>
-    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TimeSpan RateStep(int fps) => GetDuration(1, fps);
+    public static int GetCurrentFrameRate() => Default.FrameRate;
 
     /// <summary>
     ///     Returns <see cref="double" /> seconds for <paramref name="frameCount" /> at specified <paramref name="fps" />.
@@ -125,70 +94,280 @@ public static class FrameTime
     public static double GetSeconds(double frameCount, int fps) => frameCount / fps;
 
     /// <summary>
+    ///     Returns <see cref="double" /> seconds for <paramref name="frameCount" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double GetSeconds(double frameCount) => Default.GetSeconds(frameCount);
+
+    /// <summary>
     ///     Returns <see cref="double" /> seconds for <paramref name="frameCount" /> at specified <paramref name="fps" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double GetSeconds(int frameCount, int fps) => GetSeconds((double)frameCount, fps);
 
     /// <summary>
-    ///     Returns <see cref="double" /> seconds for <paramref name="frameCount" /> at specified <paramref name="fps" />.
+    ///     Returns <see cref="double" /> seconds for <paramref name="frameCount" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetMilliseconds(int frameCount, int fps) =>
-        GetSeconds(frameCount, fps) / 1000.0;
+    public static double GetSeconds(int frameCount) => Default.GetSeconds(frameCount);
+
+    /// <summary>
+    ///     Returns ticks for <paramref name="frameCount" /> at specified <paramref name="fps" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long GetTicks(int frameCount, int fps) => frameCount * TimeSpan.TicksPerSecond / fps;
+
+    /// <summary>
+    ///     Returns ticks for <paramref name="frameCount" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long GetTicks(int frameCount) => Default.GetTicks(frameCount);
+
+    /// <summary>
+    ///     Returns rounded ticks for <paramref name="frameCount" /> at specified <paramref name="fps" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long GetTicksRounded(int frameCount, int fps)
+    {
+        var ticks = frameCount * TimeSpan.TicksPerSecond;
+        var quotient = Math.DivRem(ticks, fps, out long remainder);
+        return quotient + (remainder > 0 ? 1 : 0);
+    }
 
     /// <summary>
     ///     Returns <see cref="System.TimeSpan" /> for <paramref name="frameCount" /> at specified <paramref name="fps" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TimeSpan GetDuration(int frameCount, int fps) =>
-        TimeSpan.FromSeconds(GetSeconds(frameCount, fps));
+    public static TimeSpan GetDuration(int frameCount, int fps) => TimeSpan.FromTicks(GetTicks(frameCount, fps));
 
     /// <summary>
-    ///     Returns the number of frames for <paramref name="milliseconds" /> at specified <paramref name="fps" />.
+    ///     Returns <see cref="System.TimeSpan" /> for <paramref name="frameCount" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetTotalMillisecondFrames(double milliseconds, int fps) =>
-        GetTotalFrames(milliseconds / 1000.0, fps);
+    public static TimeSpan GetDuration(int frameCount) => Default.GetDuration(frameCount);
+
+    /// <summary>
+    ///     Returns <see cref="double" /> milliseconds for <paramref name="frameCount" /> at specified <paramref name="fps" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double GetMilliseconds(double frameCount, int fps) => GetSeconds(frameCount, fps) * 1000.0;
+
+    /// <summary>
+    ///     Returns <see cref="double" /> milliseconds for <paramref name="frameCount" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double GetMilliseconds(double frameCount) => Default.GetMilliseconds(frameCount);
+
+    /// <summary>
+    ///     Returns <see cref="double" /> milliseconds for <paramref name="frameCount" /> at specified <paramref name="fps" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double GetMilliseconds(int frameCount, int fps) => GetMilliseconds((double)frameCount, fps);
+
+    /// <summary>
+    ///     Returns <see cref="double" /> milliseconds for <paramref name="frameCount" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double GetMilliseconds(int frameCount) => Default.GetMilliseconds(frameCount);
+
+    /// <summary>
+    ///     Returns the rounded <see cref="Stopwatch" /> timestamp for <paramref name="frame"/>.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long GetTimestamp(int frame, int fps)
+    {
+        var timestamp = frame * Stopwatch.Frequency;
+        var quotient = Math.DivRem(timestamp, fps, out long remainder);
+        return quotient + (remainder > 0 ? 1 : 0);
+    }
+
+    /// <summary>
+    ///     Returns the <see cref="Stopwatch" /> timestamp for <paramref name="frame"/>.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long GetTimestamp(int frame) => Default.GetTimestamp(frame);
+
+    /// <summary>
+    ///     Returns the <see cref="Stopwatch" /> timestamp for the number of <paramref name="frames"/> in the future.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long GetDeadlineTimestamp(int frames, int fps) =>
+        Stopwatch.GetTimestamp() + GetTimestamp(frames, fps);
+
+    /// <summary>
+    ///     Returns the <see cref="Stopwatch" /> timestamp for the number of <paramref name="frames"/> in the future.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long GetDeadlineTimestamp(int frames) => Default.GetDeadlineTimestamp(frames);
 
     /// <summary>
     ///     Returns the number of frames for <paramref name="seconds" /> at specified <paramref name="fps" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetTotalFrames(double seconds, int fps) => seconds * fps;
+    public static int FromSeconds(double seconds, int fps) => (int)FromSecondsTotal(seconds, fps);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="seconds" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int FromSeconds(double seconds) => Default.FromSeconds(seconds);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="ticks" /> at specified <paramref name="fps" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int FromTicks(long ticks, int fps) => (int)FromTicksTotal(ticks, fps);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="ticks" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int FromTicks(long ticks) => Default.FromTicks(ticks);
 
     /// <summary>
     ///     Returns the number of frames for <paramref name="duration" /> at specified <paramref name="fps" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double GetTotalFrames(TimeSpan duration, int fps) => GetTotalFrames(duration.TotalSeconds, fps);
+    public static int FromDuration(TimeSpan duration, int fps) => (int)FromDurationTotal(duration, fps);
 
     /// <summary>
-    ///     Returns the number of frames for <paramref name="seconds" /> at specified <paramref name="fps" />.
+    ///     Returns the number of frames for <paramref name="duration" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetFrames(double seconds, int fps) => (int)GetTotalFrames(seconds, fps);
+    public static int FromDuration(TimeSpan duration) => Default.FromDuration(duration);
 
     /// <summary>
     ///     Returns the number of frames for <paramref name="milliseconds" /> at specified <paramref name="fps" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetMillisecondFrames(double milliseconds, int fps) =>
-        (int)GetTotalMillisecondFrames(milliseconds, fps);
+    public static int FromMilliseconds(double milliseconds, int fps) => (int)FromMillisecondsTotal(milliseconds, fps);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="milliseconds" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int FromMilliseconds(double milliseconds) => Default.FromMilliseconds(milliseconds);
+
+    /// <summary>
+    ///     Returns the number of frames elapsed for the specified
+    ///     <see cref="Stopwatch"/> timestamp difference.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int FromTimestamp(long timestamp, int fps) =>
+        (int)(timestamp * ((double)fps / Stopwatch.Frequency));
+
+    /// <summary>
+    ///     Returns the number of frames elapsed for the specified
+    ///     <see cref="Stopwatch"/> timestamp difference.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int FromTimestamp(long timestamp) => Default.FromTimestamp(timestamp);
+
+    /// <summary>
+    ///     Returns the number of frames elapsed since the specified
+    ///     <see cref="Stopwatch"/> timestamp.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int FromElapsedTimestamp(long timestamp, int fps) =>
+        FromTimestamp(Stopwatch.GetTimestamp() - timestamp, fps);
+
+    /// <summary>
+    ///     Returns the number of frames elapsed since the specified
+    ///     <see cref="Stopwatch"/> timestamp.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int FromElapsedTimestamp(long timestamp) => Default.FromElapsedTimestamp(timestamp);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="seconds" /> at specified <paramref name="fps" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromSecondsTotal(double seconds, int fps) => seconds * fps;
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="seconds" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromSecondsTotal(double seconds) => Default.FromSecondsTotal(seconds);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="ticks" /> at specified <paramref name="fps" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromTicksTotal(long ticks, int fps) => ticks * ((double)fps / TimeSpan.TicksPerSecond);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="ticks" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromTicksTotal(long ticks) => Default.FromTicksTotal(ticks);
 
     /// <summary>
     ///     Returns the number of frames for <paramref name="duration" /> at specified <paramref name="fps" />.
     /// </summary>
     [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetFrames(TimeSpan duration, int fps) => (int)GetTotalFrames(duration, fps);
+    public static double FromDurationTotal(TimeSpan duration, int fps) => FromTicksTotal(duration.Ticks, fps);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="duration" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromDurationTotal(TimeSpan duration) => Default.FromDurationTotal(duration);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="milliseconds" /> at specified <paramref name="fps" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromMillisecondsTotal(double milliseconds, int fps) =>
+        FromSecondsTotal(milliseconds / 1000.0, fps);
+
+    /// <summary>
+    ///     Returns the number of frames for <paramref name="milliseconds" />.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromMillisecondsTotal(double milliseconds) => Default.FromMillisecondsTotal(milliseconds);
+
+    /// <summary>
+    ///     Returns the total number of frames elapsed for the specified <see cref="Stopwatch"/> timestamp.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromTimestampTotal(long timestamp, int fps) => timestamp * ((double)fps / Stopwatch.Frequency);
+
+    /// <summary>
+    ///     Returns the total number of frames elapsed for the specified <see cref="Stopwatch"/> timestamp.
+    /// </summary>
+    [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromTimestampTotal(long timestamp) => Default.FromTimestampTotal(timestamp);
+
+    /// <summary>
+    ///     Returns the total number of frames elapsed since the specified <see cref="Stopwatch"/> timestamp.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromElapsedTimestampTotal(long timestamp, int fps) =>
+        FromTimestampTotal(Stopwatch.GetTimestamp() - timestamp, fps);
+
+    /// <summary>
+    ///     Returns the total number of frames elapsed since the specified <see cref="Stopwatch"/> timestamp.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double FromElapsedTimestampTotal(long timestamp) => Default.FromElapsedTimestampTotal(timestamp);
 
     /// <summary>
     ///     Frame time calculator
     /// </summary>
     [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
-    public sealed class Fixed(int frameRate)
+    public sealed class Fixed
     {
-        int frameRate = frameRate;
+        int frameRate;
+
+        /// <summary>
+        ///     Frame time calculator
+        /// </summary>
+        public Fixed(int frameRate)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(frameRate);
+            this.frameRate = frameRate;
+        }
 
         /// <summary>
         ///     Used frame rate.
@@ -196,17 +375,31 @@ public static class FrameTime
         public int FrameRate => frameRate;
 
         /// <summary>Return one frame in seconds</summary>
-        public double One
+        public double FrameSeconds
         {
             [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => RateStepSeconds(frameRate);
+            get => GetSeconds(1);
+        }
+
+        /// <summary>Return one frame in ticks</summary>
+        public long FrameTicks
+        {
+            [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => GetTicks(1);
         }
 
         /// <summary>Return one frame duration</summary>
-        public TimeSpan Step
+        public TimeSpan FrameDuration
         {
             [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => RateStep(frameRate);
+            get => GetDuration(1);
+        }
+
+        /// <summary>Return one frame in milliseconds</summary>
+        public double FrameMilliseconds
+        {
+            [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => GetMilliseconds(1);
         }
 
         /// <summary>
@@ -231,54 +424,107 @@ public static class FrameTime
         public double GetSeconds(double frameCount) => FrameTime.GetSeconds(frameCount, frameRate);
 
         /// <summary>
-        ///     Returns <see cref="double" /> seconds for <paramref name="frameCount" />.
+        ///     Returns ticks for <paramref name="frameCount" />.
+        /// </summary>
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public long GetTicks(int frameCount) => FrameTime.GetTicks(frameCount, frameRate);
+
+        /// <summary>
+        ///     Returns <see cref="System.TimeSpan" /> for <paramref name="frameCount" />.
+        /// </summary>
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TimeSpan GetDuration(int frameCount) => FrameTime.GetDuration(frameCount, frameRate);
+
+        /// <summary>
+        ///     Returns <see cref="double" /> milliseconds for <paramref name="frameCount" />.
         /// </summary>
         [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double GetMilliseconds(int frameCount) => FrameTime.GetMilliseconds(frameCount, frameRate);
 
         /// <summary>
-        ///     Returns <see cref="System.TimeSpan" /> for <paramref name="frameCount" />.
+        ///     Returns <see cref="double" /> milliseconds for <paramref name="frameCount" />.
         /// </summary>
-        [Pure]
-        public TimeSpan GetDuration(int frameCount) => FrameTime.GetDuration(frameCount, frameRate);
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double GetMilliseconds(double frameCount) => FrameTime.GetMilliseconds(frameCount, frameRate);
+
+        /// <summary>
+        ///     Returns the <see cref="Stopwatch" /> timestamp for frame <paramref name="frame"/>.
+        /// </summary>
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public long GetTimestamp(int frame) => FrameTime.GetTimestamp(frame, frameRate);
+
+        /// <summary>
+        ///     Returns the <see cref="Stopwatch" /> timestamp for frame <paramref name="frame"/>.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public long GetDeadlineTimestamp(int frame) => FrameTime.GetDeadlineTimestamp(frame, frameRate);
 
         /// <summary>
         ///     Returns the number of frames for <paramref name="seconds" />.
         /// </summary>
         [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double GetTotalFrames(double seconds) => FrameTime.GetTotalFrames(seconds, frameRate);
+        public int FromSeconds(double seconds) => FrameTime.FromSeconds(seconds, frameRate);
+
+        /// <summary>
+        ///     Returns the number of frames for <paramref name="ticks" />.
+        /// </summary>
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int FromTicks(long ticks) => FrameTime.FromTicks(ticks, frameRate);
 
         /// <summary>
         ///     Returns the number of frames for <paramref name="duration" />.
         /// </summary>
         [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double GetTotalFrames(TimeSpan duration) => FrameTime.GetTotalFrames(duration, frameRate);
+        public int FromDuration(TimeSpan duration) => FrameTime.FromDuration(duration, frameRate);
+
+        /// <inheritdoc cref="FrameTime.FromTimestamp(long, int)"/>
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int FromTimestamp(long timestamp) => FrameTime.FromTimestamp(timestamp, frameRate);
+
+        /// <inheritdoc cref="FrameTime.FromElapsedTimestamp(long, int)"/>
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int FromElapsedTimestamp(long timestamp) => FrameTime.FromElapsedTimestamp(timestamp, frameRate);
+
+        /// <summary>
+        ///     Returns the number of frames for <paramref name="milliseconds" />.
+        /// </summary>
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int FromMilliseconds(double milliseconds) =>
+            FrameTime.FromMilliseconds(milliseconds, frameRate);
+
+        /// <summary>
+        ///     Returns the number of frames for <paramref name="milliseconds" />.
+        /// </summary>
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double FromMillisecondsTotal(double milliseconds) =>
+            FrameTime.FromMillisecondsTotal(milliseconds, frameRate);
 
         /// <summary>
         ///     Returns the number of frames for <paramref name="seconds" />.
         /// </summary>
         [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetFrames(double seconds) => FrameTime.GetFrames(seconds, frameRate);
+        public double FromSecondsTotal(double seconds) => FrameTime.FromSecondsTotal(seconds, frameRate);
+
+        /// <summary>
+        ///     Returns the number of frames for <paramref name="ticks" />.
+        /// </summary>
+        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double FromTicksTotal(long ticks) => FrameTime.FromTicksTotal(ticks, frameRate);
 
         /// <summary>
         ///     Returns the number of frames for <paramref name="duration" />.
         /// </summary>
         [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetFrames(TimeSpan duration) => FrameTime.GetFrames(duration, frameRate);
+        public double FromDurationTotal(TimeSpan duration) => FrameTime.FromDurationTotal(duration, frameRate);
 
-        /// <summary>
-        ///     Returns the number of frames for <paramref name="milliseconds" />.
-        /// </summary>
+        /// <inheritdoc cref="FrameTime.FromTimestampTotal(long, int)"/>
         [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetMillisecondFrames(double milliseconds) =>
-            FrameTime.GetMillisecondFrames(milliseconds, frameRate);
+        public double FromTimestampTotal(long timestamp) => FrameTime.FromTimestampTotal(timestamp, frameRate);
 
-        /// <summary>
-        ///     Returns the number of frames for <paramref name="milliseconds" />.
-        /// </summary>
-        [Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double GetTotalMillisecondFrames(double milliseconds) =>
-            FrameTime.GetTotalMillisecondFrames(milliseconds, frameRate);
+        /// <inheritdoc cref="FrameTime.FromElapsedTimestampTotal(long, int)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double FromElapsedTimestampTotal(long timestamp) =>
+            FrameTime.FromElapsedTimestampTotal(timestamp, frameRate);
     }
 }
 

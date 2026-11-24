@@ -32,6 +32,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo.png</PackageIcon>
+    <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <IsCSharp Condition=" '$(MSBuildProjectExtension)' == '.csproj' ">true</IsCSharp>
   </PropertyGroup>
 
@@ -40,12 +46,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>logo.png</PackageIcon>
-    <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

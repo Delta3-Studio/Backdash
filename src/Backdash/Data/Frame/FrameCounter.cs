@@ -49,13 +49,13 @@ public record struct FrameCounter : IUtf8SpanFormattable, ISpanFormattable, IBin
     public FrameCounter(int total) : this((FrameSpan)total) { }
 
     /// <inheritdoc />
-    public FrameCounter(TimeSpan current, TimeSpan total) : this(FrameSpan.From(current), FrameSpan.From(total)) { }
+    public FrameCounter(TimeSpan current, TimeSpan total) : this(FrameSpan.FromDuration(current), FrameSpan.FromDuration(total)) { }
 
     /// <inheritdoc />
-    public FrameCounter(TimeSpan total) : this(FrameSpan.From(total)) { }
+    public FrameCounter(TimeSpan total) : this(FrameSpan.FromDuration(total)) { }
 
     /// <summary>Get the current frame</summary>
-    public readonly Frame Current => elapsedFrames.Last;
+    public readonly Frame Current => elapsedFrames.ToFrame();
 
     /// <summary>Get remaining frames to total</summary>
     public readonly FrameSpan Remaining => totalFrames - elapsedFrames;
@@ -83,7 +83,7 @@ public record struct FrameCounter : IUtf8SpanFormattable, ISpanFormattable, IBin
     public void SetElapsed(int frames) => SetElapsed((FrameSpan)frames);
 
     /// <inheritdoc cref="SetElapsed(FrameSpan)"/>
-    public void SetElapsed(TimeSpan duration) => SetElapsed(FrameSpan.From(duration));
+    public void SetElapsed(TimeSpan duration) => SetElapsed(FrameSpan.FromDuration(duration));
 
     /// <summary>Set the total frames</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -101,7 +101,7 @@ public record struct FrameCounter : IUtf8SpanFormattable, ISpanFormattable, IBin
     public void SetTotal(int frames) => SetTotal((FrameSpan)frames);
 
     /// <inheritdoc cref="SetTotal(FrameSpan)"/>
-    public void SetTotal(TimeSpan duration) => SetTotal(FrameSpan.From(duration));
+    public void SetTotal(TimeSpan duration) => SetTotal(FrameSpan.FromDuration(duration));
 
     /// <summary>Advance elapsed counter by 1 frame</summary>
     public void Advance() => SetElapsed(elapsedFrames + FrameSpan.One);
@@ -116,7 +116,7 @@ public record struct FrameCounter : IUtf8SpanFormattable, ISpanFormattable, IBin
     public void Advance(Frame frame) => SetElapsed(elapsedFrames + frame);
 
     /// <inheritdoc cref="Advance(FrameSpan)"/>
-    public void Advance(TimeSpan duration) => SetElapsed(elapsedFrames + FrameSpan.From(duration));
+    public void Advance(TimeSpan duration) => SetElapsed(elapsedFrames + FrameSpan.FromDuration(duration));
 
     /// <summary>Go back elapsed counter by 1 frame</summary>
     public void Recede() => SetElapsed(elapsedFrames - FrameSpan.One);
@@ -131,7 +131,7 @@ public record struct FrameCounter : IUtf8SpanFormattable, ISpanFormattable, IBin
     public void Recede(Frame frame) => SetElapsed(elapsedFrames - frame);
 
     /// <inheritdoc cref="Recede(FrameSpan)"/>
-    public void Recede(TimeSpan duration) => SetElapsed(elapsedFrames - FrameSpan.From(duration));
+    public void Recede(TimeSpan duration) => SetElapsed(elapsedFrames - FrameSpan.FromDuration(duration));
 
     /// <summary>Deconstructor</summary>
     public readonly void Deconstruct(out FrameSpan elapsed, out FrameSpan total)
