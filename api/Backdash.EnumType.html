@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class EnumType | Backdash Netcode </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class EnumType | Backdash Netcode ">
+      
+      <meta name="description" content="Enum type helpers">
+      <link rel="icon" href="../docs/images/favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../docs/images/logo.png" alt="Backdash">
+            Backdash
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Backdash.EnumType">
+
+
+
+  <h1 id="Backdash_EnumType" data-uid="Backdash.EnumType" class="text-break">
+Class EnumType  
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Backdash.html">Backdash</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Backdash.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Enum type helpers</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class EnumType</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">EnumType</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Backdash_EnumType_FromTypeCode_" data-uid="Backdash.EnumType.FromTypeCode*"></a>
+
+  <h3 id="Backdash_EnumType_FromTypeCode_System_TypeCode_" data-uid="Backdash.EnumType.FromTypeCode(System.TypeCode)">
+  FromTypeCode(TypeCode)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts from <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.typecode">TypeCode</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static EnumTypeCode FromTypeCode(TypeCode value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.typecode">TypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>If the value is not a convertable <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.typecode">TypeCode</a>.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Backdash_EnumType_GetEnumTypeCode_" data-uid="Backdash.EnumType.GetEnumTypeCode*"></a>
+
+  <h3 id="Backdash_EnumType_GetEnumTypeCode_System_Type_" data-uid="Backdash.EnumType.GetEnumTypeCode(System.Type)">
+  GetEnumTypeCode(Type)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the underlying enum type code for the type <code class="paramref">type</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static EnumTypeCode? GetEnumTypeCode(Type type)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>type</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a>?</dt>
+    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> if the requested type is not an enum type</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_GetEnumTypeCode_" data-uid="Backdash.EnumType.GetEnumTypeCode*"></a>
+
+  <h3 id="Backdash_EnumType_GetEnumTypeCode__1" data-uid="Backdash.EnumType.GetEnumTypeCode``1">
+  GetEnumTypeCode&lt;TEnum&gt;()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the underlying enum type code of the enumeration <code class="typeparamref">TEnum</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static EnumTypeCode GetEnumTypeCode&lt;TEnum&gt;() where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_GetSize_" data-uid="Backdash.EnumType.GetSize*"></a>
+
+  <h3 id="Backdash_EnumType_GetSize__1" data-uid="Backdash.EnumType.GetSize``1">
+  GetSize&lt;TEnum&gt;()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the underlying type size in bytes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int GetSize&lt;TEnum&gt;() where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_GetUnderlyingType_" data-uid="Backdash.EnumType.GetUnderlyingType*"></a>
+
+  <h3 id="Backdash_EnumType_GetUnderlyingType__1" data-uid="Backdash.EnumType.GetUnderlyingType``1">
+  GetUnderlyingType&lt;TEnum&gt;()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Underlying type of the enumeration <code class="typeparamref">TEnum</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Type GetUnderlyingType&lt;TEnum&gt;() where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_IsInt32Compatible_" data-uid="Backdash.EnumType.IsInt32Compatible*"></a>
+
+  <h3 id="Backdash_EnumType_IsInt32Compatible_Backdash_EnumTypeCode_" data-uid="Backdash.EnumType.IsInt32Compatible(Backdash.EnumTypeCode)">
+  IsInt32Compatible(EnumTypeCode)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the underlying type is 32-bit or smaller.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsInt32Compatible(this EnumTypeCode value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_IsInt32Compatible_" data-uid="Backdash.EnumType.IsInt32Compatible*"></a>
+
+  <h3 id="Backdash_EnumType_IsInt32Compatible__1" data-uid="Backdash.EnumType.IsInt32Compatible``1">
+  IsInt32Compatible&lt;TEnum&gt;()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the underlying type is 32-bit or smaller.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsInt32Compatible&lt;TEnum&gt;() where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_IsSigned_" data-uid="Backdash.EnumType.IsSigned*"></a>
+
+  <h3 id="Backdash_EnumType_IsSigned_Backdash_EnumTypeCode_" data-uid="Backdash.EnumType.IsSigned(Backdash.EnumTypeCode)">
+  IsSigned(EnumTypeCode)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the underlying type is signed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsSigned(this EnumTypeCode value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_IsSigned_" data-uid="Backdash.EnumType.IsSigned*"></a>
+
+  <h3 id="Backdash_EnumType_IsSigned__1" data-uid="Backdash.EnumType.IsSigned``1">
+  IsSigned&lt;TEnum&gt;()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the underlying type is signed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsSigned&lt;TEnum&gt;() where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_IsUnsigned_" data-uid="Backdash.EnumType.IsUnsigned*"></a>
+
+  <h3 id="Backdash_EnumType_IsUnsigned_Backdash_EnumTypeCode_" data-uid="Backdash.EnumType.IsUnsigned(Backdash.EnumTypeCode)">
+  IsUnsigned(EnumTypeCode)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the underlying type is unsigned.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsUnsigned(this EnumTypeCode value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_IsUnsigned_" data-uid="Backdash.EnumType.IsUnsigned*"></a>
+
+  <h3 id="Backdash_EnumType_IsUnsigned__1" data-uid="Backdash.EnumType.IsUnsigned``1">
+  IsUnsigned&lt;TEnum&gt;()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns true if the underlying type is unsigned.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsUnsigned&lt;TEnum&gt;() where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_Size_" data-uid="Backdash.EnumType.Size*"></a>
+
+  <h3 id="Backdash_EnumType_Size_Backdash_EnumTypeCode_" data-uid="Backdash.EnumType.Size(Backdash.EnumTypeCode)">
+  Size(EnumTypeCode)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the underlying type size in bytes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Size(this EnumTypeCode value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_ToInt32_" data-uid="Backdash.EnumType.ToInt32*"></a>
+
+  <h3 id="Backdash_EnumType_ToInt32__1___0_" data-uid="Backdash.EnumType.ToInt32``1(``0)">
+  ToInt32&lt;TEnum&gt;(TEnum)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts the specified value to a 32-bit signed integer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int ToInt32&lt;TEnum&gt;(TEnum value) where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <span class="xref">TEnum</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_ToInt64_" data-uid="Backdash.EnumType.ToInt64*"></a>
+
+  <h3 id="Backdash_EnumType_ToInt64__1___0_" data-uid="Backdash.EnumType.ToInt64``1(``0)">
+  ToInt64&lt;TEnum&gt;(TEnum)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts the specified value to a 64-bit signed integer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static long ToInt64&lt;TEnum&gt;(TEnum value) where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <span class="xref">TEnum</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_ToTypeCode_" data-uid="Backdash.EnumType.ToTypeCode*"></a>
+
+  <h3 id="Backdash_EnumType_ToTypeCode_Backdash_EnumTypeCode_" data-uid="Backdash.EnumType.ToTypeCode(Backdash.EnumTypeCode)">
+  ToTypeCode(EnumTypeCode)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.typecode">TypeCode</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TypeCode ToTypeCode(EnumTypeCode value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.typecode">TypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_ToUInt32_" data-uid="Backdash.EnumType.ToUInt32*"></a>
+
+  <h3 id="Backdash_EnumType_ToUInt32__1___0_" data-uid="Backdash.EnumType.ToUInt32``1(``0)">
+  ToUInt32&lt;TEnum&gt;(TEnum)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts the specified value to a 32-bit unsigned integer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static uint ToUInt32&lt;TEnum&gt;(TEnum value) where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <span class="xref">TEnum</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint32">uint</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_ToUInt64_" data-uid="Backdash.EnumType.ToUInt64*"></a>
+
+  <h3 id="Backdash_EnumType_ToUInt64__1___0_" data-uid="Backdash.EnumType.ToUInt64``1(``0)">
+  ToUInt64&lt;TEnum&gt;(TEnum)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts the specified value to a 64-bit unsigned integer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ulong ToUInt64&lt;TEnum&gt;(TEnum value) where TEnum : unmanaged, Enum</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <span class="xref">TEnum</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint64">ulong</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TEnum</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Backdash_EnumType_TryFromTypeCode_" data-uid="Backdash.EnumType.TryFromTypeCode*"></a>
+
+  <h3 id="Backdash_EnumType_TryFromTypeCode_System_TypeCode_Backdash_EnumTypeCode__" data-uid="Backdash.EnumType.TryFromTypeCode(System.TypeCode,Backdash.EnumTypeCode@)">
+  TryFromTypeCode(TypeCode, out EnumTypeCode)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Attempts to convert a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.typecode">TypeCode</a> to an <a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryFromTypeCode(TypeCode value, out EnumTypeCode result)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.typecode">TypeCode</a></dt>
+    <dd></dd>
+    <dt><code>result</code> <a class="xref" href="Backdash.EnumTypeCode.html">EnumTypeCode</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Developed by <a href="http://delta3.studio/">Delta3</a> and <a href="https://lucasteles.dev/">Lucas Teles</a>.</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
